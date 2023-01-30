@@ -14,9 +14,9 @@ required_pypi = [
     'dict_hash', # required for caching
     'transformers',
     'torch',
+    'imodelsx',
 
     'datasets', # optional, required for getting NLP datasets
-    'imodels', # optional, required for getting tabular datasets / interpretable modeling
     'pytest', # optional, required for running tests
 ]
 

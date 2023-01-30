@@ -1,4 +1,4 @@
-This is an evolving repo optimized for machine-learning projects aimed at designing a new algorithm. They require sweeping over different hyperparameters, comparing to baselines, and iteratively refining an algorithm. Based of [cookiecutter-data-science](https://github.com/drivendata/cookiecutter-data-science).
+This is an evolving repo optimized for machine-learning projects aimed at designing a new algorithm. They require sweeping over different hyperparameters, comparing to baselines, and iteratively refining an algorithm.
 
 # Organization
 - `mprompt`: contains main code for modeling (e.g. model architecture)
@@ -34,3 +34,7 @@ This is an evolving repo optimized for machine-learning projects aimed at design
 - Keep updated requirements in setup.py
 - Follow sklearn apis whenever possible
 - Use Huggingface whenever possible, then pytorch
+
+# Reference
+- see fMRI stuff in https://github.com/csinva/fmri
+- see template at https://github.com/csinva/cookiecutter-ml-research
