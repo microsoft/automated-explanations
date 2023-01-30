@@ -11,8 +11,8 @@ import pickle as pkl
 import imodels
 import inspect
 
-import project_name.model
-import project_name.data
+import mprompt.model
+import mprompt.data
 import cache_save_utils
 
 
@@ -103,20 +103,15 @@ if __name__ == '__main__':
     # torch.manual_seed(args.seed)
 
     # load text data
-    dset, dataset_key_text = project_name.data.load_huggingface_dataset(
+    dset, dataset_key_text = mprompt.data.load_huggingface_dataset(
         dataset_name=args.dataset_name, subsample_frac=args.subsample_frac)
-    X_train, X_test, y_train, y_test, feature_names = project_name.data.convert_text_data_to_counts_array(
+    X_train, X_test, y_train, y_test, feature_names = mprompt.data.convert_text_data_to_counts_array(
         dset, dataset_key_text)    
-
-    # load tabular data
-    # https://csinva.io/imodels/util/data_util.html#imodels.util.data_util.get_clean_dataset
-    # X_train, X_test, y_train, y_test, feature_names = imodels.get_clean_dataset('compas_two_year_clean', data_source='imodels', test_size=0.33)
-
 
     X_train, X_cv, y_train, y_cv = train_test_split(X_train, y_train, test_size=0.33, random_state=args.seed)    
 
     # load model
-    model = project_name.model.get_model(args)
+    model = mprompt.model.get_model(args)
 
     # set up saving dictionary + save params file
     r = defaultdict(list)

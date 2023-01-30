@@ -3,6 +3,8 @@ scikit-learn
 pandas
 tqdm
 dict_hash # required for caching
+transformers
+torch
 
 datasets # optional, required for getting NLP datasets
 imodels # optional, required for getting tabular datasets / interpretable modeling

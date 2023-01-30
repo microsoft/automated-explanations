@@ -12,6 +12,8 @@ required_pypi = [
     'pandas',
     'tqdm',
     'dict_hash', # required for caching
+    'transformers',
+    'torch',
 
     'datasets', # optional, required for getting NLP datasets
     'imodels', # optional, required for getting tabular datasets / interpretable modeling
@@ -19,14 +21,14 @@ required_pypi = [
 ]
 
 setuptools.setup(
-    name="project_name",
+    name="mprompt",
     version="0.01",
     author="Microsoft Research",
     author_email="",
     description="",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/csinva/cookiecutter-ml-research",
+    url="https://github.com/csinva/module-prompt",
     packages=setuptools.find_packages(
         exclude=['tests', 'tests.*', '*.test.*']
     ),
