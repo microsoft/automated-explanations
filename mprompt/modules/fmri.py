@@ -5,12 +5,12 @@ from transformers import pipeline
 import numpy as np
 from tqdm import tqdm
 import sklearn.preprocessing
-from os.path import dirname, join
-import os.path
 from spacy.lang.en import English
 import imodelsx
 import imodelsx.util
 import pickle as pkl
+from os.path import dirname, join
+import os.path
 modules_dir = dirname(os.path.abspath(__file__))
 
 
@@ -32,11 +32,14 @@ class fMRIModule():
         self.ndel = 4
 
         # load weights
-        self.weights = pkl.load(open(join(self.save_dir_fmri, 'weights.pkl'), 'rb'))
+        self.weights = pkl.load(
+            open(join(self.save_dir_fmri, 'weights.pkl'), 'rb'))
 
         # load test corrs for each voxel
-        self.preproc = pkl.load(open(join(self.save_dir_fmri, 'preproc.pkl'), 'rb'))
-        self.corrs = np.sort(np.load(join(self.save_dir_fmri, 'corrs.npz'))['arr_0'])
+        self.preproc = pkl.load(
+            open(join(self.save_dir_fmri, 'preproc.pkl'), 'rb'))
+        self.corrs = np.sort(
+            np.load(join(self.save_dir_fmri, 'corrs.npz'))['arr_0'])
 
     def __call__(self, X: List[str]) -> np.ndarray:
         """Returns a scalar continuous response for each element of X
@@ -54,32 +57,17 @@ class fMRIModule():
         pred_voxel = preds_fMRI[:, self.voxel_num_best]
         return pred_voxel
 
-
-def save_mini_weights(num_top=1000, save_dir='fmri'):
-    """Call this once to save only the weights for the top voxels
-    (All voxels is too big)
-    Requires the full file weights.npz
-    """
-    # load weights
-    weights_npz = np.load(join(save_dir, 'weights.npz'))
-    weights = weights_npz['arr_0']
-    weights = weights.reshape(4, -1, 768)
-    # mean over delays dimension...
-    weights = weights.mean(axis=0).squeeze()
-    weights = weights.T  # make it (768, n_outputs)
-
-    # load corrs
-    corrs_val = np.load(join(save_dir, 'corrs.npz'))['arr_0']
-    top_idxs = np.argsort(corrs_val)[::-1]
-
-    # save top weights only
-    weights = weights[:, top_idxs[:num_top]]
-    pkl.dump(weights, open(join(save_dir, 'weights.pkl'), 'wb'))
+    def get_relevant_data(self) -> List[str]:
+        """read in full text of 26 narrative stories
+        """
+        with open(join(self.save_dir_fmri, 'narrative_stories.txt'), 'r') as f:
+            narrative_stories = f.readlines()
+        return narrative_stories
 
 
 if __name__ == '__main__':
-    # save_mini_weights()
     mod = fMRIModule()
-    X = ['I like to eat pizza', 'I like to eat pasta']
-    resp = mod(X)
+    X = mod.get_relevant_data()
+    print(X[0][:50])
+    resp = mod(X[:3])
     print(resp)

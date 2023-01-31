@@ -8,11 +8,10 @@ import numpy as np
 from sklearn.metrics import accuracy_score, roc_auc_score
 from sklearn.model_selection import train_test_split
 import pickle as pkl
-import imodels
+import imodelsx
 import inspect
 
 import mprompt.algo.model
-import mprompt.data.text
 import cache_save_utils
 
 
@@ -103,9 +102,9 @@ if __name__ == '__main__':
     # torch.manual_seed(args.seed)
 
     # load text data
-    dset, dataset_key_text = mprompt.data.text.load_huggingface_dataset(
+    dset, dataset_key_text = imodelsx.data.load_huggingface_dataset(
         dataset_name=args.dataset_name, subsample_frac=args.subsample_frac)
-    X_train, X_test, y_train, y_test, feature_names = mprompt.data.text.convert_text_data_to_counts_array(
+    X_train, X_test, y_train, y_test, feature_names = imodelsx.data.convert_text_data_to_counts_array(
         dset, dataset_key_text)    
 
     X_train, X_cv, y_train, y_cv = train_test_split(X_train, y_train, test_size=0.33, random_state=args.seed)    
