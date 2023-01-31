@@ -9,34 +9,10 @@ from sklearn.metrics import accuracy_score, roc_auc_score
 from sklearn.model_selection import train_test_split
 import pickle as pkl
 import imodelsx
-import inspect
-
-import mprompt.algo.model
+import torch
+import mprompt.modules.fmri
+import mprompt.methods.ngrams
 import cache_save_utils
-
-
-def fit_model(model, X_train, y_train, feature_names, r):
-    # fit the model
-    fit_parameters = inspect.signature(model.fit).parameters.keys()
-    if 'feature_names' in fit_parameters and feature_names is not None:
-        model.fit(X_train, y_train, feature_names=feature_names)
-    else:
-        model.fit(X_train, y_train)
-
-    return r, model
-
-def evaluate_model(model, X_train, X_cv, X_test, y_train, y_cv, y_test, r):
-    """Evaluate model performance on each split
-    """
-    metrics = {
-        'accuracy': accuracy_score,
-    }
-    for split_name, (X_, y_) in zip(['train', 'cv', 'test'], [(X_train, y_train), (X_cv, y_cv), (X_test, y_test)]):
-        y_pred_ = model.predict(X_)
-        for metric_name, metric_fn in metrics.items():
-            r[f'{metric_name}_{split_name}'] = metric_fn(y_, y_pred_)
-        
-    return r
 
 # initialize args
 def add_main_args(parser):
@@ -45,8 +21,6 @@ def add_main_args(parser):
     """
 
     # dataset args
-    parser.add_argument('--dataset_name', type=str,
-                        default='rotten_tomatoes', help='name of dataset')
     parser.add_argument('--subsample_frac', type=float,
                         default=1, help='fraction of samples to use')
 
@@ -56,17 +30,20 @@ def add_main_args(parser):
     parser.add_argument('--save_dir', type=str, default='results',
                         help='directory for saving')
 
-    # model args
-    parser.add_argument('--model_name', type=str, choices=['decision_tree', 'ridge'],
-                        default='decision_tree', help='name of model')
-    parser.add_argument('--alpha', type=float, default=1,
-                        help='regularization strength')
-    parser.add_argument('--max_depth', type=int,
-                        default=2, help='max depth of tree')
+    # module args
+    parser.add_argument('--module_name', type=str,
+                        default='fmri', help='name of module', choices=['fmri'])
+    parser.add_argument('--module_num', type=int,
+                        default=0, help='number of module to select')
+
+
+    # algo args
+    parser.add_argument('--method_name', type=str, choices=['ngrams'],
+                        default='ngrams', help='name of algo for explanation')
     return parser
 
 def add_computational_args(parser):
-    """Arguments that only affect computation and not the results (shouldnt use when checking cache)
+    """Arguments that only affect computation and not the results (shouldn't use when checking cache)
     """
     parser.add_argument('--use_cache', type=int, default=1, choices=[0, 1],
                         help='whether to check for cache')
@@ -99,18 +76,15 @@ if __name__ == '__main__':
     # set seed
     np.random.seed(args.seed)
     random.seed(args.seed)
-    # torch.manual_seed(args.seed)
+    torch.manual_seed(args.seed)
+
+    # load module to interpret
+    if args.module_name == 'fmri':
+        mod = mprompt.modules.fmri.fMRIModule(voxel_num_best=args.module_num)    
 
     # load text data
-    dset, dataset_key_text = imodelsx.data.load_huggingface_dataset(
-        dataset_name=args.dataset_name, subsample_frac=args.subsample_frac)
-    X_train, X_test, y_train, y_test, feature_names = imodelsx.data.convert_text_data_to_counts_array(
-        dset, dataset_key_text)    
-
-    X_train, X_cv, y_train, y_cv = train_test_split(X_train, y_train, test_size=0.33, random_state=args.seed)    
-
-    # load model
-    model = mprompt.algo.model.get_model(args)
+    text_str_list = mod.get_relevant_data()
+    text_str_list = text_str_list[:int(len(text_str_list) * args.subsample_frac)] # note: this isn't shuffling!
 
     # set up saving dictionary + save params file
     r = defaultdict(list)
@@ -119,13 +93,16 @@ if __name__ == '__main__':
     cache_save_utils.save_json(
         args=args, save_dir=save_dir_unique, fname='params.json', r=r)
 
-    # fit
-    r, model = fit_model(model, X_train, y_train, feature_names, r)
+    # explain with method
+    explanation = mprompt.methods.ngrams.explain_ngrams(text_str_list, mod)
+    r['explanation_init'] = explanation
+
+    # r, model = fit_model(model, X_train, y_train, feature_names, r)
     
     # evaluate
-    r = evaluate_model(model, X_train, X_cv, X_test, y_train, y_cv, y_test, r)
+    # r = evaluate_model(model, X_train, X_cv, X_test, y_train, y_cv, y_test, r)
 
     # save results
     pkl.dump(r, open(join(save_dir_unique, 'results.pkl'), 'wb'))
-    pkl.dump(model, open(join(save_dir_unique, 'model.pkl'), 'wb'))
+    # pkl.dump(model, open(join(save_dir_unique, 'model.pkl'), 'wb'))
     logging.info('Succesfully completed :)\n\n')
