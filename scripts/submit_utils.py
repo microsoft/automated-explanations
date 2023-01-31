@@ -82,6 +82,8 @@ def get_args_list(
         for i in range(len(v))]
         for k_tup, v in params_coupled_dict.items()
     ]
+    if coupled_combos_dict_list == []:
+        return shared_combos_dict_list
 
     # Combine each coupled List[Dict] with the shared List[Dict]
     combined_combos_dict_list = [
