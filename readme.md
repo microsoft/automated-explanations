@@ -11,6 +11,8 @@ This is an evolving repo optimized for machine-learning projects aimed at design
 - first, rename `mprompt` to your project name and modify `setup.py` accordingly
 - clone and run `pip install -e .`, resulting in a package named `project_name` that can be imported
     - see `setup.py` for dependencies, not all are required
+- install imodelsx from source (I'm currently moving some of the code here to `imodelsx`), it's worth having the most up-to-date version and potentiall making changes there
+    - `git clone https://github.com/csinva/imodelsX.git` then `cd imodelsX` and `pip install -e .`
 - example run: run `python scripts/01_train_basic_models.py` (which calls `experiments/01_train_model.py` then view the results in `notebooks/01_model_results.ipynb`
 - keep tests upated and run using `pytest`
 
