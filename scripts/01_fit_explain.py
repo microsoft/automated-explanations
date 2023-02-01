@@ -8,8 +8,9 @@ repo_dir = dirname(dirname(os.path.abspath(__file__)))
 
 # List of values to sweep over (sweeps over all combinations of these)
 params_shared_dict = {
-    'seed': [1, 2],
-    'save_dir': [join('/home/chansingh/mntv1', 'mprompt', 'jan30')],
+    'seed': [1],
+    # 'save_dir': [join('/home/chansingh/mntv1', 'mprompt', 'jan30')],
+    'save_dir': [join('/home/chansingh/mprompt/results/', 'jan31')],
     'use_cache': [1], # pass binary values with 0/1 instead of the ambiguous strings True/False
     'subsample_frac': [1],
     'module_num': list(range(50)),
