@@ -27,7 +27,7 @@ def add_main_args(parser):
     # training misc args
     parser.add_argument('--seed', type=int, default=1,
                         help='random seed')
-    parser.add_argument('--save_dir', type=str, default='results',
+    parser.add_argument('--save_dir', type=str, default='results/tmp',
                         help='directory for saving')
 
     # module args
