@@ -11,6 +11,11 @@ from langchain.cache import InMemoryCache
 from transformers import T5Tokenizer, T5ForConditionalGeneration
 langchain.llm_cache = InMemoryCache()
 
+def get_llm(checkpoint='openai'):
+    if checkpoint == 'openai':
+        return llm_openai()
+    else:
+        return llm_hf(checkpoint)
 
 def llm_openai() -> LLM:
     from langchain.llms import OpenAI
@@ -20,8 +25,7 @@ def llm_openai() -> LLM:
         # stop='.',
     )
 
-
-def llm_flan(checkpoint='google/flan-t5-xl') -> LLM:
+def llm_hf(checkpoint='google/flan-t5-xl') -> LLM:
     class LLM_HF(LLM):
         # langchain forces us to initialize stuff in this kind of weird way
         _checkpoint: str = checkpoint
@@ -52,44 +56,7 @@ def llm_flan(checkpoint='google/flan-t5-xl') -> LLM:
     return LLM_HF()
 
 
-def summarize_ngrams(
-    llm: LLM,
-    ngrams_list: List[str],
-    prefix_str='Here is a list of phrases:',
-    suffix_str='What is a common theme among these phrases?\nThe common theme among these phrases is',
-    num_ngrams: int = 40,
-    seed: int = 0,
-):
-    """Refine a keyphrase by making a call to the llm
-    """
-    bullet_list_ngrams = '- ' + '\n- '.join(ngrams_list[:num_ngrams])
-    prompt = prefix_str + '\n\n' + bullet_list_ngrams + '\n\n' + suffix_str
-    print(prompt)
-    summary = llm(prompt)
-
-    # clean up summary
-    summary = summary.strip()
-    # if summary.startswith('that'):
-
-    return summary
-
-    '''
-    # clean up the keyphrases
-    # (split the string s on any numeric character)
-    ks = [
-        k.replace('.', '').strip()
-        for k in re.split(r'\d', refined_keyphrase) if k.strip()
-    ]
-
-    ks = list(set(ks))  # remove duplicates
-    ks = [k.lower() for k in ks if len(k) > 2]
-
-    pkl.dump(ks, open(cache_file, 'wb'))
-    return ks
-    '''
 
 
-if __name__ == '__main__':
-    llm = llm_flan(checkpoint='google/flan-t5-xxl')
-    summary = summarize_ngrams(llm, ['cat', 'dog', 'bird', 'elephant', 'cheetah'])
-    print('summary', repr(summary))
+
+

@@ -12,6 +12,8 @@ import imodelsx
 import torch
 import mprompt.modules.fmri
 import mprompt.methods.ngrams
+import mprompt.methods.llm
+import mprompt.methods.summarize
 import cache_save_utils
 
 # initialize args
@@ -23,6 +25,8 @@ def add_main_args(parser):
     # dataset args
     parser.add_argument('--subsample_frac', type=float,
                         default=1, help='fraction of samples to use')
+    parser.add_argument('--checkpoint', type=str,
+                        default='google/flan-t5-xxl', help='which llm to use for each step')
 
     # training misc args
     parser.add_argument('--seed', type=int, default=1,
@@ -40,6 +44,8 @@ def add_main_args(parser):
     # algo args
     parser.add_argument('--method_name', type=str, choices=['ngrams'],
                         default='ngrams', help='name of algo for explanation')
+    parser.add_argument('--num_summaries', type=int,
+                        default=2, help='number of summaries to start with')
     return parser
 
 def add_computational_args(parser):
@@ -94,8 +100,14 @@ if __name__ == '__main__':
         args=args, save_dir=save_dir_unique, fname='params.json', r=r)
 
     # explain with method
-    explanation = mprompt.methods.ngrams.explain_ngrams(text_str_list, mod)
-    r['explanation_init'] = explanation
+    explanation_init_ngrams = mprompt.methods.ngrams.explain_ngrams(text_str_list, mod)
+    r['explanation_init_ngrams'] = explanation_init_ngrams
+
+    # summarize the ngrams into some candidate strings
+    llm = mprompt.methods.llm.get_llm(args.checkpoint)
+    explanation_init_strs = mprompt.methods.summarize.summarize_ngrams(
+        llm, explanation_init_ngrams, num_summaries=args.num_summaries)
+    r['explanation_init_strs'] = explanation_init_strs
 
     # r, model = fit_model(model, X_train, y_train, feature_names, r)
     
