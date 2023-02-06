@@ -8,7 +8,7 @@ import pickle as pkl
 import langchain
 from langchain.llms.base import LLM
 from langchain.cache import InMemoryCache
-from transformers import AutoConfig, AutoModel, AutoTokenizer
+from transformers import AutoConfig, AutoModel, AutoTokenizer, AutoModelForCausalLM
 from transformers import T5Tokenizer, T5ForConditionalGeneration
 langchain.llm_cache = InMemoryCache()
 
@@ -26,18 +26,26 @@ def llm_openai() -> LLM:
         # stop='.',
     )
 
+def _get_tokenizer(checkpoint):
+    if 'facebook/opt' in checkpoint:
+        # opt can't use fast tokenizer...https://huggingface.co/docs/transformers/model_doc/opt
+        return AutoTokenizer.from_pretrained(checkpoint, use_fast=False)
+    else:
+        return AutoTokenizer.from_pretrained(checkpoint, use_fast=True)
+
 def llm_hf(checkpoint='google/flan-t5-xl') -> LLM:
     class LLM_HF(LLM):
         # langchain forces us to initialize stuff in this kind of weird way
         _checkpoint: str = checkpoint
         _max_tokens = 100
-        _tokenizer = AutoTokenizer.from_pretrained(_checkpoint)
-        _model = AutoModel.from_pretrained(
+        _tokenizer = _get_tokenizer(_checkpoint)
+        _model = AutoModelForCausalLM.from_pretrained(
             checkpoint, device_map="auto")
+
 
         @property
         def _llm_type(self) -> str:
-            return "custom"
+            return "custom_hf_llm_for_langchain"
 
         # langchain wants _call instead of __call__
         def _call(self, prompt: str, stop: Optional[List[str]] = None) -> str:
@@ -49,12 +57,13 @@ def llm_hf(checkpoint='google/flan-t5-xl') -> LLM:
                 input_ids, max_length=self._max_tokens)
             return self._tokenizer.decode(outputs[0])
 
-        def get_next_token_probs(self, prompt: str, token_name: str) -> float:
-            input_ids = self._tokenizer(
-                prompt, return_tensors="pt").input_ids.to("cuda")
-            outputs = self._model(input_ids)
-            print('outputs', outputs.keys())
-            return 0
+        def get_logit_for_target_token(self, prompt: str, target_token: str) -> float:
+            input_ids = self._tokenizer(prompt, return_tensors="pt").input_ids.to("cuda")
+            logits = self._model(input_ids)['logits']  # (batch_size, seq_len, vocab_size)
+            token_output_id = self._tokenizer.convert_tokens_to_ids(target_token)
+            logit_target = logits[0, -1, token_output_id]
+            # print(logit_target, 'id', token_output_id)
+            return logit_target.item()
 
         @property
         def _identifying_params(self) -> Mapping[str, Any]:
@@ -66,8 +75,20 @@ def llm_hf(checkpoint='google/flan-t5-xl') -> LLM:
 
 
 if __name__ == '__main__':
-    llm = llm_hf(checkpoint='facebook/opt-2.7b')
-    llm.get_next_token_probs('answer yes or no:', token_name='yes')
+    llm = llm_hf(checkpoint='facebook/opt-125m')
+    # print(prompt)
+    # print(answer)
+    for prompt in [
+        'Question: Is a cat an animal?\nAnswer:',
+        'Question: Is a dog an animal?\nAnswer:',
+        'Question: Is a cat a fruit?\nAnswer:',
+        'Question: Is a dog a fruit?\nAnswer:',
+    ]:
+        target_token = 'Yes.'
+        answer = llm(prompt)
+        logit_target = llm.get_logit_for_target_token(prompt, target_token=target_token)
+        print(prompt, '\t',answer, f'logit for logit_target: {logit_target:0.2f}')
+
 
 
 
