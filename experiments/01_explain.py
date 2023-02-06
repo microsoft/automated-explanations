@@ -14,6 +14,7 @@ import mprompt.modules.fmri
 import mprompt.methods.ngrams
 import mprompt.methods.llm
 import mprompt.methods.summarize
+import mprompt.methods.synthetic
 import cache_save_utils
 
 # initialize args
@@ -46,6 +47,8 @@ def add_main_args(parser):
                         default='ngrams', help='name of algo for explanation')
     parser.add_argument('--num_summaries', type=int,
                         default=2, help='number of summaries to start with')
+    parser.add_argument('--num_synthetic_strs', type=int,
+                        default=2, help='number of synthetic strings to generate')
     return parser
 
 def add_computational_args(parser):
@@ -105,9 +108,17 @@ if __name__ == '__main__':
 
     # summarize the ngrams into some candidate strings
     llm = mprompt.methods.llm.get_llm(args.checkpoint)
-    explanation_init_strs = mprompt.methods.summarize.summarize_ngrams(
+    explanation_strs = mprompt.methods.summarize.summarize_ngrams(
         llm, explanation_init_ngrams, num_summaries=args.num_summaries)
-    r['explanation_init_strs'] = explanation_init_strs
+    r['explanation_init_strs'] = explanation_strs
+
+    # generate synthetic data
+    strs_added, strs_removed = mprompt.methods.synthetic.generate_synthetic_intervention_strs(
+        llm, explanation_str='anger', num_synthetic_strs=1)
+
+    # evaluate synthetic data
+
+    # evaluate how well explanation matches a "groundtruth"
 
     # r, model = fit_model(model, X_train, y_train, feature_names, r)
     
