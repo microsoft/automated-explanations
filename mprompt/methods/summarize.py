@@ -6,7 +6,7 @@ import os.path
 from os.path import join
 import pickle as pkl
 from langchain.llms.base import LLM
-from mprompt.methods.llm import get_llm
+from mprompt.llm import get_llm
 from transformers import T5Tokenizer, T5ForConditionalGeneration
 
 def summarize_ngrams(

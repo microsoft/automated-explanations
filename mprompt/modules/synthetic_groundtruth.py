@@ -12,22 +12,28 @@ import pickle as pkl
 from os.path import dirname, join
 import os.path
 import re
+import mprompt.llm
 modules_dir = dirname(os.path.abspath(__file__))
 
 
 class SyntheticModule():
 
-    def __init__(self, task_str: str = 'animal'):
+    def __init__(self, task_str: str = 'animal', checkpoint='google/flan-t5-xl'):
         """
         Params
         ------
         """
         self.task_str = task_str
+        self.llm = mprompt.llm.get_llm(checkpoint)
 
 
     def __call__(self, X: List[str]) -> np.ndarray:
         """Returns a scalar continuous response for each element of X
         """
+        probs = np.zeros(len(X))
+        for i, x in enumerate(X):
+            probs[i] = self.llm.get_next_token_probs(X, 'yes')
+        return probs
 
     def get_relevant_data(self) -> List[str]:
         """read in full text of 26 narrative stories

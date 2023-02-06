@@ -10,9 +10,10 @@ from sklearn.model_selection import train_test_split
 import pickle as pkl
 import imodelsx
 import torch
+import mprompt.llm
 import mprompt.modules.fmri
+import mprompt.modules.synthetic_groundtruth
 import mprompt.methods.ngrams
-import mprompt.methods.llm
 import mprompt.methods.summarize
 import mprompt.methods.synthetic
 import cache_save_utils
@@ -28,6 +29,8 @@ def add_main_args(parser):
                         default=1, help='fraction of samples to use')
     parser.add_argument('--checkpoint', type=str,
                         default='google/flan-t5-xxl', help='which llm to use for each step')
+    parser.add_argument('--checkpoint_module', type=str,
+                        default='facebook/opt-2.7b', help='which llm to use for the module (if synthetic)')
 
     # training misc args
     parser.add_argument('--seed', type=int, default=1,
@@ -37,7 +40,7 @@ def add_main_args(parser):
 
     # module args
     parser.add_argument('--module_name', type=str,
-                        default='fmri', help='name of module', choices=['fmri'])
+                        default='synthetic', help='name of module', choices=['fmri', 'synthetic'])
     parser.add_argument('--module_num', type=int,
                         default=0, help='number of module to select')
 
@@ -96,7 +99,11 @@ if __name__ == '__main__':
 
     # load module to interpret
     if args.module_name == 'fmri':
-        mod = mprompt.modules.fmri.fMRIModule(voxel_num_best=args.module_num)    
+        mod = mprompt.modules.fmri.fMRIModule(voxel_num_best=args.module_num)
+    elif args.module_name == 'synthetic':
+        mod = mprompt.modules.synthetic_groundtruth.SyntheticModule(
+            checkpoint=args.checkpoint_module)
+
 
     # load text data
     text_str_list = mod.get_relevant_data()
@@ -107,7 +114,7 @@ if __name__ == '__main__':
     r['explanation_init_ngrams'] = explanation_init_ngrams
 
     # summarize the ngrams into some candidate strings
-    llm = mprompt.methods.llm.get_llm(args.checkpoint)
+    llm = mprompt.llm.get_llm(args.checkpoint)
     explanation_strs = mprompt.methods.summarize.summarize_ngrams(
         llm, explanation_init_ngrams, num_summaries=args.num_summaries)
     r['explanation_init_strs'] = explanation_strs

@@ -16,6 +16,7 @@ required_pypi = [
     'torch',
     'imodelsx',
     'langchain',
+    'openai',
 
     'datasets', # optional, required for getting NLP datasets
     'pytest', # optional, required for running tests
