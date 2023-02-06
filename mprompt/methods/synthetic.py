@@ -10,7 +10,7 @@ from mprompt.methods.llm import get_llm
 from transformers import T5Tokenizer, T5ForConditionalGeneration
 
 
-def generate_synthetic_intervention_strs(
+def generate_synthetic_strs(
     llm: LLM,
     explanation_str: str,
     num_synthetic_strs: int = 2,
@@ -41,9 +41,10 @@ def generate_synthetic_intervention_strs(
     return strs_added, strs_removed
 
 
+
 if __name__ == '__main__':
     llm = get_llm(checkpoint='google/flan-t5-xl')
-    strs_added, strs_removed = generate_synthetic_intervention_strs(
+    strs_added, strs_removed = generate_synthetic_strs(
         llm,
         explanation_str='anger',
         num_synthetic_strs=1)

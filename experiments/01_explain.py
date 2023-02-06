@@ -113,19 +113,21 @@ if __name__ == '__main__':
     r['explanation_init_strs'] = explanation_strs
 
     # generate synthetic data
-    strs_added, strs_removed = mprompt.methods.synthetic.generate_synthetic_intervention_strs(
-        llm, explanation_str='anger', num_synthetic_strs=1)
-
-    # evaluate synthetic data
-
-    # evaluate how well explanation matches a "groundtruth"
-
-    # r, model = fit_model(model, X_train, y_train, feature_names, r)
+    for explanation_str in explanation_strs:
+        strs_added, strs_removed = mprompt.methods.synthetic.generate_synthetic_strs(
+            llm, explanation_str=explanation_str, num_synthetic_strs=args.num_synthetic_strs)
+        r['strs_added'].append(strs_added)
+        r['strs_removed'].append(strs_removed)
     
-    # evaluate
-    # r = evaluate_model(model, X_train, X_cv, X_test, y_train, y_cv, y_test, r)
+        # evaluate synthetic data (higher score is better)
+        r['score_synthetic'].append(np.mean(mod(strs_added) - mod(strs_removed)))
+    
+    # evaluate how well explanation matches a "groundtruth"
+    if args.module_name.startswith('synth'):
+        
+
+
 
     # save results
     pkl.dump(r, open(join(save_dir_unique, 'results.pkl'), 'wb'))
-    # pkl.dump(model, open(join(save_dir_unique, 'model.pkl'), 'wb'))
     logging.info('Succesfully completed :)\n\n')
