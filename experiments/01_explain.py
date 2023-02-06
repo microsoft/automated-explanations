@@ -87,6 +87,13 @@ if __name__ == '__main__':
     random.seed(args.seed)
     torch.manual_seed(args.seed)
 
+    # set up saving dictionary + save params file
+    r = defaultdict(list)
+    r.update(vars(args))
+    r['save_dir_unique'] = save_dir_unique
+    cache_save_utils.save_json(
+        args=args, save_dir=save_dir_unique, fname='params.json', r=r)
+
     # load module to interpret
     if args.module_name == 'fmri':
         mod = mprompt.modules.fmri.fMRIModule(voxel_num_best=args.module_num)    
@@ -94,13 +101,6 @@ if __name__ == '__main__':
     # load text data
     text_str_list = mod.get_relevant_data()
     text_str_list = text_str_list[:int(len(text_str_list) * args.subsample_frac)] # note: this isn't shuffling!
-
-    # set up saving dictionary + save params file
-    r = defaultdict(list)
-    r.update(vars(args))
-    r['save_dir_unique'] = save_dir_unique
-    cache_save_utils.save_json(
-        args=args, save_dir=save_dir_unique, fname='params.json', r=r)
 
     # explain with method
     explanation_init_ngrams = mprompt.methods.ngrams.explain_ngrams(text_str_list, mod)
@@ -123,8 +123,19 @@ if __name__ == '__main__':
         r['score_synthetic'].append(np.mean(mod(strs_added) - mod(strs_removed)))
     
     # evaluate how well explanation matches a "groundtruth"
-    if args.module_name.startswith('synth'):
+    if getattr(mod, "get_groundtruth_explanation", None):
         
+        # get groundtruth explanation
+        explanation_groundtruth = mod.get_groundtruth_explanation()
+        check_func = mod.get_groundtruth_keywords_check_func()
+
+        for explanation_str in explanation_strs:
+            # compute bleu score with groundtruth explanation
+            # r['score_bleu'].append(
+                # calc_bleu_score(explanation_groundtruth, explanation_str))
+
+            # compute whether explanation contains any of the synthetic keywords
+            r['score_contains_keywords'].append(check_func(explanation_str))
 
 
 

@@ -11,17 +11,18 @@ import imodelsx.util
 import pickle as pkl
 from os.path import dirname, join
 import os.path
+import re
 modules_dir = dirname(os.path.abspath(__file__))
 
 
 class SyntheticModule():
 
-    def __init__(self, prompt_num: int = 0):
+    def __init__(self, task_str: str = 'animal'):
         """
         Params
         ------
-        prompt_num: int
         """
+        self.task_str = task_str
 
 
     def __call__(self, X: List[str]) -> np.ndarray:
@@ -31,9 +32,26 @@ class SyntheticModule():
     def get_relevant_data(self) -> List[str]:
         """read in full text of 26 narrative stories
         """
-        with open(join(self.save_dir_fmri, 'narrative_stories.txt'), 'r') as f:
-            narrative_stories = f.readlines()
-        return narrative_stories
+        return ['apple orange pear three 4 five cat dog zebra']
+
+    def get_groundtruth_explanation(self) -> str:
+        """Return the groundtruth explanation
+        """
+        return 'animals'
+
+    def get_groundtruth_keywords_check_func(self) -> str:
+        """Return the groundtruth keywords
+        """
+        SYNTHETIC_FUNCTIONS = {
+            'animal': r'animal',
+            'food': r'fruit|edible',
+        }
+        regex = SYNTHETIC_FUNCTIONS[self.task_str]
+        regex_compiled = re.compile(regex, re.IGNORECASE).search
+
+        def check_answer_func(x):
+            return bool(regex_compiled(x))
+        return check_answer_func
 
 
 if __name__ == '__main__':
