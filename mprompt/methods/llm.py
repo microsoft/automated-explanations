@@ -1,42 +1,71 @@
 import re
-from typing import List
+from typing import Any, List, Mapping, Optional
 import numpy as np
 import openai
 import os.path
 from os.path import join
 import pickle as pkl
-    
+import langchain
+from langchain.llms.base import LLM
+from langchain.cache import InMemoryCache
+from transformers import T5Tokenizer, T5ForConditionalGeneration
+langchain.llm_cache = InMemoryCache()
+
+
+def llm_openai() -> LLM:
+    from langchain.llms import OpenAI
+    return OpenAI(
+        model_name='text-davinci-003',
+        max_tokens=100,
+        # stop='.',
+    )
+
+
+def llm_flan(checkpoint='google/flan-t5-xl') -> LLM:
+    class LLM_HF(LLM):
+        # langchain forces us to initialize stuff in this kind of weird way
+        _checkpoint: str = checkpoint
+        _max_tokens = 100
+        _tokenizer = T5Tokenizer.from_pretrained(_checkpoint)
+        _model = T5ForConditionalGeneration.from_pretrained(
+            checkpoint, device_map="auto")
+
+        @property
+        def _llm_type(self) -> str:
+            return "custom"
+
+        # langchain wants _call instead of __call__
+        def _call(self, prompt: str, stop: Optional[List[str]] = None) -> str:
+            if stop is not None:
+                raise ValueError("stop kwargs are not permitted.")
+            input_ids = self._tokenizer(
+                prompt, return_tensors="pt").input_ids.to("cuda")
+            outputs = self._model.generate(
+                input_ids, max_length=self._max_tokens)
+            return self._tokenizer.decode(outputs[0])
+
+        @property
+        def _identifying_params(self) -> Mapping[str, Any]:
+            """Get the identifying parameters."""
+            return vars(self)
+
+    return LLM_HF()
+
 
 def summarize_ngrams(
+    llm: LLM,
     ngrams_list: List[str],
-    prefix_str = 'Here is a list of phrases:',
-    suffix_str = 'What is a common theme among these phrases?\nThe common theme among these phrases is',
-    num_ngrams: int=40,
-    seed: int=0,
+    prefix_str='Here is a list of phrases:',
+    suffix_str='What is a common theme among these phrases?\nThe common theme among these phrases is',
+    num_ngrams: int = 40,
+    seed: int = 0,
 ):
-    """Refine a keyphrase by making a call to gpt-3
+    """Refine a keyphrase by making a call to the llm
     """
-    # check cache
-    # os.makedirs(cache_dir, exist_ok=True)
-    # cache_file = join(cache_dir, f'{keyphrase_str}___{seed}.pkl')
-    # print(f'{cache_file=}')
-    # if os.path.exists(cache_file):
-        # return pkl.load(open(cache_file, 'rb'))
-
-    bullet_list_ngrams =  '- ' + '\n- '.join(ngrams_list[:num_ngrams])
+    bullet_list_ngrams = '- ' + '\n- '.join(ngrams_list[:num_ngrams])
     prompt = prefix_str + '\n\n' + bullet_list_ngrams + '\n\n' + suffix_str
     print(prompt)
-    response = openai.Completion.create(
-        engine="text-davinci-003",
-        prompt=prompt,
-        max_tokens=1000,
-        temperature=0.1,
-        top_p=1,
-        frequency_penalty=0.25,  # maximum is 2
-        presence_penalty=0,
-        stop=["."]
-    )
-    summary = response['choices'][0]['text']
+    summary = llm(prompt)
 
     # clean up summary
     summary = summary.strip()
@@ -61,5 +90,6 @@ def summarize_ngrams(
 
 
 if __name__ == '__main__':
-    summary = summarize_ngrams(['apple', 'banana', 'cat', 'dog'])
+    llm = llm_flan(checkpoint='google/flan-t5-xxl')
+    summary = summarize_ngrams(llm, ['cat', 'dog', 'bird', 'elephant', 'cheetah'])
     print('summary', repr(summary))
