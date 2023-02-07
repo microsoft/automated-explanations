@@ -39,8 +39,13 @@ def llm_hf(checkpoint='google/flan-t5-xl') -> LLM:
         _checkpoint: str = checkpoint
         _max_tokens = 100
         _tokenizer = _get_tokenizer(_checkpoint)
-        _model = AutoModelForCausalLM.from_pretrained(
-            checkpoint, device_map="auto")
+        if 'google/flan' in checkpoint:
+            _model = AutoModel.from_pretrained(
+                checkpoint, device_map="auto")
+        else:
+            _model = AutoModelForCausalLM.from_pretrained(
+                checkpoint, device_map="auto")
+        _offset_decode = len('</s>') if 'facebook/opt' in checkpoint else 0
 
 
         @property
@@ -55,14 +60,17 @@ def llm_hf(checkpoint='google/flan-t5-xl') -> LLM:
                 prompt, return_tensors="pt").input_ids.to("cuda")
             outputs = self._model.generate(
                 input_ids, max_length=self._max_tokens)
-            return self._tokenizer.decode(outputs[0])
+            out_str = self._tokenizer.decode(outputs[0])
+            return out_str[self._offset_decode + len(prompt):]
 
         def get_logit_for_target_token(self, prompt: str, target_token: str) -> float:
-            input_ids = self._tokenizer(prompt, return_tensors="pt").input_ids.to("cuda")
-            logits = self._model(input_ids)['logits']  # (batch_size, seq_len, vocab_size)
+            inputs = self._tokenizer(prompt, return_tensors="pt").to('cuda')
+            logits = self._model(**inputs)['logits']  # (batch_size, seq_len, vocab_size)
             token_output_id = self._tokenizer.convert_tokens_to_ids(target_token)
             logit_target = logits[0, -1, token_output_id]
             # print(logit_target, 'id', token_output_id)
+            token_idx_max = logits[0, -1].argmax()
+            # print(f'{token_idx_max=} {self._tokenizer.convert_ids_to_tokens([token_idx_max])=}')
             # print('target_token inner', target_token, token_output_id)
             return logit_target.item()
 
