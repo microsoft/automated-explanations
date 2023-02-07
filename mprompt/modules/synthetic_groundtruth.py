@@ -16,6 +16,17 @@ import mprompt.llm
 modules_dir = dirname(os.path.abspath(__file__))
 
 
+TASKS = {
+    'animal': {
+        'check_func': r'animal',
+        'template': 'True or False: A {input} is an animal.\nAnswer:',
+    },
+    'food': {
+        'check_func': r'fruit|edible',
+    }
+}
+
+
 class SyntheticModule():
 
     def __init__(self, task_str: str = 'animal', checkpoint='google/flan-t5-xl'):
@@ -25,6 +36,7 @@ class SyntheticModule():
         """
         self.task_str = task_str
         self.llm = mprompt.llm.get_llm(checkpoint)
+        self.task = TASKS[task_str]
 
 
     def __call__(self, X: List[str]) -> np.ndarray:
@@ -48,11 +60,7 @@ class SyntheticModule():
     def get_groundtruth_keywords_check_func(self) -> str:
         """Return the groundtruth keywords
         """
-        SYNTHETIC_FUNCTIONS = {
-            'animal': r'animal',
-            'food': r'fruit|edible',
-        }
-        regex = SYNTHETIC_FUNCTIONS[self.task_str]
+        regex = self.task['check_func']
         regex_compiled = re.compile(regex, re.IGNORECASE).search
 
         def check_answer_func(x):

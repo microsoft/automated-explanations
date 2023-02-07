@@ -19,6 +19,8 @@ import mprompt.methods.synthetic
 import cache_save_utils
 
 # initialize args
+
+
 def add_main_args(parser):
     """Caching uses the non-default values from argparse to name the saving directory.
     Changing the default arg an argument will break cache compatibility with previous runs.
@@ -40,10 +42,9 @@ def add_main_args(parser):
 
     # module args
     parser.add_argument('--module_name', type=str,
-                        default='synthetic', help='name of module', choices=['fmri', 'synthetic'])
+                        default='fmri', help='name of module', choices=['fmri', 'synthetic'])
     parser.add_argument('--module_num', type=int,
                         default=0, help='number of module to select')
-
 
     # algo args
     parser.add_argument('--method_name', type=str, choices=['ngrams'],
@@ -54,12 +55,14 @@ def add_main_args(parser):
                         default=2, help='number of synthetic strings to generate')
     return parser
 
+
 def add_computational_args(parser):
     """Arguments that only affect computation and not the results (shouldn't use when checking cache)
     """
     parser.add_argument('--use_cache', type=int, default=1, choices=[0, 1],
                         help='whether to check for cache')
     return parser
+
 
 if __name__ == '__main__':
     # get args
@@ -76,7 +79,7 @@ if __name__ == '__main__':
     # set up saving directory + check for cache
     already_cached, save_dir_unique = cache_save_utils.get_save_dir_unique(
         parser, parser_without_computational_args, args, args.save_dir)
-    
+
     if args.use_cache and already_cached:
         logging.info(
             f'cached version exists! Successfully skipping :)\n\n\n')
@@ -104,13 +107,21 @@ if __name__ == '__main__':
         mod = mprompt.modules.synthetic_groundtruth.SyntheticModule(
             checkpoint=args.checkpoint_module)
 
-
     # load text data
     text_str_list = mod.get_relevant_data()
-    text_str_list = text_str_list[:int(len(text_str_list) * args.subsample_frac)] # note: this isn't shuffling!
+
+    # subsample data
+    # don't subsample fmri data it takes too long to rerun
+    # and joblib.cache is calledo n the full dataset in explain_ngrams
+    if not args.module_name == 'fmri':  
+        n_subsample  = int(len(text_str_list) * args.subsample_frac)
+
+        # randomly subsample list
+        text_str_list = np.random.choice(text_str_list, size=n_subsample, replace=False).tolist()
 
     # explain with method
-    explanation_init_ngrams = mprompt.methods.ngrams.explain_ngrams(text_str_list, mod)
+    explanation_init_ngrams = mprompt.methods.ngrams.explain_ngrams(
+        text_str_list, mod)
     r['explanation_init_ngrams'] = explanation_init_ngrams
 
     # summarize the ngrams into some candidate strings
@@ -125,13 +136,14 @@ if __name__ == '__main__':
             llm, explanation_str=explanation_str, num_synthetic_strs=args.num_synthetic_strs)
         r['strs_added'].append(strs_added)
         r['strs_removed'].append(strs_removed)
-    
+
         # evaluate synthetic data (higher score is better)
-        r['score_synthetic'].append(np.mean(mod(strs_added) - mod(strs_removed)))
-    
+        r['score_synthetic'].append(
+            np.mean(mod(strs_added) - mod(strs_removed)))
+
     # evaluate how well explanation matches a "groundtruth"
     if getattr(mod, "get_groundtruth_explanation", None):
-        
+
         # get groundtruth explanation
         explanation_groundtruth = mod.get_groundtruth_explanation()
         check_func = mod.get_groundtruth_keywords_check_func()
@@ -139,12 +151,10 @@ if __name__ == '__main__':
         for explanation_str in explanation_strs:
             # compute bleu score with groundtruth explanation
             # r['score_bleu'].append(
-                # calc_bleu_score(explanation_groundtruth, explanation_str))
+            # calc_bleu_score(explanation_groundtruth, explanation_str))
 
             # compute whether explanation contains any of the synthetic keywords
             r['score_contains_keywords'].append(check_func(explanation_str))
-
-
 
     # save results
     pkl.dump(r, open(join(save_dir_unique, 'results.pkl'), 'wb'))
