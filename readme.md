@@ -8,8 +8,7 @@ This is an evolving repo optimized for machine-learning projects aimed at design
 - `tests`: unit tests
 
 # Setup
-- first, rename `mprompt` to your project name and modify `setup.py` accordingly
-- clone and run `pip install -e .`, resulting in a package named `project_name` that can be imported
+- clone and run `pip install -e .`, resulting in a package named `mprompt` that can be imported
     - see `setup.py` for dependencies, not all are required
 - install imodelsx from source (I'm currently moving some of the code here to `imodelsx`), it's worth having the most up-to-date version and potentiall making changes there
     - `git clone https://github.com/csinva/imodelsX.git` then `cd imodelsX` and `pip install -e .`
