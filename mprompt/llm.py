@@ -63,6 +63,7 @@ def llm_hf(checkpoint='google/flan-t5-xl') -> LLM:
             token_output_id = self._tokenizer.convert_tokens_to_ids(target_token)
             logit_target = logits[0, -1, token_output_id]
             # print(logit_target, 'id', token_output_id)
+            # print('target_token inner', target_token, token_output_id)
             return logit_target.item()
 
         @property
@@ -78,16 +79,17 @@ if __name__ == '__main__':
     llm = llm_hf(checkpoint='facebook/opt-125m')
     # print(prompt)
     # print(answer)
-    for prompt in [
-        'Question: Is a cat an animal?\nAnswer:',
-        'Question: Is a dog an animal?\nAnswer:',
-        'Question: Is a cat a fruit?\nAnswer:',
-        'Question: Is a dog a fruit?\nAnswer:',
+    for (prompt, answer) in [
+        ('Question: Is a cat an animal?\nAnswer:', ' Yes.'),
+        ('Question: Is a dog an animal?\nAnswer:', ' Yes.'),
+        ('Question: Is a cat a fruit?\nAnswer:', ' No.'),
+        ('Question: Is a dog a fruit?\nAnswer:', ' No.'),
     ]:
-        target_token = 'Yes.'
-        answer = llm(prompt)
+        target_token = ' Yes.'
+        # answer = llm(prompt) # this is weird, adds some kind of asynchrony or something
         logit_target = llm.get_logit_for_target_token(prompt, target_token=target_token)
-        print(prompt, '\t',answer, f'logit for logit_target: {logit_target:0.2f}')
+        # print(prompt.strip(), answer, f'logit for logit_target: {logit_target:0.2f}')
+        print(repr(prompt), logit_target)
 
 
 
