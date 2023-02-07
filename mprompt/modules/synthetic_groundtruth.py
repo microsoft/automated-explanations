@@ -18,7 +18,7 @@ modules_dir = dirname(os.path.abspath(__file__))
 
 
 def generate_data():
-    return ['apple orange pear three 4 five cat dog zebra']
+    return ['apple orange pear three 4 five cat dog zebra fish raccoon horse']
 
 
 TASKS = {

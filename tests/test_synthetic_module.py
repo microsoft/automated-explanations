@@ -18,6 +18,7 @@ def test_synthetic(
     probs_neg = mod(INPUTS_NEG)
     print(probs_pos)
     print(probs_neg)
+    assert np.mean(probs_pos) > np.mean(probs_neg)
 
 
 if __name__ == '__main__':

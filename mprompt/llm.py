@@ -40,7 +40,7 @@ def llm_hf(checkpoint='google/flan-t5-xl') -> LLM:
         _max_tokens = 100
         _tokenizer = _get_tokenizer(_checkpoint)
         if 'google/flan' in checkpoint:
-            _model = AutoModel.from_pretrained(
+            _model = T5ForConditionalGeneration.from_pretrained(
                 checkpoint, device_map="auto")
         else:
             _model = AutoModelForCausalLM.from_pretrained(
