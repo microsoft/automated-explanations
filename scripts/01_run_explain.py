@@ -10,10 +10,11 @@ from imodelsx import submit_utils
 params_shared_dict = {
     'seed': [1],
     # 'save_dir': [join('/home/chansingh/mntv1', 'mprompt', 'jan30')],
-    'save_dir': [join('/home/chansingh/mprompt/results/', 'jan31')],
+    'save_dir': [join('/home/chansingh/mprompt/results/', 'feb7')],
     'use_cache': [1], # pass binary values with 0/1 instead of the ambiguous strings True/False
     'subsample_frac': [1],
-    'module_num': list(range(50)),
+    'module_num': list(range(100)),
+    'module_name': ['fmri'],
 }
 
 # List of tuples to sweep over (these values are coupled, and swept over together)

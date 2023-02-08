@@ -122,7 +122,7 @@ if __name__ == '__main__':
     # explain with method
     explanation_init_ngrams = mprompt.methods.ngrams.explain_ngrams(text_str_list, mod)
     r['explanation_init_ngrams'] = explanation_init_ngrams
-    logging.info(f'{explanation_init_ngrams[:3]=} {len(explanation_init_ngrams)}')
+    # logging.info(f'{explanation_init_ngrams[:3]=} {len(explanation_init_ngrams)}')
 
 
     # summarize the ngrams into some candidate strings
