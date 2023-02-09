@@ -26,13 +26,13 @@ def explain_ngrams(
     
     # get unique ngrams
     ngrams_list = sorted(list(set(ngrams_list)))
-    print(f'{ngrams_list=}')
+    # print(f'{ngrams_list=}')
 
     # compute scores
     # call_cached = memory.cache(mod.__call__)
     # ngram_scores = call_cached(mod(ngrams_list))
     ngram_scores = mod(ngrams_list)
-    print(f'{ngram_scores=}')
+    # print(f'{ngram_scores=}')
     scores_top_idxs = np.argsort(ngram_scores)[::-1]
     return np.array(ngrams_list)[scores_top_idxs][:num_top_ngrams].flatten().tolist()
 

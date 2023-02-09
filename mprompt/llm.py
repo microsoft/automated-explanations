@@ -13,15 +13,15 @@ from transformers import T5Tokenizer, T5ForConditionalGeneration
 langchain.llm_cache = InMemoryCache()
 
 def get_llm(checkpoint='openai'):
-    if checkpoint == 'openai':
+    if checkpoint.startswith('text-da'):
         return llm_openai()
     else:
         return llm_hf(checkpoint)
 
-def llm_openai() -> LLM:
+def llm_openai(checkpoint='text-davinci-003') -> LLM:
     from langchain.llms import OpenAI
     return OpenAI(
-        model_name='text-davinci-003',
+        model_name=checkpoint,
         max_tokens=100,
         # stop='.',
     )
@@ -45,8 +45,6 @@ def llm_hf(checkpoint='google/flan-t5-xl') -> LLM:
         else:
             _model = AutoModelForCausalLM.from_pretrained(
                 checkpoint, device_map="auto")
-        _offset_decode = len('</s>') if 'facebook/opt' in checkpoint else 0
-
 
         @property
         def _llm_type(self) -> str:
@@ -61,7 +59,12 @@ def llm_hf(checkpoint='google/flan-t5-xl') -> LLM:
             outputs = self._model.generate(
                 input_ids, max_length=self._max_tokens)
             out_str = self._tokenizer.decode(outputs[0])
-            return out_str[self._offset_decode + len(prompt):]
+            if 'facebook/opt' in checkpoint:
+                return out_str[len('</s>') + len(prompt):]
+            elif 'google/flan' in checkpoint:
+                return out_str[len('<pad>'):out_str.index('</s>')]
+            else:
+                return out_str
 
         def get_logit_for_target_token(self, prompt: str, target_token: str) -> float:
             inputs = self._tokenizer(prompt, return_tensors="pt").to('cuda')

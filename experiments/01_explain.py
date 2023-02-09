@@ -59,7 +59,7 @@ def add_main_args(parser):
 def add_computational_args(parser):
     """Arguments that only affect computation and not the results (shouldn't use when checking cache)
     """
-    parser.add_argument('--use_cache', type=int, default=1, choices=[0, 1],
+    parser.add_argument('--use_cache', type=int, default=0, choices=[0, 1],
                         help='whether to check for cache')
     return parser
 
@@ -73,7 +73,6 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # set up logging
-    logger = logging.getLogger()
     logging.basicConfig(level=logging.INFO)
 
     # set up saving directory + check for cache
@@ -85,7 +84,7 @@ if __name__ == '__main__':
             f'cached version exists! Successfully skipping :)\n\n\n')
         exit(0)
     for k in sorted(vars(args)):
-        logger.info('\t' + k + ' ' + str(vars(args)[k]))
+        logging.info('\t' + k + ' ' + str(vars(args)[k]))
     logging.info(f'\n\n\tsaving to ' + save_dir_unique + '\n')
 
     # set seed
@@ -122,7 +121,7 @@ if __name__ == '__main__':
     # explain with method
     explanation_init_ngrams = mprompt.methods.ngrams.explain_ngrams(text_str_list, mod)
     r['explanation_init_ngrams'] = explanation_init_ngrams
-    # logging.info(f'{explanation_init_ngrams[:3]=} {len(explanation_init_ngrams)}')
+    logging.info(f'{explanation_init_ngrams[:3]=} {len(explanation_init_ngrams)}')
 
 
     # summarize the ngrams into some candidate strings
@@ -130,9 +129,10 @@ if __name__ == '__main__':
     explanation_strs = mprompt.methods.summarize.summarize_ngrams(
         llm, explanation_init_ngrams, num_summaries=args.num_summaries)
     r['explanation_init_strs'] = explanation_strs
-    logging.info('explanation_init_strs' + ','.join(explanation_strs))
+    logging.info('explanation_init_strs\n\t' + '\n\t'.join(explanation_strs))
 
     # generate synthetic data
+    logging.info('\n\nGenerating synthetic data....')
     for explanation_str in explanation_strs:
         strs_added, strs_removed = mprompt.methods.synthetic.generate_synthetic_strs(
             llm, explanation_str=explanation_str, num_synthetic_strs=args.num_synthetic_strs)
@@ -142,11 +142,12 @@ if __name__ == '__main__':
         # evaluate synthetic data (higher score is better)
         r['score_synthetic'].append(
             np.mean(mod(strs_added) - mod(strs_removed)))
-    logging.info(f'{strs_added[0]=}')
-    logging.info(f'{strs_removed[0]=}')
+    logging.info(f'{explanation_strs[0]}\n+++++++++\n\t' + '\n\t'.join(r['strs_added'][0][:3]) + \
+        '\n--------\n\t' + '\n\t'.join(r['strs_removed'][0][:3]))
 
     # evaluate how well explanation matches a "groundtruth"
     if getattr(mod, "get_groundtruth_explanation", None):
+        logging.info('\n\Scoring explanation....')
 
         # get groundtruth explanation
         explanation_groundtruth = mod.get_groundtruth_explanation()
@@ -159,6 +160,7 @@ if __name__ == '__main__':
 
             # compute whether explanation contains any of the synthetic keywords
             r['score_contains_keywords'].append(check_func(explanation_str))
+    
 
     # save results
     pkl.dump(r, open(join(save_dir_unique, 'results.pkl'), 'wb'))
