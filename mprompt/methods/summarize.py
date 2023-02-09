@@ -7,7 +7,6 @@ from os.path import join
 import pickle as pkl
 from langchain.llms.base import LLM
 from mprompt.llm import get_llm
-from transformers import T5Tokenizer, T5ForConditionalGeneration
 
 def summarize_ngrams(
     llm: LLM,
@@ -15,12 +14,12 @@ def summarize_ngrams(
     num_summaries: int=2,
     prefix_str='Here is a list of phrases:',
     suffix_str='What is a common theme among these phrases?\nThe common theme among these phrases is',
-    num_ngrams: int = 40,
+    num_top_ngrams: int = 40,
     # seed: int = 0,
 ) -> List[str]:
     """Refine a keyphrase by making a call to the llm
     """
-    bullet_list_ngrams = '- ' + '\n- '.join(ngrams_list[:num_ngrams])
+    bullet_list_ngrams = '- ' + '\n- '.join(ngrams_list[:num_top_ngrams])
     prompt = prefix_str + '\n\n' + bullet_list_ngrams + '\n\n' + suffix_str
     print(prompt)
     

@@ -6,6 +6,7 @@ import os.path
 from os.path import join
 import pickle as pkl
 import langchain
+from scipy.special import softmax
 from langchain.llms.base import LLM
 from langchain.cache import InMemoryCache
 from transformers import AutoConfig, AutoModel, AutoTokenizer, AutoModelForCausalLM
@@ -66,16 +67,19 @@ def llm_hf(checkpoint='google/flan-t5-xl') -> LLM:
             else:
                 return out_str
 
-        def get_logit_for_target_token(self, prompt: str, target_token: str) -> float:
-            inputs = self._tokenizer(prompt, return_tensors="pt").to('cuda')
-            logits = self._model(**inputs)['logits']  # (batch_size, seq_len, vocab_size)
-            token_output_id = self._tokenizer.convert_tokens_to_ids(target_token)
-            logit_target = logits[0, -1, token_output_id]
-            # print(logit_target, 'id', token_output_id)
-            token_idx_max = logits[0, -1].argmax()
-            # print(f'{token_idx_max=} {self._tokenizer.convert_ids_to_tokens([token_idx_max])=}')
-            # print('target_token inner', target_token, token_output_id)
-            return logit_target.item()
+        def _get_logit_for_target_token(self, prompt: str, target_token_str: str) -> float:
+            """Get logits for each target token
+            This is weird when token_output_ids represents multiple tokens
+            It currently will only take the first token
+            """
+            # Get first token id in target_token_str
+            target_token_id = self._tokenizer(target_token_str)['input_ids'][0]
+
+            inputs = self._tokenizer(prompt, return_tensors="pt").to(self._model.device)
+            logits = self._model(**inputs)['logits'].detach().cpu()  # shape is (batch_size, seq_len, vocab_size)
+            probs_next_token = softmax(logits[0, -1, :].numpy().flatten())  # shape is (vocab_size,)
+            # token_output_ids = self.tokenizer.convert_tokens_to_ids(target_tokens)
+            return probs_next_token[target_token_id]
 
         @property
         def _identifying_params(self) -> Mapping[str, Any]:

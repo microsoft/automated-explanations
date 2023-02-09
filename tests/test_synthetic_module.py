@@ -6,9 +6,9 @@ from mprompt.modules.synthetic_groundtruth import SyntheticModule
 def test_synthetic(
     checkpoint='facebook/opt-6.7b',
 ):
-
+    task_str = 'animal'
     mod = SyntheticModule(
-        task_str='animal',
+        task_str=task_str,
         checkpoint=checkpoint
     )
 
@@ -18,7 +18,7 @@ def test_synthetic(
     probs_neg = mod(INPUTS_NEG)
     print(probs_pos)
     print(probs_neg)
-    assert np.mean(probs_pos) > np.mean(probs_neg)
+    assert np.mean(probs_pos) > np.mean(probs_neg), f'mean for inputs in {task_str} should be higher for positive examples'
 
 
 if __name__ == '__main__':

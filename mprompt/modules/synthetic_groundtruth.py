@@ -25,8 +25,8 @@ TASKS = {
     'animal': {
         'check_func': r'animal',
         'groundtruth_explanation': 'Return whether the input is an animal.',
-        'template': 'True or False: A {input} is an animal.\nAnswer:',
-        'target_token': ' True',
+        'template': 'Question: Is {input} a type of animal?\nAnswer:',
+        'target_token': ' Yes.',
         'get_relevant_data': generate_data,
     },
     'food': {
@@ -56,8 +56,8 @@ class SyntheticModule():
         probs = np.zeros(len(X))
         for i, x in enumerate(X):
             prompt = self.prompt_template.format(input=x)
-            probs[i] = self.llm.get_logit_for_target_token(
-                prompt, self.task['target_token'])
+            probs[i] = self.llm._get_logit_for_target_token(
+                prompt, target_token_str=self.task['target_token'])
         return probs
 
     def get_relevant_data(self) -> List[str]:
