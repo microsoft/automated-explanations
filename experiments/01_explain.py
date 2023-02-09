@@ -32,7 +32,7 @@ def add_main_args(parser):
     parser.add_argument('--checkpoint', type=str,
                         default='google/flan-t5-xxl', help='which llm to use for each step')
     parser.add_argument('--checkpoint_module', type=str,
-                        default='facebook/opt-2.7b', help='which llm to use for the module (if synthetic)')
+                        default='EleutherAI/gpt-j-6B', help='which llm to use for the module (if synthetic)')
 
     # training misc args
     parser.add_argument('--seed', type=int, default=1,

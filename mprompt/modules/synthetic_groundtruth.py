@@ -17,33 +17,57 @@ from langchain import PromptTemplate
 modules_dir = dirname(os.path.abspath(__file__))
 
 
-def generate_data():
-    return ['apple orange pear three 4 five cat dog zebra fish raccoon horse']
+def generate_synthetic_data() -> List[str]:
+    s = []
+    for k in TASKS.keys():
+        s.append(' '.join(TASKS[k]['examples']))
+    return s
 
 
 TASKS = {
+    # Observations: yes/no questions are terrible
+    # 'template': 'Does the input contain an animal?\nInput: {input}\nAnswer (yes or no):',
+    # 'target_token': ' yes',
+
     'animal': {
         'check_func': r'animal',
         'groundtruth_explanation': 'Return whether the input is an animal.',
-        'template': 'Question: Is {input} a type of animal?\nAnswer:',
-        'target_token': ' Yes.',
-        'get_relevant_data': generate_data,
+        'template': 'A {input} is a type of',
+        'target_token': ' animal',
+        'get_relevant_data': generate_synthetic_data,
+        'examples': ['cat', 'dog', 'giraffe', 'horse', 'zebra', 'raccoon'],
     },
     'food': {
         'check_func': r'fruit|edible',
+        'groundtruth_explanation': 'Return whether the input is a food.',
+        'template': '{input} is a type of',
+        'target_token': ' food',
+        'get_relevant_data': generate_synthetic_data,
+        'examples': ['apple', 'orange', 'pear', 'pizza', 'lasagna', 'curry', 'salad', 'chopstick'],
+    },
+    'numbers': {
+        'check_func': r'number',
+        'groundtruth_explanation': 'Return whether the input is a number.',
+        'template': '{input} is related to the concept of',
+        'target_token': ' numbers',
+        'get_relevant_data': generate_synthetic_data,
+        'examples': ['1', '2', '3', 'four', 'five', 'six', 'plus', 'minus', 'divide'],
     }
 }
 
 
 class SyntheticModule():
 
-    def __init__(self, task_str: str = 'animal', checkpoint='facebook/opt-125m'):
+    def __init__(self, task_str: str = 'animal', checkpoint='EleutherAI/gpt-j-6B'):
         """
         Params
         ------
         """
-        self.task_str = task_str
         self.llm = mprompt.llm.get_llm(checkpoint)
+        self._init_task(task_str)
+
+    def _init_task(self, task_str: str):
+        self.task_str = task_str
         self.task = TASKS[task_str]
         self.prompt_template = PromptTemplate(
             input_variables=['input'],
