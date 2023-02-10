@@ -41,7 +41,7 @@ class fMRIModule():
         self.corrs = np.sort(
             np.load(join(self.save_dir_fmri, 'corrs.npz'))['arr_0'])
 
-    def __call__(self, X: List[str]) -> np.ndarray:
+    def __call__(self, X: List[str], return_all=False) -> np.ndarray[float]:
         """Returns a scalar continuous response for each element of X
         """
         # get bert embeddings
@@ -53,9 +53,14 @@ class fMRIModule():
         # apply fMRI transform
         preds_fMRI = embs @ self.weights
 
+        
+        if return_all:
+            return preds_fMRI[:, :200]
+            
         # select voxel
-        pred_voxel = preds_fMRI[:, self.voxel_num_best]
-        return pred_voxel
+        else:
+            pred_voxel = preds_fMRI[:, self.voxel_num_best]
+            return pred_voxel
 
     def get_relevant_data(self) -> List[str]:
         """read in full text of 26 narrative stories
@@ -63,7 +68,6 @@ class fMRIModule():
         with open(join(self.save_dir_fmri, 'narrative_stories.txt'), 'r') as f:
             narrative_stories = f.readlines()
         return narrative_stories
-
 
 if __name__ == '__main__':
     mod = fMRIModule()

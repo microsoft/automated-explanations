@@ -4,17 +4,18 @@ import numpy as np
 from spacy.lang.en import English
 from os.path import dirname, join
 import os.path
-from joblib import Memory
-methods_dir = dirname(os.path.abspath(__file__))
-location = join(dirname(dirname(methods_dir)), 'results', 'cache_ngrams')
-memory = Memory(location, verbose=0)
+import pickle as pkl
+import inspect
+repo_dir = dirname(dirname(dirname(os.path.abspath(__file__))))
 
 def explain_ngrams(
+        args,
         X: List[str],
         mod,
         ngrams: int = 3,
         all_ngrams: bool = True,
-        num_top_ngrams: int = 100
+        num_top_ngrams: int = 100,
+        use_cache: bool = True,
 ) -> List[str]:
     """Note: this caches the call that gets the scores
     """
@@ -29,9 +30,22 @@ def explain_ngrams(
     # print(f'{ngrams_list=}')
 
     # compute scores
-    # call_cached = memory.cache(mod.__call__)
-    # ngram_scores = call_cached(mod(ngrams_list))
-    ngram_scores = mod(ngrams_list)
+    cache_file  = join(repo_dir, 'results', 'cache_ngrams', f'{args.module_name}.pkl')
+    if os.path.exists(cache_file):
+        ngram_scores = pkl.load(open(cache_file, 'rb'))
+    else:
+        call_parameters = inspect.signature(mod.__call__).parameters.keys()
+        if 'return_all' in call_parameters:
+            ngram_scores = mod(ngrams_list, return_all=True)
+        else:
+            ngram_scores = mod(ngrams_list)
+        os.makedirs(dirname(cache_file), exist_ok=True)
+        pkl.dump(ngram_scores, open(cache_file, 'wb'))
+
+    # multidimensional predictions
+    if len(ngram_scores.shape) > 1 and ngram_scores.shape[1] > 1:
+        ngram_scores = ngram_scores[:, args.module_num]
+
     # print(f'{ngram_scores=}')
     scores_top_idxs = np.argsort(ngram_scores)[::-1]
     return np.array(ngrams_list)[scores_top_idxs][:num_top_ngrams].flatten().tolist()

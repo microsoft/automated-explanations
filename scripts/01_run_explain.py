@@ -31,4 +31,5 @@ submit_utils.run_args_list(
     args_list,
     script_name=join(repo_dir, 'experiments', '01_explain.py'),
     actually_run=True,
+    gpu_ids=[0],
 )

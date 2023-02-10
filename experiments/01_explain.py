@@ -112,18 +112,19 @@ if __name__ == '__main__':
     text_str_list = mod.get_relevant_data()
 
     # subsample data
-    # don't subsample fmri data it takes too long to rerun
-    # and joblib.cache is calledo n the full dataset in explain_ngrams
     if args.subsample_frac < 1 and not args.module_name == 'fmri':
-        n_subsample = int(len(text_str_list) * args.subsample_frac)
+        assert False, 'dont subsample data right now, since explain_ngrams is using caching'
+        # n_subsample = int(len(text_str_list) * args.subsample_frac)
 
         # randomly subsample list
-        text_str_list = np.random.choice(
-            text_str_list, size=n_subsample, replace=False).tolist()
+        # text_str_list = np.random.choice(
+            # text_str_list, size=n_subsample, replace=False).tolist()
 
     # explain with method
     explanation_init_ngrams = mprompt.methods.ngrams.explain_ngrams(
-        text_str_list, mod)
+        args,
+        text_str_list, mod
+        )
     r['explanation_init_ngrams'] = explanation_init_ngrams
     logging.info(
         f'{explanation_init_ngrams[:3]=} {len(explanation_init_ngrams)}')
