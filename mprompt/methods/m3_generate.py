@@ -13,19 +13,17 @@ from langchain import PromptTemplate
 def generate_synthetic_strs(
     llm: LLM,
     explanation_str: str,
-    num_synthetic_strs: int = 2,
-    prefix_str_add='Generate 20 sentences that contain the concept of',
-    prefix_str_remove='Generate 20 sentences that contain the concept of',
+    num_synthetic_strs: int = 20,
 ) -> Tuple[List[str], List[str]]:
     """Generate text_added and text_removed via call to an LLM.
     Note: might want to pass in a custom text to edit in this function.
+    Issue: flan-t5-xxl is only able to generate one sentence before stopping
     """
 
     template = '''
-Generate {num_synthetic_strs} senteces that {blank_or_do_not}contain the concept of "{concept}":
+Generate {num_synthetic_strs} sentences that {blank_or_do_not}contain the concept of "{concept}":
 
-1.'
-'''
+1. The'''
     prompt_template = PromptTemplate(
         input_variables=['num_synthetic_strs', 'blank_or_do_not', 'concept'],
         template=template,
@@ -66,9 +64,9 @@ Generate {num_synthetic_strs} senteces that {blank_or_do_not}contain the concept
 
 
 if __name__ == '__main__':
-    llm = get_llm(checkpoint='google/flan-t5-xxl')
+    llm = get_llm(checkpoint='facebook/opt-iml-max-30b')
     strs_added, strs_removed = generate_synthetic_strs(
         llm,
         explanation_str='anger',
-        num_synthetic_strs=1)
+        num_synthetic_strs=20)
     print(f'{strs_added=} {strs_removed=}')

@@ -141,7 +141,8 @@ if __name__ == '__main__':
     logging.info('\n\nGenerating synthetic data....')
     for explanation_str in explanation_strs:
         strs_added, strs_removed = mprompt.methods.m3_generate.generate_synthetic_strs(
-            llm, explanation_str=explanation_str, num_synthetic_strs=args.num_synthetic_strs)
+            llm, explanation_str=explanation_str,
+            num_synthetic_strs=args.num_synthetic_strs)
         r['strs_added'].append(strs_added)
         r['strs_removed'].append(strs_removed)
 

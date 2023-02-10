@@ -48,7 +48,7 @@ def llm_hf(checkpoint='google/flan-t5-xl') -> LLM:
             self._tokenizer = _get_tokenizer(_checkpoint)
             if 'google/flan' in checkpoint:
                 self._model = T5ForConditionalGeneration.from_pretrained(
-                    checkpoint, device_map="auto")
+                    checkpoint, device_map="auto", torch_dtype=torch.float16)
             else:
                 self._model = AutoModelForCausalLM.from_pretrained(
                     checkpoint, device_map="auto",
@@ -61,11 +61,16 @@ def llm_hf(checkpoint='google/flan-t5-xl') -> LLM:
                 prompt, return_tensors="pt").input_ids.to("cuda")
             # stopping_criteria = StoppingCriteriaList([MaxLengthCriteria(max_length=max_tokens)])
             # outputs = self._model.generate(input_ids, max_length=max_tokens, stopping_criteria=stopping_criteria)
-            outputs = self._model.generate(input_ids, max_length=max_tokens)
+            outputs = self._model.generate(
+                input_ids,
+                # max_new_tokens=max_tokens,
+                do_sample=True,
+            )
             out_str = self._tokenizer.decode(outputs[0])
             if 'facebook/opt' in checkpoint:
                 return out_str[len('</s>') + len(prompt):]
             elif 'google/flan' in checkpoint:
+                print('full', out_str)
                 return out_str[len('<pad>'):out_str.index('</s>')]
             else:
                 return out_str
@@ -99,21 +104,3 @@ def llm_hf(checkpoint='google/flan-t5-xl') -> LLM:
             return "custom_hf_llm_for_langchain"
 
     return LLM_HF()
-
-
-if __name__ == '__main__':
-    llm = llm_hf(checkpoint='facebook/opt-125m')
-    # print(prompt)
-    # print(answer)
-    for (prompt, answer) in [
-        ('Question: Is a cat an animal?\nAnswer:', ' Yes.'),
-        ('Question: Is a dog an animal?\nAnswer:', ' Yes.'),
-        ('Question: Is a cat a fruit?\nAnswer:', ' No.'),
-        ('Question: Is a dog a fruit?\nAnswer:', ' No.'),
-    ]:
-        target_token = ' Yes.'
-        # answer = llm(prompt) # this is weird, adds some kind of asynchrony or something
-        logit_target = llm.get_logit_for_target_token(
-            prompt, target_token=target_token)
-        # print(prompt.strip(), answer, f'logit for logit_target: {logit_target:0.2f}')
-        print(repr(prompt), logit_target)
