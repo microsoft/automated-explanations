@@ -20,12 +20,12 @@ def generate_synthetic_strs(
     """Generate text_added and text_removed via call to an LLM.
     Note: might want to pass in a custom text to edit in this function.
     """
+
     template = '''
 Generate {num_synthetic_strs} senteces that {blank_or_do_not}contain the concept of "{concept}":
 
 1.'
 '''
-
     prompt_template = PromptTemplate(
         input_variables=['num_synthetic_strs', 'blank_or_do_not', 'concept'],
         template=template,
@@ -39,15 +39,16 @@ Generate {num_synthetic_strs} senteces that {blank_or_do_not}contain the concept
             concept=explanation_str,
         )
 
-        synthetic_text_numbered_str = llm(prompt)
+        # note: this works works with openai model
+        # but tends to stop after generating just one text with non-openai
+        # need to fix generation function to generate more...
+        synthetic_text_numbered_str = llm(prompt, max_tokens=1000)
         print(synthetic_text_numbered_str)
 
         # need to parse output for generations here....
         # (split the string s on any numeric character)
-        ks = [
-            k.replace('.', '').replace('"', '').strip()
-            for k in re.split(r'\d', synthetic_text_numbered_str) if k.strip()
-        ]
+        synthetic_strs = re.split(r'\d', synthetic_text_numbered_str)
+        print('synthetic_strs=', synthetic_strs)
 
         # ks = list(set(ks))  # remove duplicates
         # ks = [k.lower() for k in ks if len(k) > 2] # lowercase & len > 2
@@ -55,11 +56,11 @@ Generate {num_synthetic_strs} senteces that {blank_or_do_not}contain the concept
         # synthetic_str = synthetic_str.strip()
         # ....
 
-        if blank_or_do_not == '':
-            strs_added.append(synthetic_str)
-        else:
-            strs_removed.append(synthetic_str)
-
+        for s in synthetic_strs:
+            if blank_or_do_not == '':
+                strs_added.append(s)
+            else:
+                strs_removed.append(s)
     return strs_added, strs_removed
 
 

@@ -11,7 +11,8 @@ from langchain.llms.base import LLM
 import torch
 from langchain.cache import InMemoryCache
 from transformers import AutoConfig, AutoModel, AutoTokenizer, AutoModelForCausalLM
-from transformers import T5Tokenizer, T5ForConditionalGeneration
+from transformers import T5Tokenizer, T5ForConditionalGeneration, StoppingCriteriaList, MaxLengthCriteria
+
 langchain.llm_cache = InMemoryCache()
 
 
@@ -41,31 +42,26 @@ def _get_tokenizer(checkpoint):
 
 
 def llm_hf(checkpoint='google/flan-t5-xl') -> LLM:
-    class LLM_HF(LLM):
-        # langchain forces us to initialize stuff in this kind of weird way
-        _checkpoint: str = checkpoint
-        _max_tokens = 100
-        _tokenizer = _get_tokenizer(_checkpoint)
-        if 'google/flan' in checkpoint:
-            _model = T5ForConditionalGeneration.from_pretrained(
-                checkpoint, device_map="auto")
-        else:
-            _model = AutoModelForCausalLM.from_pretrained(
-                checkpoint, device_map="auto",
-                torch_dtype=torch.float16)
+    class LLM_HF():
+        def __init__(self):
+            _checkpoint: str = checkpoint
+            self._tokenizer = _get_tokenizer(_checkpoint)
+            if 'google/flan' in checkpoint:
+                self._model = T5ForConditionalGeneration.from_pretrained(
+                    checkpoint, device_map="auto")
+            else:
+                self._model = AutoModelForCausalLM.from_pretrained(
+                    checkpoint, device_map="auto",
+                    torch_dtype=torch.float16)
 
-        @property
-        def _llm_type(self) -> str:
-            return "custom_hf_llm_for_langchain"
-
-        # langchain wants _call instead of __call__
-        def _call(self, prompt: str, stop: Optional[List[str]] = None) -> str:
+        def __call__(self, prompt: str, stop: Optional[List[str]] = None, max_tokens=1000) -> str:
             if stop is not None:
                 raise ValueError("stop kwargs are not permitted.")
             input_ids = self._tokenizer(
                 prompt, return_tensors="pt").input_ids.to("cuda")
-            outputs = self._model.generate(
-                input_ids, max_length=self._max_tokens)
+            # stopping_criteria = StoppingCriteriaList([MaxLengthCriteria(max_length=max_tokens)])
+            # outputs = self._model.generate(input_ids, max_length=max_tokens, stopping_criteria=stopping_criteria)
+            outputs = self._model.generate(input_ids, max_length=max_tokens)
             out_str = self._tokenizer.decode(outputs[0])
             if 'facebook/opt' in checkpoint:
                 return out_str[len('</s>') + len(prompt):]
@@ -97,6 +93,10 @@ def llm_hf(checkpoint='google/flan-t5-xl') -> LLM:
         def _identifying_params(self) -> Mapping[str, Any]:
             """Get the identifying parameters."""
             return vars(self)
+
+        @property
+        def _llm_type(self) -> str:
+            return "custom_hf_llm_for_langchain"
 
     return LLM_HF()
 
