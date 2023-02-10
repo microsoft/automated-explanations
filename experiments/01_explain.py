@@ -151,6 +151,12 @@ if __name__ == '__main__':
     logging.info(f'{explanation_strs[0]}\n+++++++++\n\t' + '\n\t'.join(r['strs_added'][0][:3]) +
                  '\n--------\n\t' + '\n\t'.join(r['strs_removed'][0][:3]))
 
+    # sort everything by score
+    sort_inds = np.argsort(r['score_synthetic'])[::-1]
+    for k in ['explanation_init_strs', 'strs_added', 'strs_removed', 'score_synthetic']:
+        r[k] = [r[k][i] for i in sort_inds]
+        r['top_' + k] = r[k][0]
+
     # evaluate how well explanation matches a "groundtruth"
     if getattr(mod, "get_groundtruth_explanation", None):
         logging.info('\n\Scoring explanation....')

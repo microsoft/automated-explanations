@@ -41,7 +41,7 @@ class fMRIModule():
         self.corrs = np.sort(
             np.load(join(self.save_dir_fmri, 'corrs.npz'))['arr_0'])
 
-    def __call__(self, X: List[str], return_all=False) -> np.ndarray[float]:
+    def __call__(self, X: List[str], return_all=False) -> np.ndarray:
         """Returns a scalar continuous response for each element of X
         """
         # get bert embeddings

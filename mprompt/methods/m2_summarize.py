@@ -7,6 +7,7 @@ from os.path import join
 import pickle as pkl
 from langchain.llms.base import LLM
 from mprompt.llm import get_llm
+from langchain import PromptTemplate
 
 def summarize_ngrams(
     llm: LLM,
