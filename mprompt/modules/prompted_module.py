@@ -51,14 +51,15 @@ TASKS = {
         'template': '{input} is related to the concept of',
         'target_token': ' numbers',
         'get_relevant_data': generate_synthetic_data,
+        # actual numbers like '1' do poorly
         'examples': ['1', '2', '3', 'four', 'five', 'six', 'plus', 'minus', 'divide'],
     }
 }
 
 
-class SyntheticModule():
+class PromptedModule():
 
-    def __init__(self, task_str: str = 'animal', checkpoint='EleutherAI/gpt-j-6B'):
+    def __init__(self, task_str: str = 'animal', checkpoint='gpt-xl'):
         """
         Params
         ------
@@ -106,7 +107,7 @@ class SyntheticModule():
 
 
 if __name__ == '__main__':
-    mod = SyntheticModule()
+    mod = PromptedModule()
     X = mod.get_relevant_data()
     print(X[0][:50])
     resp = mod(X[:3])

@@ -1,15 +1,19 @@
 import numpy as np
 from mprompt.llm import llm_hf
-from mprompt.modules.synthetic_groundtruth import SyntheticModule, TASKS
-
+from mprompt.modules.prompted_module import PromptedModule, TASKS
+import torch
+import random
 
 def test_synthetic(
-    # checkpoint='gpt2-xl', # 1.5B
-    checkpoint='EleutherAI/gpt-j-6B',
+    checkpoint='gpt2-xl', # 1.5B
+    # checkpoint='EleutherAI/gpt-j-6B',
     # checkpoint='facebook/opt-6.7b', # fails with opt models
     # checkpoint='facebook/opt-13b',
 ):
-    mod = SyntheticModule(
+    np.random.seed(1)
+    random.seed(1)
+    torch.manual_seed(1)
+    mod = PromptedModule(
         checkpoint=checkpoint
     )
     for task_str in TASKS.keys():

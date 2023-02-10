@@ -11,11 +11,11 @@ import pickle as pkl
 import imodelsx
 import torch
 import mprompt.llm
-import mprompt.modules.fmri
-import mprompt.modules.synthetic_groundtruth
-import mprompt.methods.ngrams
-import mprompt.methods.summarize
-import mprompt.methods.synthetic
+import mprompt.modules.fmri_module
+import mprompt.modules.prompted_module
+import mprompt.methods.m1_ngrams
+import mprompt.methods.m2_summarize
+import mprompt.methods.m3_generate
 import cache_save_utils
 
 # initialize args
@@ -32,7 +32,7 @@ def add_main_args(parser):
     parser.add_argument('--checkpoint', type=str,
                         default='google/flan-t5-xxl', help='which llm to use for each step')
     parser.add_argument('--checkpoint_module', type=str,
-                        default='EleutherAI/gpt-j-6B', help='which llm to use for the module (if synthetic)')
+                        default='gpt2-xl', help='which llm to use for the module (if synthetic)')
 
     # training misc args
     parser.add_argument('--seed', type=int, default=1,
@@ -103,9 +103,9 @@ if __name__ == '__main__':
 
     # load module to interpret
     if args.module_name == 'fmri':
-        mod = mprompt.modules.fmri.fMRIModule(voxel_num_best=args.module_num)
+        mod = mprompt.modules.fmri_module.fMRIModule(voxel_num_best=args.module_num)
     elif args.module_name == 'synthetic':
-        mod = mprompt.modules.synthetic_groundtruth.SyntheticModule(
+        mod = mprompt.modules.prompted_module.PromptedModule(
             checkpoint=args.checkpoint_module)
 
     # load text data
@@ -121,7 +121,7 @@ if __name__ == '__main__':
             # text_str_list, size=n_subsample, replace=False).tolist()
 
     # explain with method
-    explanation_init_ngrams = mprompt.methods.ngrams.explain_ngrams(
+    explanation_init_ngrams = mprompt.methods.m1_ngrams.explain_ngrams(
         args,
         text_str_list, mod
         )
@@ -131,7 +131,7 @@ if __name__ == '__main__':
 
     # summarize the ngrams into some candidate strings
     llm = mprompt.llm.get_llm(args.checkpoint)
-    explanation_strs = mprompt.methods.summarize.summarize_ngrams(
+    explanation_strs = mprompt.methods.m2_summarize.summarize_ngrams(
         llm, explanation_init_ngrams,
         num_summaries=args.num_summaries, num_top_ngrams=args.num_top_ngrams)
     r['explanation_init_strs'] = explanation_strs
@@ -140,7 +140,7 @@ if __name__ == '__main__':
     # generate synthetic data
     logging.info('\n\nGenerating synthetic data....')
     for explanation_str in explanation_strs:
-        strs_added, strs_removed = mprompt.methods.synthetic.generate_synthetic_strs(
+        strs_added, strs_removed = mprompt.methods.m3_generate.generate_synthetic_strs(
             llm, explanation_str=explanation_str, num_synthetic_strs=args.num_synthetic_strs)
         r['strs_added'].append(strs_added)
         r['strs_removed'].append(strs_removed)
