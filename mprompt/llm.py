@@ -54,7 +54,8 @@ def llm_hf(checkpoint='google/flan-t5-xl') -> LLM:
                     checkpoint, device_map="auto",
                     torch_dtype=torch.float16)
 
-        def __call__(self, prompt: str, stop: Optional[List[str]] = None, max_tokens=1000) -> str:
+        def __call__(self, prompt: str, stop: Optional[List[str]] = None,
+        max_new_tokens=20, do_sample=False) -> str:
             if stop is not None:
                 raise ValueError("stop kwargs are not permitted.")
             input_ids = self._tokenizer(
@@ -63,8 +64,10 @@ def llm_hf(checkpoint='google/flan-t5-xl') -> LLM:
             # outputs = self._model.generate(input_ids, max_length=max_tokens, stopping_criteria=stopping_criteria)
             outputs = self._model.generate(
                 input_ids,
-                # max_new_tokens=max_tokens,
-                do_sample=True,
+                max_new_tokens=max_new_tokens,
+                do_sample=do_sample,
+                # top_p=0.92, 
+                # top_k=0
             )
             out_str = self._tokenizer.decode(outputs[0])
             if 'facebook/opt' in checkpoint:

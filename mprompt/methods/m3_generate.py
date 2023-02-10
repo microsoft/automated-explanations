@@ -17,7 +17,9 @@ def generate_synthetic_strs(
 ) -> Tuple[List[str], List[str]]:
     """Generate text_added and text_removed via call to an LLM.
     Note: might want to pass in a custom text to edit in this function.
-    Issue: flan-t5-xxl is only able to generate one sentence before stopping
+    Issue
+        flan-t5-xxl/opt-iml-max-30b can only generate one sentence before stopping
+        EleutherAI/gpt-neox-20b can generate multiple sentences, but they are not faithful to the concept
     """
 
     template = '''
@@ -40,7 +42,7 @@ Generate {num_synthetic_strs} sentences that {blank_or_do_not}contain the concep
         # note: this works works with openai model
         # but tends to stop after generating just one text with non-openai
         # need to fix generation function to generate more...
-        synthetic_text_numbered_str = llm(prompt, max_tokens=1000)
+        synthetic_text_numbered_str = llm(prompt, max_new_tokens=400, do_sample=True)
         print(synthetic_text_numbered_str)
 
         # need to parse output for generations here....
@@ -64,7 +66,7 @@ Generate {num_synthetic_strs} sentences that {blank_or_do_not}contain the concep
 
 
 if __name__ == '__main__':
-    llm = get_llm(checkpoint='facebook/opt-iml-max-30b')
+    llm = get_llm(checkpoint='EleutherAI/gpt-neox-20b')
     strs_added, strs_removed = generate_synthetic_strs(
         llm,
         explanation_str='anger',
