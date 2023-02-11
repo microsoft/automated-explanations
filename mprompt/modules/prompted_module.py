@@ -50,7 +50,7 @@ class PromptedModule():
     def get_relevant_data(self) -> List[str]:
         """Return text corpus for this task
         """
-        return self.task['get_relevant_data']()
+        return self.task['gen_func']()
 
     def get_groundtruth_explanation(self) -> str:
         """Return the groundtruth explanation

@@ -28,9 +28,14 @@ def explain_ngrams(
     # get unique ngrams
     ngrams_list = sorted(list(set(ngrams_list)))
     # print(f'{ngrams_list=}')
+    print('num ngrams', len(ngrams_list), 'examples', ngrams_list[:5])
 
-    # compute scores
-    cache_file  = join(repo_dir, 'results', 'cache_ngrams', f'{args.module_name}.pkl')
+    # compute scores and cache...
+    # fmri should cache all preds together, since they are efficiently computed together
+    if args.module_name == 'fmri':
+        cache_file  = join(repo_dir, 'results', 'cache_ngrams', f'{args.module_name}.pkl')
+    else:
+        cache_file = join(repo_dir, 'results', 'cache_ngrams', f'{args.module_name}_{args.module_num}.pkl')
     if os.path.exists(cache_file):
         ngram_scores = pkl.load(open(cache_file, 'rb'))
     else:

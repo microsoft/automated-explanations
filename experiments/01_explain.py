@@ -17,6 +17,7 @@ import mprompt.modules.prompted_module
 import mprompt.methods.m1_ngrams
 import mprompt.methods.m2_summarize
 import mprompt.methods.m3_generate
+from mprompt.data.data import TASKS_D3
 import cache_save_utils
 
 
@@ -41,7 +42,7 @@ def add_main_args(parser):
 
     # module args
     parser.add_argument('--module_name', type=str,
-                        default='synthetic', help='name of module', choices=['fmri', 'synthetic'])
+                        default='prompted', help='name of module', choices=['fmri', 'synthetic'])
     parser.add_argument('--module_num', type=int,
                         default=0, help='number of module to select')
 
@@ -102,10 +103,13 @@ if __name__ == '__main__':
 
     # load module to interpret
     if args.module_name == 'fmri':
-        mod = mprompt.modules.fmri_module.fMRIModule(voxel_num_best=args.module_num)
-    elif args.module_name == 'synthetic':
+        mod = mprompt.modules.fmri_module.fMRIModule(
+            voxel_num_best=args.module_num)
+    elif args.module_name == 'prompted':
         mod = mprompt.modules.prompted_module.PromptedModule(
-            checkpoint=args.checkpoint_module)
+            task_str=list(TASKS_D3.keys())[0],
+            checkpoint=args.checkpoint_module,
+        )
 
     # load text data
     text_str_list = mod.get_relevant_data()
@@ -116,14 +120,15 @@ if __name__ == '__main__':
         # n_subsample = int(len(text_str_list) * args.subsample_frac)
 
         # randomly subsample list
-        # text_str_list = np.random.choice(
+        # text_str_list, size=n_subsample, replace=False).tolist()
             # text_str_list, size=n_subsample, replace=False).tolist()
 
     # explain with method
     explanation_init_ngrams = mprompt.methods.m1_ngrams.explain_ngrams(
         args,
-        text_str_list, mod
-        )
+        text_str_list,
+        mod,
+    )
     r['explanation_init_ngrams'] = explanation_init_ngrams
     logging.info(
         f'{explanation_init_ngrams[:3]=} {len(explanation_init_ngrams)}')
