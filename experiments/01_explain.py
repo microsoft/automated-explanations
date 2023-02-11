@@ -143,10 +143,11 @@ if __name__ == '__main__':
 
     # summarize the ngrams into some candidate strings
     llm = mprompt.llm.get_llm(args.checkpoint)
-    explanation_strs = mprompt.methods.m2_summarize.summarize_ngrams(
+    explanation_strs, explanation_rationales = mprompt.methods.m2_summarize.summarize_ngrams(
         args, llm, explanation_init_ngrams,
         num_summaries=args.num_summaries, num_top_ngrams=args.num_top_ngrams)
     r['explanation_init_strs'] = explanation_strs
+    r['explanation_init_rationales'] = explanation_rationales
     logging.info('explanation_init_strs\n\t' + '\n\t'.join(explanation_strs))
 
     # generate synthetic data

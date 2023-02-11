@@ -1,5 +1,5 @@
 import re
-from typing import Any, List, Mapping, Optional
+from typing import Any, List, Mapping, Optional, Tuple
 import numpy as np
 import openai
 import os.path
@@ -20,18 +20,21 @@ def summarize_ngrams(
     num_top_ngrams: int = 30,
     num_top_ngrams_to_consider: int = 50,
     # seed: int = 0,
-) -> List[str]:
+) -> Tuple[List[str], List[str]]:
     """Refine a keyphrase by making a call to the llm
     """
     rng = np.random.default_rng(args.seed)
 
     summaries = []
+    summary_rationales = []
     for i in range(num_summaries):
         # randomly sample num_top_ngrams (preserving ordering)
+        n_to_choose_from = min(num_top_ngrams_to_consider, len(ngrams_list))
+        n_to_choose = min(num_top_ngrams, n_to_choose_from)
         idxs = np.sort(
-            rng.choice(np.arange(
-                min(num_top_ngrams_to_consider, len(ngrams_list))),  # choose from this many ngrams
-                size=num_top_ngrams, # choose this many ngrams
+            rng.choice(
+                n_to_choose_from,
+                size=n_to_choose,
                 replace=False
             )
         )
@@ -41,43 +44,68 @@ def summarize_ngrams(
         summary = llm(prompt)
 
         # clean up summary
-        summary = summary.strip()
-        # if summary.startswith('that'):
-
-        if summary.endswith('.'):
-            summary = summary[:-1]
-
-        # keep removing unnecessary prefixes
-        modified_str = True
-        while modified_str:
-            modified_str = False
-            for k in ['that', 'they', 'are', 'all', 'contain', 'the', 'use of', 'related to', 'involve'
-            'some form of', 'some kind of', 'the use of', 'describe', 'refer to']:
-                if summary.startswith(k):
-                    summary = summary[len(k):].strip()
-                    modified_str = True
-        
-        '''
-        # clean up the keyphrases
-        # (split the string s on any numeric character)
-        ks = [
-            k.replace('.', '').strip()
-            for k in re.split(r'\d', refined_keyphrase) if k.strip()
-        ]
-
-        ks = list(set(ks))  # remove duplicates
-        ks = [k.lower() for k in ks if len(k) > 2]
-        '''
-
+        summary, summary_rationale = clean_summary(summary)
         summaries.append(summary)
+        summary_rationales.append(summary_rationale)
 
     # remove replicates
-    summaries = list(set(summaries))
-    return summaries
+    idxs_replicate = [False]
+    summaries_running = {summaries[0]}
+    for i in range(1, len(summaries)):
+        if summaries[i] in summaries_running:
+            idxs_replicate.append(True)
+        else:
+            idxs_replicate.append(False)
+        summaries_running.add(summaries[i])
+    summaries = [s for i, s in enumerate(summaries) if not idxs_replicate[i]]
+    summary_rationales = [s for i, s in enumerate(
+        summary_rationales) if not idxs_replicate[i]]
+
+    return summaries, summary_rationales
+
+
+def clean_summary(summary: str):
+    summary = summary.strip().lower()
+
+    # keep removing unnecessary prefixes
+    modified_str = True
+    while modified_str:
+        modified_str = False
+        for k in ['that', 'they', 'are', 'all', 'contain', 'the', 'use of', 'related to', 'involve',
+                  'some form of', 'some kind of', 'the use of', 'describe', 'refer to', 'words', 'word', 'used to', 'relate to', ]:
+            if summary.startswith(k):
+                summary = summary[len(k):].strip()
+                modified_str = True
+
+    # remove unnecessary suffix
+    if summary.endswith('.'):
+        summary = summary[:-1]
+
+    # sometimes summary comes with a rationale, e.g.
+    # Summary: [involve people and places.]
+    # Rationale: [Many of the phrases involve someone saying something, or someone being somewhere. There are also references to family members, such as "father's getting" and "grandfather caught a"]
+    if '. ' in summary:
+        summary_clean = summary[:summary.index('. ')].strip()
+        summary_rationale = summary[summary.index('. ') + 1:].strip()
+    else:
+        summary_clean = summary
+        summary_rationale = ''
+
+    return summary_clean, summary_rationale
 
 
 if __name__ == '__main__':
-    llm = get_llm(checkpoint='google/flan-t5-xxl')
-    summary = summarize_ngrams(
-        llm, ['cat', 'dog', 'bird', 'elephant', 'cheetah'])
-    print('summary', repr(summary))
+    summary_clean, summary_rationale = clean_summary(
+        'relate to some form of science or research. Many of the phrases refer to specific scientific fields such as actuarial science, transracial adoption, and cognitive ability. Other phrases refer to the effects of certain phenomena, such as prozac and epilepsy')
+    # print('Clean:', repr(summary_clean))
+    # print('Rationale:', repr(summary_rationale))
+    llm = get_llm(checkpoint='text-davinci-003')
+
+    class args:
+        seed = 1
+    summaries, summary_rationales = summarize_ngrams(
+        args,
+        llm,
+        ['cat', 'dog', 'bird', 'elephant', 'cheetah'])
+    print('Summaries:', summaries)
+    print('Rationales:', summary_rationales)

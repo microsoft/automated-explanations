@@ -41,6 +41,8 @@ def llm_openai(checkpoint='text-davinci-003') -> LLM:
             hash_str = hashlib.sha256(prompt.encode()).hexdigest()
             cache_file = join(
                 self.cache_dir, f'{hash_str}__num_tok={max_new_tokens}__seed={seed}.pkl')
+            cache_file_raw = join(
+                self.cache_dir, f'raw_{hash_str}__num_tok={max_new_tokens}__seed={seed}.pkl')
             if os.path.exists(cache_file):
                 return pkl.load(open(cache_file, 'rb'))
 
@@ -57,6 +59,8 @@ def llm_openai(checkpoint='text-davinci-003') -> LLM:
             response_text = response['choices'][0]['text']
 
             pkl.dump(response_text, open(cache_file, 'wb'))
+            pkl.dump({'prompt': prompt, 'response_text': response_text},
+                     open(cache_file_raw, 'wb'))
             return response_text
 
     return LLM_OpenAI(checkpoint)
