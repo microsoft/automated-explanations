@@ -56,7 +56,7 @@ def add_main_args(parser):
     parser.add_argument('--num_summaries', type=int,
                         default=2, help='number of summaries to start with')
     parser.add_argument('--num_synthetic_strs', type=int,
-                        default=2, help='number of synthetic strings to generate')
+                        default=3, help='number of synthetic strings to generate')
     return parser
 
 
@@ -144,7 +144,7 @@ if __name__ == '__main__':
     # summarize the ngrams into some candidate strings
     llm = mprompt.llm.get_llm(args.checkpoint)
     explanation_strs = mprompt.methods.m2_summarize.summarize_ngrams(
-        llm, explanation_init_ngrams,
+        args, llm, explanation_init_ngrams,
         num_summaries=args.num_summaries, num_top_ngrams=args.num_top_ngrams)
     r['explanation_init_strs'] = explanation_strs
     logging.info('explanation_init_strs\n\t' + '\n\t'.join(explanation_strs))
@@ -160,7 +160,7 @@ if __name__ == '__main__':
 
         # evaluate synthetic data (higher score is better)
         r['score_synthetic'].append(
-            np.mean(mod(strs_added) - mod(strs_removed)))
+            np.mean(mod(strs_added)) - np.mean(mod(strs_removed)))
     logging.info(f'{explanation_strs[0]}\n+++++++++\n\t' + '\n\t'.join(r['strs_added'][0][:3]) +
                  '\n--------\n\t' + '\n\t'.join(r['strs_removed'][0][:3]))
 

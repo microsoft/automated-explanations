@@ -41,14 +41,14 @@ Generate {num_synthetic_strs} sentences that {blank_or_do_not}contain the concep
 
         # note: this works works with openai model
         # but tends to stop after generating just one text with non-openai
-        # need to fix generation function to generate more...
         synthetic_text_numbered_str = llm(prompt, max_new_tokens=400, do_sample=True)
         print(synthetic_text_numbered_str)
 
-        # need to parse output for generations here....
-        # (split the string s on any numeric character)
-        synthetic_strs = re.split(r'\d', synthetic_text_numbered_str)
-        synthetic_strs = [s[s.index('.')] for s in synthetic_strs if s.strip()]
+        
+        # split the string s on any number followed by period like 1. or 2.
+        synthetic_strs = re.split(r'\d.', synthetic_text_numbered_str)
+        synthetic_strs = [s.strip() for s in synthetic_strs if s.strip()]
+        synthetic_strs = [s for s in synthetic_strs if len(s) > 2]
         print('synthetic_strs=', synthetic_strs)
 
         # ks = list(set(ks))  # remove duplicates

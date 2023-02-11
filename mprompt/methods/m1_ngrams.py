@@ -14,7 +14,7 @@ def explain_ngrams(
         mod,
         ngrams: int = 3,
         all_ngrams: bool = True,
-        num_top_ngrams: int = 100,
+        num_top_ngrams: int = 75,
         use_cache: bool = True,
 ) -> List[str]:
     """Note: this caches the call that gets the scores

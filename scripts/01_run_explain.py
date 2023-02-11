@@ -10,11 +10,14 @@ from imodelsx import submit_utils
 params_shared_dict = {
     'seed': [1],
     # 'save_dir': [join('/home/chansingh/mntv1', 'mprompt', 'jan30')],
-    'save_dir': [join(repo_dir, 'results', 'feb9')],
+    'save_dir': [join(repo_dir, 'results', 'feb10_fmri_sweep')],
     'use_cache': [1], # pass binary values with 0/1 instead of the ambiguous strings True/False
     'subsample_frac': [1],
     'module_num': list(range(200)),
     'module_name': ['fmri'],
+    'num_top_ngrams': [30],
+    'num_summaries': [5],
+    'num_synthetic_strs': [10],
 }
 
 # List of tuples to sweep over (these values are coupled, and swept over together)
@@ -31,5 +34,6 @@ submit_utils.run_args_list(
     args_list,
     script_name=join(repo_dir, 'experiments', '01_explain.py'),
     actually_run=True,
-    gpu_ids=[0],
+    # gpu_ids=[0],
+    n_cpus=1,
 )
