@@ -47,9 +47,15 @@ def summarize_ngrams(
         if summary.endswith('.'):
             summary = summary[:-1]
 
-        for k in ['that', 'they']:
-            if summary.startswith(k):
-                summary = summary[len(k):].strip()
+        # keep removing unnecessary prefixes
+        modified_str = True
+        while modified_str:
+            modified_str = False
+            for k in ['that', 'they', 'are', 'all', 'contain', 'the', 'use of', 'related to', 'involve'
+            'some form of', 'some kind of', 'the use of', 'describe', 'refer to']:
+                if summary.startswith(k):
+                    summary = summary[len(k):].strip()
+                    modified_str = True
         
         '''
         # clean up the keyphrases
