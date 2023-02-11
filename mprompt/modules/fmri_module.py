@@ -34,12 +34,14 @@ class fMRIModule():
         # load weights
         self.weights = pkl.load(
             open(join(self.save_dir_fmri, 'weights.pkl'), 'rb'))
-
-        # load test corrs for each voxel
         self.preproc = pkl.load(
             open(join(self.save_dir_fmri, 'preproc.pkl'), 'rb'))
+
+        # load test corrs for each voxel
+        # this has all voxels, so can infer voxel locations from this
         self.corrs = np.sort(
-            np.load(join(self.save_dir_fmri, 'corrs.npz'))['arr_0'])
+            np.load(join(self.save_dir_fmri, 'corrs.npz'))['arr_0'])[::-1]
+        self.corr = self.corrs[voxel_num_best]
 
     def __call__(self, X: List[str], return_all=False) -> np.ndarray:
         """Returns a scalar continuous response for each element of X
@@ -75,3 +77,4 @@ if __name__ == '__main__':
     print(X[0][:50])
     resp = mod(X[:3])
     print(resp)
+    print(mod.corrs[:20])

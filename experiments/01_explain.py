@@ -107,6 +107,7 @@ if __name__ == '__main__':
     if args.module_name == 'fmri':
         mod = mprompt.modules.fmri_module.fMRIModule(
             voxel_num_best=args.module_num)
+        r['fmri_test_corr'] = mod.corr
     elif args.module_name.startswith('prompted'):
         if args.module_name == 'prompted_d3':
             T = TASKS_D3
