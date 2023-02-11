@@ -3,7 +3,8 @@ from copy import deepcopy
 import logging
 import random
 from collections import defaultdict
-from os.path import join
+from os.path import join, dirname
+import os
 import numpy as np
 from sklearn.metrics import accuracy_score, roc_auc_score
 from sklearn.model_selection import train_test_split
@@ -17,8 +18,6 @@ import mprompt.methods.m1_ngrams
 import mprompt.methods.m2_summarize
 import mprompt.methods.m3_generate
 import cache_save_utils
-
-# initialize args
 
 
 def add_main_args(parser):
