@@ -60,7 +60,8 @@ def calculate_mean_preds_matrix_over_tasks(mod, task_names, assert_checks=False)
 
 
 if __name__ == '__main__':
-    checkpoint = 'gpt2-xl'
+    # checkpoint = 'gpt2-xl'
+    checkpoint = 'facebook/opt-iml-max-30b'
     task_names = list(TASKS_D3.keys())
     np.random.seed(1)
     random.seed(1)
@@ -71,4 +72,4 @@ if __name__ == '__main__':
     mean_preds_matrix = calculate_mean_preds_matrix_over_tasks(
         mod, task_names, assert_checks=False)
     pkl.dump(mean_preds_matrix,
-             open(join(path_to_repo, 'results', 'mean_preds_matrix_d3.pkl'), 'wb'))
+             open(join(path_to_repo, 'results', f'mean_preds_matrix_d3___{checkpoint.replace("/", "__")}.pkl'), 'wb'))
