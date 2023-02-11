@@ -71,196 +71,337 @@ TASKS_D3 = {
         'groundtruth_explanation': 'describes a situation that involves terrorism',
         'template': 'The phrase "{input}" involves',
         'target_token': ' terrorism',
-
+        'examples': ['bomb threat', 'hijacking', 'radicalization', 'terrorism', 'hostage-taking'],
     },
     'd3_7_crime': {
-        'check_func': 'crime|criminal|criminality',
-        'groundtruth_explanation': 'involves crime'
-    },
-    'd3_8_shelter': {
-        'check_func': 'shelter|home|house',
-        'groundtruth_explanation': 'describes a situation where people need shelter'
-    },
-    'd3_9_food': {
-        'check_func': 'food|hunger|needs',
-        'groundtruth_explanation': 'is related to food security'
-    },
-    'd3_10_infrastructure': {
-        'check_func': 'infrastructure|buildings|roads|bridges|build',
-        'groundtruth_explanation': 'is related to infrastructure'
-    },
-    'd3_11_regime change': {
-        'check_func': 'regime change|coup|revolution|revolt|political action|political event|upheaval',
-        'groundtruth_explanation': 'describes a regime change'
-    },
-    'd3_12_medical': {
-        'check_func': 'medical|health',
-        'groundtruth_explanation': 'is related to a medical situation'
-    },
-    'd3_13_water': {
-        'check_func': 'water',
-        'groundtruth_explanation': 'involves a situation where people need clean water'
-    },
-    'd3_14_search': {
-        'check_func': 'search|rescue|help',
-        'groundtruth_explanation': 'involves a search/rescue situation'
-    },
+'check_func': 'crime|criminal|criminality',
+'groundtruth_explanation': 'involves crime',
+'template': 'The phrase "{input}" involves',
+'target_token': ' crime',
+'examples': ['robbery', 'theft', 'murder', 'fraud', 'embezzlement'],
+},
+'d3_8_shelter': {
+'check_func': 'shelter|home|house',
+'groundtruth_explanation': 'describes a situation where people need shelter',
+'template': 'The phrase "{input}" describes a situation where people need',
+'target_token': ' shelter',
+'examples': ['homelessness', 'natural disaster', 'refugee crisis', 'emergency housing', 'eviction'],
+},
+'d3_9_food': {
+'check_func': 'food|hunger|needs',
+'groundtruth_explanation': 'is related to food security',
+'template': 'The phrase "{input}" is related to',
+'target_token': ' food security',
+'examples': ['food insecurity', 'malnutrition', 'food bank', 'hunger strike', 'food assistance'],
+},
+'d3_10_infrastructure': {
+'check_func': 'infrastructure|buildings|roads|bridges|build',
+'groundtruth_explanation': 'is related to infrastructure',
+'template': 'The phrase "{input}" is related to',
+'target_token': ' infrastructure',
+'examples': ['transportation', 'construction', 'public works', 'utilities', 'urban planning'],
+},
+'d3_11_regime change': {
+'check_func': 'regime change|coup|revolution|revolt|political action|political event|upheaval',
+'groundtruth_explanation': 'describes a regime change',
+'template': 'The phrase "{input}" describes a',
+'target_token': ' regime change',
+'examples': ['overthrow of a government', 'political uprising', 'peaceful transition of power', 'elections', "coup"],
+},
+'d3_12_medical': {
+'check_func': 'medical|health',
+'groundtruth_explanation': 'is related to a medical situation',
+'template': 'The phrase "{input}" is related to a',
+'target_token': ' medical situation',
+'examples': ['disease outbreak', 'vaccination campaign', 'emergency medical response', 'public health policy', 'healthcare access'],
+},
+'d3_13_water': {
+'check_func': 'water',
+'groundtruth_explanation': 'involves a situation where people need clean water',
+'template': 'The phrase "{input}" involves a situation where people need',
+'target_token': ' clean water',
+'examples': ['water scarcity', 'water pollution', 'waterborne illness', 'water infrastructure', 'water conservation'],
+},
+'d3_14_search': {
+'check_func': 'search|rescue|help',
+'groundtruth_explanation': 'involves a search/rescue situation',
+'template': 'The phrase "{input}" involves a',
+'target_token': ' search/rescue situation',
+'examples': ['missing person', 'natural disaster response', 'emergency services', 'mountain rescue', 'disaster relief'],
+},
     'd3_15_utility': {
-        'check_func': 'utility|energy|sanitation|electricity|power',
-        'groundtruth_explanation': 'expresses need for utility, energy or sanitation'
-    },
-    'd3_16_hillary': {
-        'check_func': 'hillary|clinton|against Hillary|opposed to Hillary|republican|against Clinton|opposed to Clinton',
-        'groundtruth_explanation': 'is against Hillary'
-    },
-    'd3_17_hillary': {
-        'check_func': 'hillary|clinton|support Hillary|support Clinton|democrat',
-        'groundtruth_explanation': 'supports hillary'
-    },
-    'd3_18_offensive': {
-        'check_func': 'offensive|toxic|abusive|insulting|insult|abuse|offend|offend',
-        'groundtruth_explanation': 'contains offensive content'
-    },
-    'd3_19_offensive': {
-        'check_func': 'offensive|toxic|abusive|insulting|insult|abuse|offend|offend|women|immigrants',
-        'groundtruth_explanation': 'insult women or immigrants'
-    },
-    'd3_20_pro-life': {
-        'check_func': 'pro-life|abortion|pro life',
-        'groundtruth_explanation': 'is pro-life'
-    },
-    'd3_21_pro-choice': {
-        'check_func': 'pro-choice|abortion|pro choice',
-        'groundtruth_explanation': 'supports abortion'
-    },
+'check_func': 'utility|energy|sanitation|electricity|power',
+'groundtruth_explanation': 'expresses need for utility, energy or sanitation',
+'template': 'The phrase "{input}" involves',
+'target_token': 'utility, energy or sanitation',
+'examples': ['electricity bill', 'water supply', 'power outage', 'sewage treatment', 'garbage disposal'],
+},
+'d3_16_hillary': {
+'check_func': 'hillary|clinton|against Hillary|opposed to Hillary|republican|against Clinton|opposed to Clinton',
+'groundtruth_explanation': 'is against Hillary',
+'template': 'The phrase "{input}" involves',
+'target_token': 'being against Hillary',
+'examples': ['Never Hillary', 'Stop Hillary', 'Hillary for Prison', 'Anti-Clinton', 'Never Clinton'],
+},
+'d3_17_hillary': {
+'check_func': 'hillary|clinton|support Hillary|support Clinton|democrat',
+'groundtruth_explanation': 'supports hillary',
+'template': 'The phrase "{input}" involves',
+'target_token': 'supporting Hillary',
+'examples': ["I'm With Her", 'Hillary 2020', 'Clinton Foundation', 'Democrats for Hillary', 'Hillary supporter'],
+},
+'d3_18_offensive': {
+'check_func': 'offensive|toxic|abusive|insulting|insult|abuse|offend|offend',
+'groundtruth_explanation': 'contains offensive content',
+'template': 'The phrase "{input}" involves',
+'target_token': 'offensive content',
+'examples': ['racial slurs', 'sexist comments', 'homophobic remarks', 'hate speech', 'harassment'],
+},
+'d3_19_offensive': {
+'check_func': 'offensive|toxic|abusive|insulting|insult|abuse|offend|offend|women|immigrants',
+'groundtruth_explanation': 'insult women or immigrants',
+'template': 'The phrase "{input}" involves',
+'target_token': 'insulting women or immigrants',
+'examples': ['misogynistic comments', 'xenophobic remarks', 'sexist insults', 'hate speech against women', 'racist attacks on immigrants'],
+},
+'d3_20_pro-life': {
+'check_func': 'pro-life|abortion|pro life',
+'groundtruth_explanation': 'is pro-life',
+'template': 'The phrase "{input}" involves',
+'target_token': 'being pro-life',
+'examples': ['anti-abortion', 'defund Planned Parenthood', 'sanctity of life', 'pro-birth', 'abortion is murder'],
+},
+'d3_21_pro-choice': {
+'check_func': 'pro-choice|abortion|pro choice',
+'groundtruth_explanation': 'supports abortion',
+'template': 'The phrase "{input}" involves',
+'target_token': 'supporting abortion',
+'examples': ['reproductive rights', 'abortion access', "women's choice", 'my body my choice', 'trust women'],
+},
     'd3_22_physics': {
-        'check_func': 'physics',
-        'groundtruth_explanation': 'is about physics'
-    },
-    'd3_23_computer science': {
-        'check_func': 'computer science|computer|artificial intelligence|ai',
-        'groundtruth_explanation': 'is related to computer science'
-    },
-    'd3_24_statistics': {
-        'check_func': 'statistics|stat|probability',
-        'groundtruth_explanation': 'is about statistics'
-    },
-    'd3_25_math': {
-        'check_func': 'math|arithmetic|algebra|geometry',
-        'groundtruth_explanation': 'is about math research'
-    },
-    'd3_26_grammar': {
-        'check_func': 'grammar|syntax|punctuation|grammat',
-                      'groundtruth_explanation': 'is ungrammatical'
-    },
-    'd3_27_grammar': {
-        'check_func': 'grammar|syntax|punctuation|grammat',
-                      'groundtruth_explanation': 'is grammatical'
-    },
-    'd3_28_sexis': {
-        'check_func': 'sexis|women|femini',
-        'groundtruth_explanation': 'is offensive to women'
-    },
-    'd3_29_sexis': {
-        'check_func': 'sexis|women|femini',
-        'groundtruth_explanation': 'supports feminism'
-    },
-    'd3_30_news': {
-        'check_func': 'news|international|current events',
-        'groundtruth_explanation': 'is about world news'
-    },
+'check_func': 'physics',
+'groundtruth_explanation': 'is about physics',
+'template': 'The phrase "{input}" is about',
+'target_token': ' physics',
+'examples': ["quantum mechanics", "thermodynamics", "astrophysics"],
+},
+'d3_23_computer science': {
+'check_func': 'computer science|computer|artificial intelligence|ai',
+'groundtruth_explanation': 'is related to computer science',
+'template': 'The phrase "{input}" is related to',
+'target_token': ' computer science',
+'examples': ["programming", "machine learning", "data structures"],
+},
+'d3_24_statistics': {
+'check_func': 'statistics|stat|probability',
+'groundtruth_explanation': 'is about statistics',
+'template': 'The phrase "{input}" is about',
+'target_token': ' statistics',
+'examples': ["hypothesis testing", "regression analysis", "sampling distributions"],
+},
+'d3_25_math': {
+'check_func': 'math|arithmetic|algebra|geometry',
+'groundtruth_explanation': 'is about math research',
+'template': 'The phrase "{input}" is about',
+'target_token': ' math research',
+'examples': ["number theory", "topology", "combinatorics"],
+},
+'d3_26_grammar': {
+'check_func': 'grammar|syntax|punctuation|grammat',
+'groundtruth_explanation': 'is ungrammatical',
+'template': 'The phrase "{input}" is',
+'target_token': ' ungrammatical',
+'examples': ["Me no speak English good.", "Her don't like coffee.", "I is very happy."],
+},
+'d3_27_grammar': {
+'check_func': 'grammar|syntax|punctuation|grammat',
+'groundtruth_explanation': 'is grammatical',
+'template': 'The phrase "{input}" is',
+'target_token': ' grammatical',
+'examples': ["I am happy.", "He likes coffee.", "She speaks English well."],
+},
+'d3_28_sexis': {
+'check_func': 'sexis|women|femini',
+'groundtruth_explanation': 'is offensive to women',
+'template': 'The phrase "{input}" is',
+'target_token': ' offensive to women',
+'examples': ["She's not good at math because she's a woman.", "Women belong in the kitchen.", "Girls can't play sports."],
+},
+'d3_29_sexis': {
+'check_func': 'sexis|women|femini',
+'groundtruth_explanation': 'supports feminism',
+'template': 'The phrase "{input}" supports',
+'target_token': ' feminism',
+'examples': ["Equal pay for equal work.", "Reproductive rights for women.", "Girls can do anything boys can do."],
+},
+'d3_30_news': {
+'check_func': 'news|international|current events',
+'groundtruth_explanation': 'is about world news',
+'template': 'The phrase "{input}" is about',
+'target_token': ' world news',
+'examples': ["Politics in Europe", "Economic developments in Asia", "Natural disasters in South America"],
+},
     'd3_31_sports': {
-        'check_func': 'sports',
-        'groundtruth_explanation': 'is about sports news'
-    },
-    'd3_32_business': {
-        'check_func': 'business|economics|finance',
-        'groundtruth_explanation': 'is related to business'
-    },
-    'd3_33_tech': {
-        'check_func': 'tech',
-        'groundtruth_explanation': 'is related to technology'
-    },
-    'd3_34_bad': {
-        'check_func': 'bad|negative|awful|terrible|horrible|poor|boring|dislike',
-        'groundtruth_explanation': 'contains a bad movie review'
-    },
-    'd3_35_good': {
-        'check_func': 'good|great|like|love|positive|awesome|amazing|excellent',
-        'groundtruth_explanation': 'thinks the movie is good'
-    },
-    'd3_36_quantity': {
-        'check_func': 'quantity|number|numeric',
-        'groundtruth_explanation': 'asks for a quantity'
-    },
-    'd3_37_location': {
-        'check_func': 'location|place',
-        'groundtruth_explanation': 'asks about a location'
-    },
-    'd3_38_person': {
-        'check_func': 'person|group|individual|people',
-        'groundtruth_explanation': 'asks about a person'
-    },
-    'd3_39_entity': {
-        'check_func': 'entity|thing|object',
-        'groundtruth_explanation': 'asks about an entity'
-    },
+'check_func': 'sports',
+'groundtruth_explanation': 'is about sports news',
+'template': 'The phrase "{input}" is about',
+'target_token': ' sports',
+'examples': ["football game", "basketball player", "tennis tournament"],
+},
+'d3_32_business': {
+'check_func': 'business|economics|finance',
+'groundtruth_explanation': 'is related to business',
+'template': 'The phrase "{input}" is related to',
+'target_token': ' business',
+'examples': ["stock market", "corporate merger", "entrepreneurship"],
+},
+'d3_33_tech': {
+'check_func': 'tech',
+'groundtruth_explanation': 'is related to technology',
+'template': 'The phrase "{input}" is related to',
+'target_token': ' technology',
+'examples': ["computer hardware", "artificial intelligence", "digital privacy"],
+},
+'d3_34_bad': {
+'check_func': 'bad|negative|awful|terrible|horrible|poor|boring|dislike',
+'groundtruth_explanation': 'contains a bad movie review',
+'template': 'The phrase "{input}" contains',
+'target_token': ' a negative sentiment',
+'examples': ["worst movie ever", "boring plot", "terrible acting"],
+},
+'d3_35_good': {
+'check_func': 'good|great|like|love|positive|awesome|amazing|excellent',
+'groundtruth_explanation': 'thinks the movie is good',
+'template': 'The phrase "{input}" thinks the movie is',
+'target_token': ' good',
+'examples': ["excellent performance", "amazing special effects", "loved the movie"],
+},
+'d3_36_quantity': {
+'check_func': 'quantity|number|numeric',
+'groundtruth_explanation': 'asks for a quantity',
+'template': 'The phrase "{input}" asks for a',
+'target_token': ' quantity',
+'examples': ["How many are there?", "What is the total?", "How much does it cost?"],
+},
+'d3_37_location': {
+'check_func': 'location|place',
+'groundtruth_explanation': 'asks about a location',
+'template': 'The phrase "{input}" asks about',
+'target_token': ' a location',
+'examples': ["Where is the nearest hotel?", "What's the address?", "Can you give me directions?"],
+},
+'d3_38_person': {
+'check_func': 'person|group|individual|people',
+'groundtruth_explanation': 'asks about a person',
+'template': 'The phrase "{input}" asks about',
+'target_token': ' a person',
+'examples': ["Who is the CEO?", "What's your name?", "Can you introduce me to him?"],
+},
+'d3_39_entity': {
+'check_func': 'entity|thing|object',
+'groundtruth_explanation': 'asks about an entity',
+'template': 'The phrase "{input}" asks about',
+'target_token': ' an entity',
+'examples': ["What is that?", "Can you show me?", "What's the name of this?"],
+},
     'd3_40_abbrevation': {
-        'check_func': 'abbrevation|abbr|acronym',
-        'groundtruth_explanation': 'asks about an abbreviation'
-    },
-    'd3_41_defin': {
-        'check_func': 'defin|meaning|explain',
-        'groundtruth_explanation': 'contains a definition'
-    },
-    'd3_42_environment': {
-        'check_func': 'environment|climate change|global warming',
-        'groundtruth_explanation': 'is against environmentalist'
-    },
-    'd3_43_environment': {
-        'check_func': 'environment|climate change|global warming',
-        'groundtruth_explanation': 'is environmentalist'
-    },
-    'd3_44_spam': {
-        'check_func': 'spam|annoying|unwanted',
-        'groundtruth_explanation': 'is a spam'
-    },
-    'd3_45_fact': {
-        'check_func': 'fact|info|knowledge',
-        'groundtruth_explanation': 'asks for factual information'
-    },
-    'd3_46_opinion': {
-        'check_func': 'opinion|personal|bias',
-        'groundtruth_explanation': 'asks for an opinion'
-    },
-    'd3_47_math': {
-        'check_func': 'math|science',
-        'groundtruth_explanation': 'is related to math and science'
-    },
-    'd3_48_health': {
-        'check_func': 'health|medical|disease',
-        'groundtruth_explanation': 'is related to health'
-    },
-    'd3_49_computer': {
-        'check_func': 'computer|internet|web',
-        'groundtruth_explanation': 'related to computer or internet'
-    },
-    'd3_50_sport': {
-        'check_func': 'sport',
-        'groundtruth_explanation': 'is related to sports'
-    },
-    'd3_51_entertainment': {
-        'check_func': 'entertainment|music|movie|tv',
-        'groundtruth_explanation': 'is about entertainment'
-    },
-    'd3_52_family': {
-        'check_func': 'family|relationships',
-        'groundtruth_explanation': 'is about family and relationships'
-    },
-    'd3_53_politic': {
-        'check_func': 'politic|government|law',
-        'groundtruth_explanation': 'is related to politics or government'
-    }
+'check_func': 'abbrevation|abbr|acronym',
+'groundtruth_explanation': 'asks about an abbreviation',
+'template': 'The phrase "{input}" is an',
+'target_token': ' abbreviation',
+'examples': ["NASA", "UNESCO", "FBI"],
+},
+'d3_41_defin': {
+'check_func': 'defin|meaning|explain',
+'groundtruth_explanation': 'contains a definition',
+'template': 'The phrase "{input}" means',
+'target_token': ' ',
+'examples': ["What is the meaning of love?", "Define 'algorithm'", "Explain 'cognitive dissonance'"],
+},
+'d3_42_environment': {
+'check_func': 'environment|climate change|global warming',
+'groundtruth_explanation': 'is against environmentalist',
+'template': 'The phrase "{input}" is',
+'target_token': ' against environmentalist',
+'examples': ["climate change is a hoax", "stop the eco-terrorists", "save the whales... and eat them"],
+},
+'d3_43_environment': {
+'check_func': 'environment|climate change|global warming',
+'groundtruth_explanation': 'is environmentalist',
+'template': 'The phrase "{input}" supports',
+'target_token': ' environmentalism',
+'examples': ["reduce, reuse, recycle", "climate change is real", "protect the rainforest"],
+},
+'d3_44_spam': {
+'check_func': 'spam|annoying|unwanted',
+'groundtruth_explanation': 'is a spam',
+'template': 'The phrase "{input}" is',
+'target_token': ' a spam',
+'examples': ["Make money fast", "Lose weight quickly", "You've won a prize"],
+},
+'d3_45_fact': {
+'check_func': 'fact|info|knowledge',
+'groundtruth_explanation': 'asks for factual information',
+'template': 'The phrase "{input}" refers to',
+'target_token': ' factual information',
+'examples': ["What is the capital of France?", "When was World War II?", "How many planets are in the solar system?"],
+},
+'d3_46_opinion': {
+'check_func': 'opinion|personal|bias',
+'groundtruth_explanation': 'asks for an opinion',
+'template': 'In your opinion, is "{input}"',
+'target_token': ' ?',
+'examples': ["Do you think chocolate is the best ice cream flavor?", "What's your favorite movie?", "Should college be free?"],
+},
+'d3_47_math': {
+'check_func': 'math|science',
+'groundtruth_explanation': 'is related to math and science',
+'template': 'The phrase "{input}" is related to',
+'target_token': ' math and science',
+'examples': ["What's the Pythagorean theorem?", "What is a derivative?", "What are the four fundamental forces of nature?"],
+},
+'d3_48_health': {
+'check_func': 'health|medical|disease',
+'groundtruth_explanation': 'is related to health',
+'template': 'The phrase "{input}" is related to',
+'target_token': ' health',
+'examples': ["How to prevent heart disease?", "What is diabetes?", "What are the symptoms of depression?"],
+},
+   'd3_49_computer': {
+'check_func': 'computer|internet|web',
+'groundtruth_explanation': 'related to computer or internet',
+'template': 'The phrase "{input}" is',
+'target_token': ' related to computers or the internet',
+'examples': ["website", "software", "network", "online", "programming"],
+},
+'d3_50_sport': {
+'check_func': 'sport',
+'groundtruth_explanation': 'is related to sports',
+'template': 'The phrase "{input}" is',
+'target_token': ' related to sports',
+'examples': ["football", "basketball", "tennis", "soccer", "baseball"],
+},
+'d3_51_entertainment': {
+'check_func': 'entertainment|music|movie|tv',
+'groundtruth_explanation': 'is about entertainment',
+'template': 'The phrase "{input}" is',
+'target_token': ' related to entertainment',
+'examples': ["concert", "film", "show", "streaming", "cinema"],
+},
+'d3_52_family': {
+'check_func': 'family|relationships',
+'groundtruth_explanation': 'is about family and relationships',
+'template': 'The phrase "{input}" is',
+'target_token': ' related to family and relationships',
+'examples': ["parenting", "marriage", "divorce", "childhood", "siblings"],
+},
+'d3_53_politic': {
+'check_func': 'politic|government|law',
+'groundtruth_explanation': 'is related to politics or government',
+'template': 'The phrase "{input}" is',
+'target_token': ' related to politics or government',
+'examples': ["election", "legislation", "democracy", "voting", "diplomacy"],
+}
 }
 ks = list(TASKS_D3.keys())
 
