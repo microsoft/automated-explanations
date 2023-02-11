@@ -70,6 +70,7 @@ TASKS_D3 = {
         'check_func': 'terorrism|terror',
         'groundtruth_explanation': 'describes a situation that involves terrorism',
         'template': 'The phrase "{input}" involves',
+        'target_token': ' terrorism',
 
     },
     'd3_7_crime': {
@@ -94,7 +95,7 @@ TASKS_D3 = {
     },
     'd3_12_medical': {
         'check_func': 'medical|health',
-                      'groundtruth_explanation': 'is related to a medical situation'
+        'groundtruth_explanation': 'is related to a medical situation'
     },
     'd3_13_water': {
         'check_func': 'water',
@@ -110,11 +111,11 @@ TASKS_D3 = {
     },
     'd3_16_hillary': {
         'check_func': 'hillary|clinton|against Hillary|opposed to Hillary|republican|against Clinton|opposed to Clinton',
-                      'groundtruth_explanation': 'is against Hillary'
+        'groundtruth_explanation': 'is against Hillary'
     },
     'd3_17_hillary': {
         'check_func': 'hillary|clinton|support Hillary|support Clinton|democrat',
-                      'groundtruth_explanation': 'supports hillary'
+        'groundtruth_explanation': 'supports hillary'
     },
     'd3_18_offensive': {
         'check_func': 'offensive|toxic|abusive|insulting|insult|abuse|offend|offend',
