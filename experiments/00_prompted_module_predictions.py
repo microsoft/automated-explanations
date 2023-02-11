@@ -37,9 +37,9 @@ def calculate_mean_preds_matrix_over_tasks(mod, task_names, assert_checks=False)
             else:
                 X = TASKS[task_str_baseline]['examples']
                 pred = mod(X)
-                probs_baseline |= {
+                probs_baseline.update({
                     x: p for x, p in zip(X, pred)
-                }
+                })
                 mean_preds_matrix[r, c] = np.mean(list(probs_baseline.values()))
 
         if assert_checks:
