@@ -41,7 +41,7 @@ class PromptedModule():
         """Returns a scalar continuous response for each element of X
         """
         probs = np.zeros(len(X))
-        for i, x in enumerate(X):
+        for i, x in enumerate(tqdm(X)):
             prompt = self.prompt_template.format(input=x)
             probs[i] = self.llm._get_logit_for_target_token(
                 prompt, target_token_str=self.task['target_token'])
@@ -69,8 +69,9 @@ class PromptedModule():
 
 
 if __name__ == '__main__':
-    mod = PromptedModule()
+    mod = PromptedModule(task_str='d3_0_irony')
     X = mod.get_relevant_data()
+    print('X', X)
     print(X[0][:50])
     resp = mod(X[:3])
     print(resp)

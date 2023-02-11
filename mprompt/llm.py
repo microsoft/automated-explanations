@@ -34,23 +34,25 @@ def llm_openai(checkpoint='text-davinci-003') -> LLM:
             self.checkpoint = checkpoint
             self.cache_dir = cache_dir
 
-        def __call__(self, prompt: str, max_tokens=250, seed=1):
+        def __call__(self, prompt: str,
+                     max_new_tokens=250, seed=1, do_sample=True):
             # cache
             os.makedirs(self.cache_dir, exist_ok=True)
             hash_str = hashlib.sha256(prompt.encode()).hexdigest()
-            cache_file = join(self.cache_dir, f'{hash_str}__num_tok={max_tokens}__seed={seed}.pkl')
+            cache_file = join(
+                self.cache_dir, f'{hash_str}__num_tok={max_new_tokens}__seed={seed}.pkl')
             if os.path.exists(cache_file):
                 return pkl.load(open(cache_file, 'rb'))
 
             response = openai.Completion.create(
                 engine=self.checkpoint,
                 prompt=prompt,
-                max_tokens=max_tokens,
+                max_tokens=max_new_tokens,
                 temperature=0.1,
                 top_p=1,
                 frequency_penalty=0.25,  # maximum is 2
                 presence_penalty=0,
-                stop=["101"]
+                # stop=["101"]
             )
             response_text = response['choices'][0]['text']
 

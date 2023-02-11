@@ -40,6 +40,7 @@ def explain_ngrams(
         ngram_scores = pkl.load(open(cache_file, 'rb'))
     else:
         call_parameters = inspect.signature(mod.__call__).parameters.keys()
+        print('predicting all ngrams...')
         if 'return_all' in call_parameters:
             ngram_scores = mod(ngrams_list, return_all=True)
         else:
@@ -53,7 +54,8 @@ def explain_ngrams(
 
     # print(f'{ngram_scores=}')
     scores_top_idxs = np.argsort(ngram_scores)[::-1]
-    return np.array(ngrams_list)[scores_top_idxs][:num_top_ngrams].flatten().tolist()
+    ngrams_top = np.array(ngrams_list)[scores_top_idxs][:num_top_ngrams]
+    return ngrams_top.flatten().tolist()
 
 
 if __name__ == '__main__':

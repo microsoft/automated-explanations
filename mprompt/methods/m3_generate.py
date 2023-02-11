@@ -48,6 +48,7 @@ Generate {num_synthetic_strs} sentences that {blank_or_do_not}contain the concep
         # need to parse output for generations here....
         # (split the string s on any numeric character)
         synthetic_strs = re.split(r'\d', synthetic_text_numbered_str)
+        synthetic_strs = [s[s.index('.')] for s in synthetic_strs if s.strip()]
         print('synthetic_strs=', synthetic_strs)
 
         # ks = list(set(ks))  # remove duplicates

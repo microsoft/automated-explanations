@@ -17,7 +17,7 @@ import mprompt.modules.prompted_module
 import mprompt.methods.m1_ngrams
 import mprompt.methods.m2_summarize
 import mprompt.methods.m3_generate
-from mprompt.data.data import TASKS_D3
+from mprompt.data.data import TASKS_D3, TASKS_TOY
 import cache_save_utils
 
 
@@ -30,7 +30,9 @@ def add_main_args(parser):
     parser.add_argument('--subsample_frac', type=float,
                         default=1, help='fraction of samples to use')
     parser.add_argument('--checkpoint', type=str,
-                        default='google/flan-t5-xxl', help='which llm to use for each step')
+                        # default='google/flan-t5-xxl',
+                        default='text-davinci-003',
+                        help='which llm to use for each step')
     parser.add_argument('--checkpoint_module', type=str,
                         default='gpt2-xl', help='which llm to use for the module (if synthetic)')
 
@@ -42,8 +44,8 @@ def add_main_args(parser):
 
     # module args
     parser.add_argument('--module_name', type=str,
-                        default='prompted', help='name of module', choices=['fmri', 'synthetic'])
-    parser.add_argument('--module_num', type=int,
+                        default='prompted_toy', help='name of module', choices=['fmri', 'prompted_d3', 'prompted_toy'])
+    parser.add_argument('--module_num', type=int, # good task is d3_13_water or d3_16_hillary
                         default=0, help='number of module to select')
 
     # algo args
@@ -105,9 +107,15 @@ if __name__ == '__main__':
     if args.module_name == 'fmri':
         mod = mprompt.modules.fmri_module.fMRIModule(
             voxel_num_best=args.module_num)
-    elif args.module_name == 'prompted':
+    elif args.module_name.startswith('prompted'):
+        if args.module_name == 'prompted_d3':
+            T = TASKS_D3
+        else:
+            T = TASKS_TOY
+        task_str = list(T.keys())[args.module_num]
+        print('running', task_str)
         mod = mprompt.modules.prompted_module.PromptedModule(
-            task_str=list(TASKS_D3.keys())[0],
+            task_str=task_str,
             checkpoint=args.checkpoint_module,
         )
 

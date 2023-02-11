@@ -16,11 +16,12 @@ DESCRIPTIONS_DICT = json.load(open(
 def fetch_data(task_name_induction):
     df = pd.read_csv(oj(D3_PROCESSED_DIR,
                         task_name_induction[:task_name_induction.rindex('_')] + '.csv'))
+    # print('df', df.head())
     # Fix input: Encourage model to answer output as next token.
     # df['input'] = df['input'].map(lambda s: f'Input: {s} Answer:')
     # Fix output: Prepend a space and add newlines to match output format of number tasks
     # df['output'] = df['output'].map(lambda s: f' {s}\n\n')
-    return df
+    return df['input'].values.tolist()
 
 
 
@@ -409,7 +410,7 @@ TASKS_D3 = {
 ks = list(TASKS_D3.keys())
 
 for k in ks:
-    TASKS_D3[k]['gen_func'] = partial(fetch_data, k)
+    TASKS_D3[k]['gen_func'] = partial(fetch_data, task_name_induction=k)
 
 if __name__ == '__main__':
     print(TASKS_D3)

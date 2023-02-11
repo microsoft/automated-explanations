@@ -15,7 +15,7 @@ def summarize_ngrams(
     num_summaries: int=2,
     prefix_str='Here is a list of phrases:',
     suffix_str='What is a common theme among these phrases?\nThe common theme among these phrases is',
-    num_top_ngrams: int = 40,
+    num_top_ngrams: int = 30,
     # seed: int = 0,
 ) -> List[str]:
     """Refine a keyphrase by making a call to the llm
@@ -32,6 +32,9 @@ def summarize_ngrams(
         summary = summary.strip()
         # if summary.startswith('that'):
 
+        if summary.endswith('.'):
+            summary = summary[:-1]
+
         '''
         # clean up the keyphrases
         # (split the string s on any numeric character)
@@ -46,6 +49,8 @@ def summarize_ngrams(
 
         summaries.append(summary)
 
+    # remove replicates
+    summaries = list(set(summaries))
     return summaries
 
 
