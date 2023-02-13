@@ -10,10 +10,12 @@ from mprompt.llm import get_llm
 from transformers import T5Tokenizer, T5ForConditionalGeneration
 from langchain import PromptTemplate
 
+
 def generate_synthetic_strs(
     llm: LLM,
     explanation_str: str,
     num_synthetic_strs: int = 20,
+    template_num: int=0,
 ) -> Tuple[List[str], List[str]]:
     """Generate text_added and text_removed via call to an LLM.
     Note: might want to pass in a custom text to edit in this function.
@@ -22,17 +24,28 @@ def generate_synthetic_strs(
         EleutherAI/gpt-neox-20b can generate multiple sentences, but they are not faithful to the concept
     """
 
-    template = '''
+    templates = [
+        '''
 Generate {num_synthetic_strs} sentences that {blank_or_do_not}contain the concept of "{concept}":
 
-1. The'''
+1. The''',
+        '''
+Generate {num_synthetic_strs} phrases that are {blank_or_do_not}similar to the concept of "{concept}":
+
+1.''',
+    ]
+    blank_or_do_not_templates = [
+        ['', 'do not '],
+        ['', 'not '],
+    ]
+    template = templates[template_num]
     prompt_template = PromptTemplate(
         input_variables=['num_synthetic_strs', 'blank_or_do_not', 'concept'],
         template=template,
-    )    
+    )
     strs_added = []
     strs_removed = []
-    for blank_or_do_not in ['', 'do not ']:
+    for blank_or_do_not in blank_or_do_not_templates[template_num]:
         prompt = prompt_template.format(
             num_synthetic_strs=num_synthetic_strs,
             blank_or_do_not=blank_or_do_not,
@@ -41,13 +54,23 @@ Generate {num_synthetic_strs} sentences that {blank_or_do_not}contain the concep
 
         # note: this works works with openai model
         # but tends to stop after generating just one text with non-openai
-        synthetic_text_numbered_str = llm(prompt, max_new_tokens=400, do_sample=True)
+        synthetic_text_numbered_str = llm(
+            prompt, max_new_tokens=400, do_sample=True)
+        print('\n\n---------------\n')
+        print(prompt)
+        print('\n\n---------------\n')
         print(synthetic_text_numbered_str)
+        print('\n\n---------------\n')
 
-        
         # split the string s on any number followed by period like 1. or 2.
-        synthetic_strs = re.split(r'\d.', synthetic_text_numbered_str)
-        synthetic_strs = [s.strip() for s in synthetic_strs if s.strip()]
+        synthetic_strs_split = re.split(r'\d.', synthetic_text_numbered_str)
+        synthetic_strs_split = [s.strip() for s in synthetic_strs_split if s.strip()]
+        synthetic_strs = []
+        for i in range(len(synthetic_strs_split)):
+            s = synthetic_strs_split[i]
+            if s.startswith('.'):
+                s = s[1:]
+            synthetic_strs.append(s.strip())
         synthetic_strs = [s for s in synthetic_strs if len(s) > 2]
         print('synthetic_strs=', synthetic_strs)
 
@@ -65,11 +88,13 @@ Generate {num_synthetic_strs} sentences that {blank_or_do_not}contain the concep
     return strs_added, strs_removed
 
 
-
 if __name__ == '__main__':
-    llm = get_llm(checkpoint='EleutherAI/gpt-neox-20b')
+    # llm = get_llm(checkpoint='EleutherAI/gpt-neox-20b')
+    llm = get_llm('text-davinci-003')
     strs_added, strs_removed = generate_synthetic_strs(
         llm,
         explanation_str='anger',
-        num_synthetic_strs=20)
+        num_synthetic_strs=20,
+        template_num=1,    
+    )
     print(f'{strs_added=} {strs_removed=}')

@@ -57,6 +57,8 @@ def add_main_args(parser):
                         default=2, help='number of summaries to start with')
     parser.add_argument('--num_synthetic_strs', type=int,
                         default=3, help='number of synthetic strings to generate')
+    parser.add_argument('--generate_template_num', type=int,
+                        default=1, help='which template to use for generation')
     return parser
 
 
@@ -156,7 +158,9 @@ if __name__ == '__main__':
     for explanation_str in explanation_strs:
         strs_added, strs_removed = mprompt.methods.m3_generate.generate_synthetic_strs(
             llm, explanation_str=explanation_str,
-            num_synthetic_strs=args.num_synthetic_strs)
+            num_synthetic_strs=args.num_synthetic_strs,
+            template_num=args.generate_template_num,
+        )
         r['strs_added'].append(strs_added)
         r['strs_removed'].append(strs_removed)
 
