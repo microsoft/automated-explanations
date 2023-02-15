@@ -29,6 +29,11 @@ def calculate_mean_preds_matrix_over_tasks(mod, task_names, assert_checks=False)
             x: p for x, p in zip(X, pred)
         }
 
+        # print generations
+        generations = mod.generate(X)
+        for gen in generations:
+            print(gen)
+
         # calculate probs for other categories
         probs_baseline = {}
         for c, task_str_baseline in enumerate(task_names):
@@ -59,17 +64,28 @@ def calculate_mean_preds_matrix_over_tasks(mod, task_names, assert_checks=False)
     return mean_preds_matrix
 
 
+def test_mean_preds_matrix():
+    mod = PromptedModule(
+        checkpoint='gpt2',
+    )
+    task_names = list(TASKS_TOY.keys())
+    mean_preds_matrix = calculate_mean_preds_matrix_over_tasks(
+        mod, task_names, assert_checks=True)
+
 if __name__ == '__main__':
-    # checkpoint = 'gpt2-xl'
-    checkpoint = 'facebook/opt-iml-max-30b'
-    task_names = list(TASKS_D3.keys())
     np.random.seed(1)
     random.seed(1)
     torch.manual_seed(1)
-    mod = PromptedModule(
-        checkpoint=checkpoint,
-    )
-    mean_preds_matrix = calculate_mean_preds_matrix_over_tasks(
-        mod, task_names, assert_checks=False)
-    pkl.dump(mean_preds_matrix,
-             open(join(path_to_repo, 'results', f'mean_preds_matrix_d3___{checkpoint.replace("/", "__")}.pkl'), 'wb'))
+
+    # checkpoint = 'gpt2-xl'
+    # checkpoint = 'facebook/opt-iml-max-30b'
+    # task_names = list(TASKS_D3.keys())
+    # mod = PromptedModule(
+    #     checkpoint=checkpoint,
+    # )
+    # mean_preds_matrix = calculate_mean_preds_matrix_over_tasks(
+    #     mod, task_names, assert_checks=False)
+    # pkl.dump(mean_preds_matrix,
+    #          open(join(path_to_repo, 'results', f'mean_preds_matrix_d3___{checkpoint.replace("/", "__")}.pkl'), 'wb'))
+
+    test_mean_preds_matrix()

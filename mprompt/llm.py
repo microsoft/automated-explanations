@@ -94,14 +94,18 @@ def llm_hf(checkpoint='google/flan-t5-xl') -> LLM:
                      max_new_tokens=20, do_sample=False) -> str:
             if stop is not None:
                 raise ValueError("stop kwargs are not permitted.")
-            input_ids = self._tokenizer(
-                prompt, return_tensors="pt").input_ids.to("cuda")
+            inputs = self._tokenizer(prompt, return_tensors="pt").to(self._model.device) #.input_ids.to("cuda")
             # stopping_criteria = StoppingCriteriaList([MaxLengthCriteria(max_length=max_tokens)])
             # outputs = self._model.generate(input_ids, max_length=max_tokens, stopping_criteria=stopping_criteria)
+            print('pad_token', self._tokenizer.pad_token)
+            if self._tokenizer.pad_token_id is None:
+                self._tokenizer.pad_token_id = self._tokenizer.eos_token_id
             outputs = self._model.generate(
-                input_ids,
+                **inputs,
                 max_new_tokens=max_new_tokens,
                 do_sample=do_sample,
+                # pad_token=self._tokenizer.pad_token,
+                pad_token_id=self._tokenizer.pad_token_id,
                 # top_p=0.92,
                 # top_k=0
             )
@@ -115,7 +119,7 @@ def llm_hf(checkpoint='google/flan-t5-xl') -> LLM:
                 return out_str
 
         def _get_logit_for_target_token(self, prompt: str, target_token_str: str) -> float:
-            """Get logits for each target token
+            """Get logits target_token_str
             This is weird when token_output_ids represents multiple tokens
             It currently will only take the first token
             """

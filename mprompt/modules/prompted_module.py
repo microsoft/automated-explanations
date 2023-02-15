@@ -46,6 +46,16 @@ class PromptedModule():
             probs[i] = self.llm._get_logit_for_target_token(
                 prompt, target_token_str=self.task['target_token'])
         return probs
+    
+    def generate(self, X: List[str]) -> List[str]:
+        """Returns a text generation for each value of a list of strings
+        Only really used for testing
+        """
+        generations = []
+        for i, x in enumerate(tqdm(X)):
+            prompt = self.prompt_template.format(input=x)
+            generations.append(prompt + ' -> ' + repr(self.llm(prompt)))
+        return generations
 
     def get_relevant_data(self) -> List[str]:
         """Return text corpus for this task
