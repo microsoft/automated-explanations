@@ -18,7 +18,7 @@ import mprompt.methods.m1_ngrams
 import mprompt.methods.m2_summarize
 import mprompt.methods.m3_generate
 from mprompt.data.data import TASKS_D3, TASKS_TOY
-import cache_save_utils
+from imodelsx import cache_save_utils
 
 
 def add_main_args(parser):

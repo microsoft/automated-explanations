@@ -7,7 +7,7 @@ def test_small_pipeline():
     save_dir = os.path.join(repo_dir, 'results', 'tmp')
     cmd = prefix + ' python ' + \
         os.path.join(repo_dir, 'experiments',
-                    f'01_explain.py --use_cache 0 --subsample_frac 0.04 --save_dir {save_dir}')
+                    f'01_explain.py --use_cache 0 --save_dir {save_dir}')
     print(cmd)
     exit_value = os.system(cmd)
     assert exit_value == 0, 'default pipeline passed'

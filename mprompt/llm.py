@@ -94,10 +94,13 @@ def llm_hf(checkpoint='google/flan-t5-xl') -> LLM:
                      max_new_tokens=20, do_sample=False) -> str:
             if stop is not None:
                 raise ValueError("stop kwargs are not permitted.")
-            inputs = self._tokenizer(prompt, return_tensors="pt").to(self._model.device) #.input_ids.to("cuda")
+            inputs = self._tokenizer(
+                prompt, return_tensors="pt",
+                return_attention_mask=True
+            ).to(self._model.device)  # .input_ids.to("cuda")
             # stopping_criteria = StoppingCriteriaList([MaxLengthCriteria(max_length=max_tokens)])
             # outputs = self._model.generate(input_ids, max_length=max_tokens, stopping_criteria=stopping_criteria)
-            print('pad_token', self._tokenizer.pad_token)
+            # print('pad_token', self._tokenizer.pad_token)
             if self._tokenizer.pad_token_id is None:
                 self._tokenizer.pad_token_id = self._tokenizer.eos_token_id
             outputs = self._model.generate(
@@ -128,7 +131,11 @@ def llm_hf(checkpoint='google/flan-t5-xl') -> LLM:
 
             # get prob of target token
             inputs = self._tokenizer(
-                prompt, return_tensors="pt").to(self._model.device)
+                prompt, return_tensors="pt",
+                return_attention_mask=True,
+                padding=False,
+                truncation=False,
+            ).to(self._model.device)
             # shape is (batch_size, seq_len, vocab_size)
             logits = self._model(**inputs)['logits'].detach().cpu()
             # shape is (vocab_size,)

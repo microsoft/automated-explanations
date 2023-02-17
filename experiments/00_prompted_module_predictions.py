@@ -47,6 +47,7 @@ def calculate_mean_preds_matrix_over_tasks(mod, task_names, assert_checks=False)
                 })
                 mean_preds_matrix[r, c] = np.mean(list(probs_baseline.values()))
 
+        print('\n\n')
         if assert_checks:
             for k in sorted(probs_pos, key=probs_pos.get, reverse=True):
                 print(f'\t{k} {probs_pos[k]:.2e}')

@@ -15,15 +15,17 @@ TASKS_TOY = {
     'toy_animal': {
         'check_func': r'animal',
         'groundtruth_explanation': 'Return whether the input is an animal.',
-        'template': 'A {input} is a type of',
-        'target_token': ' animal',
+        # 'template': 'A "{input}" is a type of',
+        # 'target_token': ' animal',
+        'template': 'True or False? A {input} is a type of animal?\n',
+        'target_token': 'True.',
         'gen_func': generate_synthetic_data,
         'examples': ['cat', 'dog', 'giraffe', 'horse', 'zebra', 'raccoon'],
     },
     'toy_food': {
         'check_func': r'fruit|edible',
         'groundtruth_explanation': 'Return whether the input is a food.',
-        'template': '{input} is a type of',
+        'template': '"{input}" is a type of',
         'target_token': ' food',
         'gen_func': generate_synthetic_data,
         'examples': ['apple', 'orange', 'pear', 'pizza', 'lasagna', 'curry', 'salad', 'chopstick'],
@@ -31,7 +33,7 @@ TASKS_TOY = {
     'toy_numbers': {
         'check_func': r'number',
         'groundtruth_explanation': 'Return whether the input is a number.',
-        'template': '{input} is related to the concept of',
+        'template': '"{input}" is related to the concept of',
         'target_token': ' numbers',
         'gen_func': generate_synthetic_data,
         # actual numbers like '1' do poorly
