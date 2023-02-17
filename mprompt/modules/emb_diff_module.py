@@ -18,41 +18,54 @@ from langchain import PromptTemplate
 from mprompt.data.data import TASKS
 modules_dir = dirname(os.path.abspath(__file__))
 
-
 class EmbDiffModule():
 
-    def __init__(self, task_str: str = 'toy_animal', checkpoint='gpt2-xl'):
+    def __init__(self,
+                 task_str: str = 'toy_animal',
+                 checkpoint='gpt2-xl',
+                 use_instructor=True,
+    ):
         """
         Params
         ------
         """
         print(f'loading {checkpoint}...')
-        self.extract_embs = pipeline(
-            "feature-extraction",
-            model=checkpoint,
-            truncation=True,
-            device=0
-        )
+        if use_instructor:
+            from InstructorEmbedding import INSTRUCTOR
+            self.extract_embs = INSTRUCTOR('hkunlp/instructor-xl')
+        else:
+            self.extract_embs = pipeline(
+                "feature-extraction",
+                model=checkpoint,
+                truncation=True,
+                device=0
+            )
+        self.use_instructor = use_instructor
         self._init_task(task_str)
 
     def _init_task(self, task_str: str):
         self.task_str = task_str
         self.task = TASKS[task_str]
+        self.target_str = self.task['target_str']
+        self.emb = self._get_emb(self.target_str)
         # embs = [
             # self._get_emb(x) for x in ['horse', 'dog', 'cat'] 
         # ]
-        # self.emb = self._get_emb('horse')
         # self.emb = np.mean(embs, axis=0)
-        self.emb = self._get_emb(self.task['target_str'])
+        
         # print('ref', self.emb.shape)
-        # self.emb = self.pipe(self.task['target_token'])[0][0]
 
     def _get_emb(self, x: str) -> np.ndarray:
-        # emb is (batch_size, 1, (seq_len + 2), embedding_dim)
-        # embedding_dim = 768 for bert-base-uncased and 1024 for roberta-large
-        emb = np.array(self.extract_embs([x]))
-        # return emb[0, 0].mean(axis=0) # mean over seq_len
-        return emb[0, 0, 0] # take cls token (first)
+        if self.use_instructor:
+            instruction = f"Represent the short phrase for clustering: "
+            embs = self.extract_embs.encode([[instruction, x]])
+            return embs[0]
+        else:
+            # emb is (batch_size, 1, (seq_len + 2), embedding_dim)
+            # embedding_dim = 768 for bert-base-uncased and 1024 for roberta-large
+            emb = np.array(self.extract_embs([x]))
+            return emb[0, 0].mean(axis=0) # mean over seq_len
+            # return emb[0, 0, 0] # take cls token (first)
 
 
     def __call__(self, X: List[str]) -> np.ndarray:
@@ -62,7 +75,7 @@ class EmbDiffModule():
         for i, x in enumerate(tqdm(X)):
             emb = self._get_emb(x)
             # neg_dists[i] = - np.linalg.norm(emb - self.emb, ord=2)
-            neg_dists[i] = - scipy.spatial.distance.cosine(emb, self.emb)
+            neg_dists[i] = - scipy.spatial.distance.euclidean(emb, self.emb)
         return neg_dists
 
     def get_relevant_data(self) -> List[str]:
