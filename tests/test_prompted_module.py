@@ -31,10 +31,8 @@ def test_mean_preds_matrix(plot=False):
     checkpoints = ['facebook/opt-iml-30b']
     # checkpoints = ['roberta-large']
     for checkpoint in checkpoints:
-        mod = PromptedModule(
-            checkpoint=checkpoint,
-        )
-        # mod = EmbDiffModule(checkpoint=checkpoint)
+        # mod = PromptedModule(checkpoint=checkpoint)
+        mod = EmbDiffModule(checkpoint=checkpoint)
         task_names = list(TASKS_TOY.keys())
         mean_preds_matrix = prompted_module_exp.calculate_mean_preds_matrix_over_tasks(
             mod, task_names, assert_checks=True,

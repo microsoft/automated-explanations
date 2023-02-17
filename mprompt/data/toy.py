@@ -21,14 +21,21 @@ TASKS_TOY = {
         'gen_func': generate_synthetic_data,
         'examples': ['cat', 'dog', 'giraffe', 'horse', 'zebra', 'raccoon'],
         'template':
-'''True or False? chair is related to animals.
-Answer: False.
+'''
+Q: "chair" is related to animals.
+A: False.
 
-True or False? bird is related to animals.
-Answer: True.
+Q: "bird" is related to animals.
+A: True.
 
-True or False? A {input} is related to animals.
-Answer:''',
+Q: "cheetah" is related to animals.
+A: True.
+
+Q: "banana" is related to animals.
+A: False.
+
+Q: "{input} is related to animals.
+A:''',
         'target_token': ' True.',
     },
     'toy_food': {

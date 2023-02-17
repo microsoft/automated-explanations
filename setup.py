@@ -18,6 +18,7 @@ required_pypi = [
     'langchain',
     'openai',
     'accelerate',
+    'InstructorEmbedding', # embeddings for emb_diff_module
 
     'datasets', # optional, required for getting NLP datasets
     'pytest', # optional, required for running tests

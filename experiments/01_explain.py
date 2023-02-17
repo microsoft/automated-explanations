@@ -44,7 +44,10 @@ def add_main_args(parser):
 
     # module args
     parser.add_argument('--module_name', type=str,
-                        default='prompted_toy', help='name of module', choices=['fmri', 'prompted_d3', 'prompted_toy'])
+                        default='emb_diff_toy', help='name of module',
+                        choices=['fmri',
+                                 'emb_diff_d3', 'emb_diff_toy',
+                                 'prompted_d3', 'prompted_toy'])
     parser.add_argument('--module_num', type=int, # good task is d3_13_water or d3_16_hillary
                         default=0, help='number of module to select')
 
@@ -110,17 +113,23 @@ if __name__ == '__main__':
         mod = mprompt.modules.fmri_module.fMRIModule(
             voxel_num_best=args.module_num)
         r['fmri_test_corr'] = mod.corr
-    elif args.module_name.startswith('prompted'):
-        if args.module_name == 'prompted_d3':
+    else:
+        if args.module_name.endswith('d3'):
             T = TASKS_D3
-        else:
+        elif args.module_name.endwith('toy'):
             T = TASKS_TOY
         task_str = list(T.keys())[args.module_num]
         print('running', task_str)
-        mod = mprompt.modules.prompted_module.PromptedModule(
-            task_str=task_str,
-            checkpoint=args.checkpoint_module,
-        )
+        if args.module_name.startswith('prompted'):
+            mod = mprompt.modules.prompted_module.PromptedModule(
+                task_str=task_str,
+                checkpoint=args.checkpoint_module,
+            )
+        elif args.module_name.startswith('emb_diff'):
+            mod = mprompt.modules.emb_diff_module.EmbDiffModule(
+                task_str=task_str,
+                # checkpoint=args.checkpoint_module,
+            )
 
     # load text data
     text_str_list = mod.get_relevant_data()

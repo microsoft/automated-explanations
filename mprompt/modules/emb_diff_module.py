@@ -16,6 +16,7 @@ import mprompt.llm
 import scipy.spatial.distance
 from langchain import PromptTemplate
 from mprompt.data.data import TASKS
+from InstructorEmbedding import INSTRUCTOR
 modules_dir = dirname(os.path.abspath(__file__))
 
 
@@ -33,7 +34,6 @@ class EmbDiffModule():
         """
         if use_instructor:
             print(f'loading hkunlp/instructor-xl...')
-            from InstructorEmbedding import INSTRUCTOR
             self.extract_embs = INSTRUCTOR('hkunlp/instructor-xl')
         else:
             print(f'loading {checkpoint}...')
@@ -71,7 +71,7 @@ class EmbDiffModule():
             # embedding_dim = 768 for bert-base-uncased and 1024 for roberta-large
             emb = np.array(self.extract_embs([x]))
             return emb[0, 0].mean(axis=0)  # mean over seq_len
-            # return emb[0, 0, 0] # take cls token (first)
+            # return emb[0, 0, 0] # take [CLS] token (first)
 
     def __call__(self, X: List[str]) -> np.ndarray:
         """Returns a scalar continuous response for each element of X
