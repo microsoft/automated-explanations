@@ -14,6 +14,7 @@ import torch
 import mprompt.llm
 import mprompt.modules.fmri_module
 import mprompt.modules.prompted_module
+import mprompt.modules.emb_diff_module
 import mprompt.methods.m1_ngrams
 import mprompt.methods.m2_summarize
 import mprompt.methods.m3_generate
@@ -54,8 +55,10 @@ def add_main_args(parser):
     # algo args
     parser.add_argument('--method_name', type=str, choices=['ngrams'],
                         default='ngrams', help='name of algo for explanation')
-    parser.add_argument('--num_top_ngrams', type=int,
-                        default=10, help='number of ngrams to use to start the explanation')
+    parser.add_argument('--num_top_ngrams_to_use', type=int,
+                        default=3, help='number of ngrams to use to start the explanation')
+    parser.add_argument('--num_top_ngrams_to_consider', type=int,
+                        default=5, help='select top ngrams from this many')
     parser.add_argument('--num_summaries', type=int,
                         default=2, help='number of summaries to start with')
     parser.add_argument('--num_synthetic_strs', type=int,
@@ -116,10 +119,10 @@ if __name__ == '__main__':
     else:
         if args.module_name.endswith('d3'):
             T = TASKS_D3
-        elif args.module_name.endwith('toy'):
+        elif args.module_name.endswith('toy'):
             T = TASKS_TOY
         task_str = list(T.keys())[args.module_num]
-        print('running', task_str)
+        logging.info('running ' + task_str)
         if args.module_name.startswith('prompted'):
             mod = mprompt.modules.prompted_module.PromptedModule(
                 task_str=task_str,
@@ -156,11 +159,15 @@ if __name__ == '__main__':
     # summarize the ngrams into some candidate strings
     llm = mprompt.llm.get_llm(args.checkpoint)
     explanation_strs, explanation_rationales = mprompt.methods.m2_summarize.summarize_ngrams(
-        args, llm, explanation_init_ngrams,
-        num_summaries=args.num_summaries, num_top_ngrams=args.num_top_ngrams)
+        args,
+        llm, explanation_init_ngrams,
+        num_top_ngrams_to_use=args.num_top_ngrams_to_use,
+        num_top_ngrams_to_consider=args.num_top_ngrams_to_consider,
+    )
     r['explanation_init_strs'] = explanation_strs
     r['explanation_init_rationales'] = explanation_rationales
     logging.info('explanation_init_strs\n\t' + '\n\t'.join(explanation_strs))
+    exit(0)
 
     # generate synthetic data
     logging.info('\n\nGenerating synthetic data....')

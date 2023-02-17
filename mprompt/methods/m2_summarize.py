@@ -17,7 +17,7 @@ def summarize_ngrams(
     num_summaries: int = 2,
     prefix_str='Here is a list of phrases:',
     suffix_str='What is a common theme among these phrases?\nThe common theme among these phrases is',
-    num_top_ngrams: int = 30,
+    num_top_ngrams_to_use: int = 30,
     num_top_ngrams_to_consider: int = 50,
     # seed: int = 0,
 ) -> Tuple[List[str], List[str]]:
@@ -29,18 +29,20 @@ def summarize_ngrams(
     summary_rationales = []
     for i in range(num_summaries):
         # randomly sample num_top_ngrams (preserving ordering)
-        n_to_choose_from = min(num_top_ngrams_to_consider, len(ngrams_list))
-        n_to_choose = min(num_top_ngrams, n_to_choose_from)
+        n_to_consider = min(num_top_ngrams_to_consider, len(ngrams_list))
+        n_to_use = min(num_top_ngrams_to_use, n_to_consider)
         idxs = np.sort(
             rng.choice(
-                n_to_choose_from,
-                size=n_to_choose,
+                n_to_consider,
+                size=n_to_use,
                 replace=False
             )
         )
         bullet_list_ngrams = '- ' + '\n- '.join(np.array(ngrams_list)[idxs])
         prompt = prefix_str + '\n\n' + bullet_list_ngrams + '\n\n' + suffix_str
-        print(prompt)
+        if i == 0:
+            print('First prompt')
+            print(prompt)
         summary = llm(prompt)
 
         # clean up summary
