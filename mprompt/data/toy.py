@@ -15,26 +15,28 @@ TASKS_TOY = {
     'toy_animal': {
         'check_func': r'animal',
         'groundtruth_explanation': 'Return whether the input is an animal.',
-        # 'template': 'A "{input}" is a type of',
-        # 'target_token': ' animal',
-        'template':
-'''True or False? A chair is an animal.
-Answer: False.
-
-True or False? bird is an animal.
-Answer: True.
-
-True or False? A {input} is an animal.
-Answer:''',
-        'target_token': ' True.',
+        'template': 'A "{input}" is a type of',
+        'target_token': ' animal',
+        'target_str': 'animal',
         'gen_func': generate_synthetic_data,
         'examples': ['cat', 'dog', 'giraffe', 'horse', 'zebra', 'raccoon'],
+        # 'template':
+# '''True or False? A chair is an animal.
+# Answer: False.
+
+# True or False? bird is an animal.
+# Answer: True.
+
+# True or False? A {input} is an animal.
+# Answer:''',
+        # 'target_token': ' True.',
     },
     'toy_food': {
         'check_func': r'fruit|edible',
         'groundtruth_explanation': 'Return whether the input is a food.',
         'template': '"{input}" is a type of',
         'target_token': ' food',
+        'target_str': 'food',
         'gen_func': generate_synthetic_data,
         'examples': ['apple', 'orange', 'pear', 'pizza', 'lasagna', 'curry', 'salad', 'chopstick'],
     },
@@ -43,6 +45,7 @@ Answer:''',
         'groundtruth_explanation': 'Return whether the input is a number.',
         'template': '"{input}" is related to the concept of',
         'target_token': ' numbers',
+        'target_str': 'numbers',
         'gen_func': generate_synthetic_data,
         # actual numbers like '1' do poorly
         'examples': ['1', '2', '3', 'four', 'five', 'six', 'plus', 'minus', 'divide'],

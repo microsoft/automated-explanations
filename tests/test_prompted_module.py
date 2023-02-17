@@ -1,5 +1,6 @@
 import pickle as pkl
 from mprompt.modules.prompted_module import PromptedModule
+from mprompt.modules.emb_diff_module import EmbDiffModule
 from mprompt.llm import llm_hf
 import random
 import torch
@@ -27,11 +28,13 @@ def plot_mean_preds_matrix(mean_preds_matrix, task_names, save_name):
 
 def test_mean_preds_matrix(plot=False):
     mean_preds_matrix_dict = {}
-    checkpoints = ['gpt2-xl']
+    # checkpoints = ['gpt2-xl']
+    checkpoints = ['roberta-large']
     for checkpoint in checkpoints:
-        mod = PromptedModule(
-            checkpoint=checkpoint,
-        )
+        # mod = PromptedModule(
+            # checkpoint=checkpoint,
+        # )
+        mod = EmbDiffModule(checkpoint=checkpoint)
         task_names = list(TASKS_TOY.keys())
         mean_preds_matrix = prompted_module_exp.calculate_mean_preds_matrix_over_tasks(
             mod, task_names, assert_checks=True,

@@ -26,9 +26,9 @@ def calculate_mean_preds_matrix_over_tasks(mod, task_names, assert_checks=False)
         X = TASKS[task_str]['examples']
 
         # print generations
-        generations = mod.generate(X)
-        for gen in generations:
-            print(gen)
+        # generations = mod.generate(X)
+        # for gen in generations:
+            # print(gen)
 
         # calculate correct preds
         pred = mod(X)
