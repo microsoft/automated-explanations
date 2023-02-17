@@ -1,5 +1,6 @@
 import pickle as pkl
 from mprompt.modules.prompted_module import PromptedModule
+from mprompt.modules.emb_diff_module import EmbDiffModule
 from mprompt.llm import llm_hf
 import random
 import torch
@@ -28,26 +29,20 @@ def calculate_mean_preds_matrix_over_tasks(mod, task_names, assert_checks=False)
         # print generations
         # generations = mod.generate(X)
         # for gen in generations:
-            # print(gen)
-
-        # calculate correct preds
-        pred = mod(X)
-        probs_pos = {
-            x: p for x, p in zip(X, pred)
-        }
+        # print(gen)
 
         # calculate probs for other categories
         probs_baseline = {}
         for c, task_str_baseline in enumerate(task_names):
-            if task_str_baseline == task_str:
-                mean_preds_matrix[r, c] = np.mean(list(probs_pos.values()))
-            else:
-                X = TASKS[task_str_baseline]['examples']
-                pred = mod(X)
-                probs_baseline.update({
-                    x: p for x, p in zip(X, pred)
-                })
-                mean_preds_matrix[r, c] = np.mean(list(probs_baseline.values()))
+            X = TASKS[task_str_baseline]['examples']
+            pred = mod(X)
+            mean_preds_matrix[r, c] = np.mean(pred)
+            if assert_checks:
+                preds_dict = {x: p for x, p in zip(X, pred)}
+                if r == c:
+                    probs_pos = preds_dict
+                else:
+                    probs_baseline.update(preds_dict)
 
         print('\n\n')
         if assert_checks:
@@ -67,28 +62,18 @@ def calculate_mean_preds_matrix_over_tasks(mod, task_names, assert_checks=False)
     return mean_preds_matrix
 
 
-def test_mean_preds_matrix():
-    mod = PromptedModule(
-        checkpoint='gpt2',
-    )
-    task_names = list(TASKS_TOY.keys())
-    mean_preds_matrix = calculate_mean_preds_matrix_over_tasks(
-        mod, task_names, assert_checks=True)
-
 if __name__ == '__main__':
     np.random.seed(1)
     random.seed(1)
     torch.manual_seed(1)
 
     # checkpoint = 'gpt2-xl'
+    checkpoint = 'instructor'
     # checkpoint = 'facebook/opt-iml-max-30b'
-    # task_names = list(TASKS_D3.keys())
-    # mod = PromptedModule(
-    #     checkpoint=checkpoint,
-    # )
-    # mean_preds_matrix = calculate_mean_preds_matrix_over_tasks(
-    #     mod, task_names, assert_checks=False)
-    # pkl.dump(mean_preds_matrix,
-    #          open(join(path_to_repo, 'results', f'mean_preds_matrix_d3___{checkpoint.replace("/", "__")}.pkl'), 'wb'))
-
-    test_mean_preds_matrix()
+    task_names = list(TASKS_D3.keys())
+    # mod = PromptedModule(checkpoint=checkpoint)
+    mod = EmbDiffModule(checkpoint=checkpoint)
+    mean_preds_matrix = calculate_mean_preds_matrix_over_tasks(
+        mod, task_names, assert_checks=False)
+    pkl.dump(mean_preds_matrix,
+             open(join(path_to_repo, 'results', f'mean_preds_matrix_d3___{checkpoint.replace("/", "__")}.pkl'), 'wb'))

@@ -18,22 +18,25 @@ from langchain import PromptTemplate
 from mprompt.data.data import TASKS
 modules_dir = dirname(os.path.abspath(__file__))
 
+
 class EmbDiffModule():
 
-    def __init__(self,
-                 task_str: str = 'toy_animal',
-                 checkpoint='gpt2-xl',
-                 use_instructor=True,
+    def __init__(
+        self,
+        task_str: str = 'toy_animal',
+        checkpoint='gpt2-xl',
+        use_instructor=True,
     ):
         """
         Params
         ------
         """
-        print(f'loading {checkpoint}...')
         if use_instructor:
+            print(f'loading hkunlp/instructor-xl...')
             from InstructorEmbedding import INSTRUCTOR
             self.extract_embs = INSTRUCTOR('hkunlp/instructor-xl')
         else:
+            print(f'loading {checkpoint}...')
             self.extract_embs = pipeline(
                 "feature-extraction",
                 model=checkpoint,
@@ -46,13 +49,16 @@ class EmbDiffModule():
     def _init_task(self, task_str: str):
         self.task_str = task_str
         self.task = TASKS[task_str]
-        self.target_str = self.task['target_str']
+        if 'target_str' in self.task:
+            self.target_str = self.task['target_str']
+        else:
+            self.target_str = self.task['target_token'].strip().split()[0]
         self.emb = self._get_emb(self.target_str)
         # embs = [
-            # self._get_emb(x) for x in ['horse', 'dog', 'cat'] 
+        # self._get_emb(x) for x in ['horse', 'dog', 'cat']
         # ]
         # self.emb = np.mean(embs, axis=0)
-        
+
         # print('ref', self.emb.shape)
 
     def _get_emb(self, x: str) -> np.ndarray:
@@ -64,9 +70,8 @@ class EmbDiffModule():
             # emb is (batch_size, 1, (seq_len + 2), embedding_dim)
             # embedding_dim = 768 for bert-base-uncased and 1024 for roberta-large
             emb = np.array(self.extract_embs([x]))
-            return emb[0, 0].mean(axis=0) # mean over seq_len
+            return emb[0, 0].mean(axis=0)  # mean over seq_len
             # return emb[0, 0, 0] # take cls token (first)
-
 
     def __call__(self, X: List[str]) -> np.ndarray:
         """Returns a scalar continuous response for each element of X
