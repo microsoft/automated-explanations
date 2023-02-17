@@ -24,15 +24,17 @@ def calculate_mean_preds_matrix_over_tasks(mod, task_names, assert_checks=False)
         print('\ntask_str', task_str)
         mod._init_task(task_str)
         X = TASKS[task_str]['examples']
-        pred = mod(X)
-        probs_pos = {
-            x: p for x, p in zip(X, pred)
-        }
 
         # print generations
         generations = mod.generate(X)
         for gen in generations:
             print(gen)
+
+        # calculate correct preds
+        pred = mod(X)
+        probs_pos = {
+            x: p for x, p in zip(X, pred)
+        }
 
         # calculate probs for other categories
         probs_baseline = {}

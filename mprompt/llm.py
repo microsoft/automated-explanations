@@ -119,7 +119,7 @@ def llm_hf(checkpoint='google/flan-t5-xl') -> LLM:
                 print('full', out_str)
                 return out_str[len('<pad>'):out_str.index('</s>')]
             else:
-                return out_str
+                return out_str[len(prompt):]
 
         def _get_logit_for_target_token(self, prompt: str, target_token_str: str) -> float:
             """Get logits target_token_str
@@ -140,9 +140,24 @@ def llm_hf(checkpoint='google/flan-t5-xl') -> LLM:
             logits = self._model(**inputs)['logits'].detach().cpu()
             # shape is (vocab_size,)
             probs_next_token = softmax(logits[0, -1, :].numpy().flatten())
-            # token_output_ids = self._tokenizer.convert_tokens_to_ids(target_tokens)
-            # str(self._tokenizer.convert_ids_to_tokens([np.argmax(probs_next_token)])[0])
             return probs_next_token[target_token_id]
+
+            # Get first token id in target_token_str
+            # target_token_id1 = self._tokenizer(' True.')['input_ids'][0]
+            # target_token_id2 = self._tokenizer(' False.')['input_ids'][0]
+
+            # # get prob of target token
+            # inputs = self._tokenizer(
+            #     prompt, return_tensors="pt",
+            #     return_attention_mask=True,
+            #     padding=False,
+            #     truncation=False,
+            # ).to(self._model.device)
+            # # shape is (batch_size, seq_len, vocab_size)
+            # logits = self._model(**inputs)['logits'].detach().cpu()
+            # # shape is (vocab_size,)
+            # probs_next_token = softmax(logits[0, -1, :].numpy().flatten())
+            # return probs_next_token[target_token_id1] - probs_next_token[target_token_id2]
 
         @ property
         def _identifying_params(self) -> Mapping[str, Any]:

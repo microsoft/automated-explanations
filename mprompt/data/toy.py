@@ -17,8 +17,16 @@ TASKS_TOY = {
         'groundtruth_explanation': 'Return whether the input is an animal.',
         # 'template': 'A "{input}" is a type of',
         # 'target_token': ' animal',
-        'template': 'True or False? A {input} is a type of animal?\n',
-        'target_token': 'True.',
+        'template':
+'''True or False? A chair is an animal.
+Answer: False.
+
+True or False? bird is an animal.
+Answer: True.
+
+True or False? A {input} is an animal.
+Answer:''',
+        'target_token': ' True.',
         'gen_func': generate_synthetic_data,
         'examples': ['cat', 'dog', 'giraffe', 'horse', 'zebra', 'raccoon'],
     },

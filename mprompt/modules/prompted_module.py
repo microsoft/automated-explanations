@@ -54,7 +54,7 @@ class PromptedModule():
         generations = []
         for i, x in enumerate(tqdm(X)):
             prompt = self.prompt_template.format(input=x)
-            generations.append(prompt + ' -> ' + repr(self.llm(prompt)))
+            generations.append(repr(prompt) + ' -> ' + repr(self.llm(prompt)))
         return generations
 
     def get_relevant_data(self) -> List[str]:
