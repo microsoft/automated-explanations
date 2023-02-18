@@ -9,7 +9,7 @@ params_shared_dict = {
     'save_dir': [join(repo_dir, 'results', 'feb18_synthetic_sweep')],
     'use_cache': [1],
     'subsample_frac': [1],
-    'module_num': [16, 3, 9, 12, 50, 23],
+    'module_num': [3, 7, 9, 12, 13, 16, 23, 32, 50, 53],
     'module_name': ['emb_diff_d3'],
     'num_top_ngrams_to_use': [30],
     'num_top_ngrams_to_consider': [50],
