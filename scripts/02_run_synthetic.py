@@ -6,7 +6,7 @@ from imodelsx import submit_utils
 # List of values to sweep over (sweeps over all combinations of these)
 params_shared_dict = {
     'seed': [1],
-    'save_dir': [join(repo_dir, 'results', 'feb18_synthetic_sweep')],
+    'save_dir': [join('/home/chansingh/mntv1/mprompt', 'feb18_synthetic_sweep')],
     'use_cache': [1],
     'subsample_frac': [1],
     'module_num': [3, 7, 9, 12, 13, 16, 23, 32, 50, 53],
