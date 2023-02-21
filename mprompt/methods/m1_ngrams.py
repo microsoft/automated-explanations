@@ -20,7 +20,7 @@ def explain_ngrams(
     """Note: this caches the call that gets the scores
     """
     # get all ngrams
-    tok = English()
+    tok = English(max_length=10e10)
     X_str = ' '.join(X)
     ngrams_list = imodelsx.util.generate_ngrams_list(
         X_str, ngrams=ngrams, tokenizer_ngrams=tok, all_ngrams=all_ngrams)

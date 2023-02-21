@@ -167,7 +167,6 @@ if __name__ == '__main__':
     r['explanation_init_strs'] = explanation_strs
     r['explanation_init_rationales'] = explanation_rationales
     logging.info('explanation_init_strs\n\t' + '\n\t'.join(explanation_strs))
-    exit(0)
 
     # generate synthetic data
     logging.info('\n\nGenerating synthetic data....')
