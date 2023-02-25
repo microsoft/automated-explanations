@@ -9,7 +9,8 @@ params_shared_dict = {
     'save_dir': [join('/home/chansingh/mntv1/mprompt', 'feb18_synthetic_sweep')],
     'use_cache': [1],
     'subsample_frac': [1],
-    'module_num': list(range(30)), # [3, 7, 9, 12, 13, 16, 23, 32, 50, 53],
+    'module_num': list(range(54)),
+    # [3, 7, 9, 12, 13, 16, 23, 32, 50, 53],
     'module_name': ['emb_diff_d3'],
     'num_top_ngrams_to_use': [30],
     'num_top_ngrams_to_consider': [50],
@@ -33,5 +34,6 @@ submit_utils.run_args_list(
     script_name=join(repo_dir, 'experiments', '01_explain.py'),
     actually_run=True,
     # gpu_ids=[0],
-    n_cpus=6,
+    n_cpus=20,
+    repeat_failed_jobs=True,
 )
