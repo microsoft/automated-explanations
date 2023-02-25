@@ -166,9 +166,12 @@ if __name__ == '__main__':
     llm = mprompt.llm.get_llm(args.checkpoint)
     explanation_strs, explanation_rationales = mprompt.methods.m2_summarize.summarize_ngrams(
         args,
-        llm, explanation_init_ngrams,
+        llm,
+        explanation_init_ngrams,
+        num_summaries=args.num_summaries,
         num_top_ngrams_to_use=args.num_top_ngrams_to_use,
         num_top_ngrams_to_consider=args.num_top_ngrams_to_consider,
+        seed=args.seed,
     )
     r['explanation_init_strs'] = explanation_strs
     r['explanation_init_rationales'] = explanation_rationales
@@ -178,7 +181,8 @@ if __name__ == '__main__':
     logging.info('\n\nGenerating synthetic data....')
     for explanation_str in explanation_strs:
         strs_added, strs_removed = mprompt.methods.m3_generate.generate_synthetic_strs(
-            llm, explanation_str=explanation_str,
+            llm,
+            explanation_str=explanation_str,
             num_synthetic_strs=args.num_synthetic_strs,
             template_num=args.generate_template_num,
         )

@@ -19,11 +19,11 @@ def summarize_ngrams(
     suffix_str='What is a common theme among these phrases?\nThe common theme among these phrases is',
     num_top_ngrams_to_use: int = 30,
     num_top_ngrams_to_consider: int = 50,
-    # seed: int = 0,
+    seed: int = 0,
 ) -> Tuple[List[str], List[str]]:
     """Refine a keyphrase by making a call to the llm
     """
-    rng = np.random.default_rng(args.seed)
+    rng = np.random.default_rng(seed)
 
     summaries = []
     summary_rationales = []

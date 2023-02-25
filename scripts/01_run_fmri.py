@@ -17,7 +17,7 @@ params_shared_dict = {
     'module_name': ['fmri'],
     'num_top_ngrams_to_use': [30],
     'num_top_ngrams_to_consider': [50],
-    'num_summaries': [5],
+    'num_summaries': [2],
     'num_synthetic_strs': [10],
 }
 
