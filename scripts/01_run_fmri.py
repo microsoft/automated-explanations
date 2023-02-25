@@ -9,8 +9,8 @@ from imodelsx import submit_utils
 # List of values to sweep over (sweeps over all combinations of these)
 params_shared_dict = {
     'seed': [1],
-    # 'save_dir': [join('/home/chansingh/mntv1', 'mprompt', 'jan30')],
-    'save_dir': [join(repo_dir, 'results', 'feb12_fmri_sweep_gen_template1')],
+    'save_dir': [join('/home/chansingh/mntv1/mprompt', 'feb12_fmri_sweep_gen_template1')],
+    # 'save_dir': [join(repo_dir, 'results', 'feb12_fmri_sweep_gen_template1')],
     'use_cache': [1], # pass binary values with 0/1 instead of the ambiguous strings True/False
     'subsample_frac': [1],
     'module_num': list(range(200)),
