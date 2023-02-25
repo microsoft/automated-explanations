@@ -83,11 +83,6 @@ class EmbDiffModule():
             neg_dists[i] = - scipy.spatial.distance.euclidean(emb, self.emb)
         return neg_dists
 
-    def get_relevant_data(self) -> List[str]:
-        """Return text corpus for this task
-        """
-        return self.task['gen_func']()
-
     def get_groundtruth_explanation(self) -> str:
         """Return the groundtruth explanation
         """

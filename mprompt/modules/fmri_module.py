@@ -12,6 +12,7 @@ import pickle as pkl
 from os.path import dirname, join
 import os.path
 modules_dir = dirname(os.path.abspath(__file__))
+SAVE_DIR_FMRI = join(modules_dir, 'fmri')
 
 
 class fMRIModule():
@@ -28,7 +29,7 @@ class fMRIModule():
         # hyperparams for loaded model
         self.checkpoint = 'bert-base-uncased'
         self.model = 'bert-10__ndel=4'
-        self.save_dir_fmri = join(modules_dir, 'fmri')
+        self.save_dir_fmri = SAVE_DIR_FMRI
         self.ndel = 4
 
         # load weights
@@ -64,12 +65,6 @@ class fMRIModule():
             pred_voxel = preds_fMRI[:, self.voxel_num_best]
             return pred_voxel
 
-    def get_relevant_data(self) -> List[str]:
-        """read in full text of 26 narrative stories
-        """
-        with open(join(self.save_dir_fmri, 'narrative_stories.txt'), 'r') as f:
-            narrative_stories = f.readlines()
-        return narrative_stories
 
 if __name__ == '__main__':
     mod = fMRIModule()

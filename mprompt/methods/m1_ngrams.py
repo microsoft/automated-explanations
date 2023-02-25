@@ -32,12 +32,13 @@ def explain_ngrams(
 
     # compute scores and cache...
     # fmri should cache all preds together, since they are efficiently computed together
-    if args.module_name == 'fmri':
-        cache_file  = join(CACHE_DIR, 'cache_ngrams', f'{args.module_name}.pkl')
-    else:
-        cache_file = join(CACHE_DIR, 'cache_ngrams', f'{args.module_name}_{args.module_num}.pkl')
-    if os.path.exists(cache_file):
-        ngram_scores = pkl.load(open(cache_file, 'rb'))
+    if use_cache:
+        if args.module_name == 'fmri':
+            cache_file  = join(CACHE_DIR, 'cache_ngrams', f'{args.module_name}.pkl')
+        else:
+            cache_file = join(CACHE_DIR, 'cache_ngrams', f'{args.module_name}_{args.module_num}.pkl')
+        if os.path.exists(cache_file):
+            ngram_scores = pkl.load(open(cache_file, 'rb'))
     else:
         call_parameters = inspect.signature(mod.__call__).parameters.keys()
         print('predicting all ngrams...')
@@ -45,8 +46,10 @@ def explain_ngrams(
             ngram_scores = mod(ngrams_list, return_all=True)
         else:
             ngram_scores = mod(ngrams_list)
-        os.makedirs(dirname(cache_file), exist_ok=True)
-        pkl.dump(ngram_scores, open(cache_file, 'wb'))
+
+        if use_cache:
+            os.makedirs(dirname(cache_file), exist_ok=True)
+            pkl.dump(ngram_scores, open(cache_file, 'wb'))
 
     # multidimensional predictions
     if len(ngram_scores.shape) > 1 and ngram_scores.shape[1] > 1:
@@ -54,10 +57,13 @@ def explain_ngrams(
 
     # add noise to ngram scores
     if args.noise_ngram_scores > 0:
-        # scores_top_100
-        # std = np.std()
-        ngram_scores += np.random.normal(
-            scale=args.noise_ngram_scores, size=ngram_scores.shape)
+        scores_top_100 = np.sort(ngram_scores)[::-1][:100]
+        std_top_100 = np.std(scores_top_100)
+        rng = np.random.default_rng(args.seed)
+        ngram_scores += rng.normal(
+            scale=std_top_100 * args.noise_ngram_scores,
+            size=ngram_scores.shape,
+        )
 
     # print(f'{ngram_scores=}')
     scores_top_idxs = np.argsort(ngram_scores)[::-1]
@@ -67,9 +73,15 @@ def explain_ngrams(
 
 if __name__ == '__main__':
     def mod(X):
-        return np.arange(len(X))
+        return np.arange(len(X)).astype(float)
+    class a:
+        noise_ngram_scores = 3
+        seed = 100
+
     explanation = explain_ngrams(
-        ['test input', 'input2'],
-        mod
+        a(),
+        ['i1', 'i2', 'i3', 'i4'],
+        mod,
+        use_cache=False,
     )
     print(explanation)

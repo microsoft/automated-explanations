@@ -20,7 +20,14 @@ params_shared_dict = {
 }
 
 # List of tuples to sweep over (these values are coupled, and swept over together)
-params_coupled_dict = {}
+params_coupled_dict = {
+    ('noise_ngram_scores',): [
+        (i,) for i in [0, 3]
+    ],
+    # ('model_name', 'max_features'): [
+    #     ('llm_tree', 5)
+    # ],
+}
 
 # Args list is a list of dictionaries
 # If you want to do something special to remove some of these runs, can remove them before calling run_args_list

@@ -18,6 +18,7 @@ import mprompt.modules.emb_diff_module
 import mprompt.methods.m1_ngrams
 import mprompt.methods.m2_summarize
 import mprompt.methods.m3_generate
+import mprompt.data.data
 from mprompt.data.data import TASKS_D3, TASKS_TOY
 from imodelsx import cache_save_utils
 
@@ -37,7 +38,8 @@ def add_main_args(parser):
     parser.add_argument('--checkpoint_module', type=str,
                         default='gpt2-xl', help='which llm to use for the module (if synthetic)')
     parser.add_argument('--noise_ngram_scores', type=float, default=0,
-                        help='how much noise to add to ngram scores (multiplied by stddev of top 100 ngrams)')
+                        help='''how much noise to add to ngram scores
+                        (noise stddev = noise_ngram_scores * stddev(top-100 ngram responses)''')
 
     # training misc args
     parser.add_argument('--seed', type=int, default=1,
@@ -119,11 +121,7 @@ if __name__ == '__main__':
             voxel_num_best=args.module_num)
         r['fmri_test_corr'] = mod.corr
     else:
-        if args.module_name.endswith('d3'):
-            T = TASKS_D3
-        elif args.module_name.endswith('toy'):
-            T = TASKS_TOY
-        task_str = list(T.keys())[args.module_num]
+        task_str = mprompt.data.data.get_task_str(args.module_name, args.module_num)
         logging.info('running ' + task_str)
         if args.module_name.startswith('prompted'):
             mod = mprompt.modules.prompted_module.PromptedModule(
@@ -137,7 +135,7 @@ if __name__ == '__main__':
             )
 
     # load text data
-    text_str_list = mod.get_relevant_data()
+    text_str_list = mprompt.data.data.get_relevant_data(args.module_name, args.module_num)
 
     # subsample data
     if args.subsample_frac < 1 and not args.module_name == 'fmri':
@@ -195,7 +193,7 @@ if __name__ == '__main__':
 
     # evaluate how well explanation matches a "groundtruth"
     if getattr(mod, "get_groundtruth_explanation", None):
-        logging.info('\n\Scoring explanation....')
+        logging.info('Scoring explanation....')
 
         # get groundtruth explanation
         explanation_groundtruth = mod.get_groundtruth_explanation()
