@@ -37,9 +37,14 @@ def add_main_args(parser):
                         help='which llm to use for each step')
     parser.add_argument('--checkpoint_module', type=str,
                         default='gpt2-xl', help='which llm to use for the module (if synthetic)')
+
+    # data ablations
     parser.add_argument('--noise_ngram_scores', type=float, default=0,
-                        help='''how much noise to add to ngram scores
+                        help='''ablation: how much noise to add to ngram scores
                         (noise stddev = noise_ngram_scores * stddev(top-100 ngram responses)''')
+    parser.add_argument('--module_num_restrict', type=int, default=-1,
+                        help='''ablation: alternative module_num to specify a corpus to restrict the ngram responses''')
+    
 
     # training misc args
     parser.add_argument('--seed', type=int, default=1,
@@ -151,6 +156,7 @@ if __name__ == '__main__':
         args,
         text_str_list,
         mod,
+        num_top_ngrams=75,
     )
     r['explanation_init_ngrams'] = explanation_init_ngrams
     logging.info(

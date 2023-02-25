@@ -7,6 +7,8 @@ import os.path
 import pickle as pkl
 import inspect
 from mprompt.config import CACHE_DIR
+import mprompt.data.data
+
 
 def explain_ngrams(
         args,
@@ -23,8 +25,12 @@ def explain_ngrams(
     tok = English(max_length=10e10)
     X_str = ' '.join(X)
     ngrams_list = imodelsx.util.generate_ngrams_list(
-        X_str, ngrams=ngrams, tokenizer_ngrams=tok, all_ngrams=all_ngrams)
-    
+        X_str,
+        ngrams=ngrams,
+        tokenizer_ngrams=tok,
+        all_ngrams=all_ngrams
+    )
+
     # get unique ngrams
     ngrams_list = sorted(list(set(ngrams_list)))
     # print(f'{ngrams_list=}')
@@ -34,9 +40,11 @@ def explain_ngrams(
     # fmri should cache all preds together, since they are efficiently computed together
     if use_cache:
         if args.module_name == 'fmri':
-            cache_file  = join(CACHE_DIR, 'cache_ngrams', f'{args.module_name}.pkl')
+            cache_file = join(CACHE_DIR, 'cache_ngrams',
+                              f'{args.module_name}.pkl')
         else:
-            cache_file = join(CACHE_DIR, 'cache_ngrams', f'{args.module_name}_{args.module_num}.pkl')
+            cache_file = join(CACHE_DIR, 'cache_ngrams',
+                              f'{args.module_name}_{args.module_num}.pkl')
         if os.path.exists(cache_file):
             ngram_scores = pkl.load(open(cache_file, 'rb'))
     else:
@@ -65,6 +73,22 @@ def explain_ngrams(
             size=ngram_scores.shape,
         )
 
+    # restrict top ngrams to alternative corpus
+    if args.module_num_restrict >= 0:
+        print('before', ngrams_list)
+        text_str_list_alt = mprompt.data.data.get_relevant_data(
+            args.module_name, args.module_num_restrict)
+        ngrams_set_alt = set(imodelsx.util.generate_ngrams_list(
+            ' '.join(text_str_list_alt),
+            ngrams=ngrams,
+            tokenizer_ngrams=tok,
+            all_ngrams=all_ngrams
+        ))
+        idxs_to_keep = np.array([i for i, ngram in enumerate(ngrams_list) if ngram in ngrams_set_alt])
+        ngrams_list = [ngrams_list[i] for i in idxs_to_keep]
+        ngram_scores = ngram_scores[idxs_to_keep]
+        print('after', ngrams_list)
+
     # print(f'{ngram_scores=}')
     scores_top_idxs = np.argsort(ngram_scores)[::-1]
     ngrams_top = np.array(ngrams_list)[scores_top_idxs][:num_top_ngrams]
@@ -74,14 +98,19 @@ def explain_ngrams(
 if __name__ == '__main__':
     def mod(X):
         return np.arange(len(X)).astype(float)
+
     class a:
         noise_ngram_scores = 3
         seed = 100
+        module_name = 'emb_diff_d3'
+        module_num = 0
+        module_num_restrict = -1
 
     explanation = explain_ngrams(
         a(),
-        ['i1', 'i2', 'i3', 'i4'],
+        ['and', 'i1', 'i2', 'i3', 'i4'],
         mod,
         use_cache=False,
+
     )
     print(explanation)
