@@ -1,0 +1,1 @@
+CACHE_DIR = '/home/chansingh/mntv1/mprompt/cache'

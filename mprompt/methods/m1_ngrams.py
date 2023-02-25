@@ -6,7 +6,7 @@ from os.path import dirname, join
 import os.path
 import pickle as pkl
 import inspect
-repo_dir = dirname(dirname(dirname(os.path.abspath(__file__))))
+from mprompt.config import CACHE_DIR
 
 def explain_ngrams(
         args,
@@ -33,9 +33,9 @@ def explain_ngrams(
     # compute scores and cache...
     # fmri should cache all preds together, since they are efficiently computed together
     if args.module_name == 'fmri':
-        cache_file  = join(repo_dir, 'results', 'cache_ngrams', f'{args.module_name}.pkl')
+        cache_file  = join(CACHE_DIR, 'cache_ngrams', f'{args.module_name}.pkl')
     else:
-        cache_file = join(repo_dir, 'results', 'cache_ngrams', f'{args.module_name}_{args.module_num}.pkl')
+        cache_file = join(CACHE_DIR, 'cache_ngrams', f'{args.module_name}_{args.module_num}.pkl')
     if os.path.exists(cache_file):
         ngram_scores = pkl.load(open(cache_file, 'rb'))
     else:
@@ -51,6 +51,13 @@ def explain_ngrams(
     # multidimensional predictions
     if len(ngram_scores.shape) > 1 and ngram_scores.shape[1] > 1:
         ngram_scores = ngram_scores[:, args.module_num]
+
+    # add noise to ngram scores
+    if args.noise_ngram_scores > 0:
+        # scores_top_100
+        # std = np.std()
+        ngram_scores += np.random.normal(
+            scale=args.noise_ngram_scores, size=ngram_scores.shape)
 
     # print(f'{ngram_scores=}')
     scores_top_idxs = np.argsort(ngram_scores)[::-1]

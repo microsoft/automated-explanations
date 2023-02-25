@@ -14,6 +14,7 @@ This is an evolving repo optimized for machine-learning projects aimed at design
     - `git clone https://github.com/csinva/imodelsX.git` then `cd imodelsX` and `pip install -e .`
 - example run: run `python scripts/01_train_basic_models.py` (which calls `experiments/01_train_model.py` then view the results in `notebooks/01_model_results.ipynb`
 - keep tests upated and run using `pytest`
+- note: intermediate cache gets stored to the directory specified in `mprompt/config.py`
 
 # Features
 - scripts sweep over hyperparameters using easy-to-specify python code

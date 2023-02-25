@@ -36,6 +36,8 @@ def add_main_args(parser):
                         help='which llm to use for each step')
     parser.add_argument('--checkpoint_module', type=str,
                         default='gpt2-xl', help='which llm to use for the module (if synthetic)')
+    parser.add_argument('--noise_ngram_scores', type=float, default=0,
+                        help='how much noise to add to ngram scores (multiplied by stddev of top 100 ngrams)')
 
     # training misc args
     parser.add_argument('--seed', type=int, default=1,

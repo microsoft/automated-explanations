@@ -15,7 +15,8 @@ import openai
 from langchain.llms.base import LLM
 import hashlib
 import torch
-repo_dir = join(dirname(dirname(__file__)))
+from mprompt.config import CACHE_DIR
+# repo_dir = join(dirname(dirname(__file__)))
 
 langchain.llm_cache = InMemoryCache()
 
@@ -30,7 +31,7 @@ def get_llm(checkpoint):
 def llm_openai(checkpoint='text-davinci-003') -> LLM:
     class LLM_OpenAI():
         def __init__(self, checkpoint,
-                     cache_dir=join(repo_dir, 'results', 'cache_openai')):
+                     cache_dir=join(CACHE_DIR, 'cache_openai')):
             self.checkpoint = checkpoint
             self.cache_dir = cache_dir
 
