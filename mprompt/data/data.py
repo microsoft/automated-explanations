@@ -26,4 +26,9 @@ def get_task_str(module_name, module_num) -> str:
     return task_str
 
 def get_task_keyword(task_name):
-    return TASKS[task_name]['target_token'].strip().split()[0]
+    return TASKS[task_name]['target_token'].strip()
+
+if __name__ == '__main__':
+    for i, task in enumerate(TASKS_D3):
+        task_keyword = get_task_keyword(task)
+        print(task, get_task_keyword(task))

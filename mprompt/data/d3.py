@@ -41,10 +41,10 @@ TASKS_D3 = {
         'examples': ["that's just great.", "thanks a lot.", "how original", "how convenient"],
     },
     'd3_1_objective': {
-        'check_func': 'objective|factual|nonpersonal|neutral',
+        'check_func': 'objective|factual|nonpersonal|neutral|unbias',
         'groundtruth_explanation': 'is a more objective description of what happened',
         'template': 'The phrase "{input}" is',
-        'target_token': ' objective',
+        'target_token': ' unbiased',
         'examples': ["The temperature is 70 degrees.", "The movie is 2 hours long.", "The book is 300 pages long.", "The flight is at 7 PM.", "The concert is at 8 PM.", "The hike is 4 hours long.", "The team scored 3 goals.", "The building is 10 stories tall.", "The package weighs 5 pounds.", "The meeting is at 10 AM."],
     },
     'd3_2_subjective': {
@@ -160,10 +160,10 @@ TASKS_D3 = {
         'examples': ["I'm With Her", 'Hillary 2020', 'Clinton Foundation', 'Democrats for Hillary', 'Hillary supporter'],
     },
     'd3_18_offensive': {
-        'check_func': 'offensive|toxic|abusive|insulting|insult|abuse|offend|offend',
+        'check_func': 'offensive|toxic|abusive|insulting|insult|abuse|offend|offend|derogatory',
         'groundtruth_explanation': 'contains offensive content',
         'template': 'The phrase "{input}" contains content that is',
-        'target_token': ' offensive',
+        'target_token': ' derogatory',
         'examples': ['racial slurs', 'sexist comments', 'homophobic remarks', 'hate speech', 'harassment'],
     },
     'd3_19_offensive': {
@@ -212,7 +212,7 @@ TASKS_D3 = {
         'check_func': 'math|arithmetic|algebra|geometry',
         'groundtruth_explanation': 'is about math research',
         'template': 'The phrase "{input}" is about',
-        'target_token': ' math research',
+        'target_token': ' math',
         'examples': ["number theory", "topology", "combinatorics"],
     },
     'd3_26_grammar': {
@@ -254,7 +254,7 @@ TASKS_D3 = {
         'check_func': 'sports',
         'groundtruth_explanation': 'is about sports news',
         'template': 'The phrase "{input}" is about',
-        'target_token': ' sports',
+        'target_token': ' sports news',
         'examples': ["football game", "basketball player", "tennis tournament"],
     },
     'd3_32_business': {
@@ -359,7 +359,7 @@ TASKS_D3 = {
         'check_func': 'opinion|personal|bias',
         'groundtruth_explanation': 'asks for an opinion',
         'template': 'The phrase "{input}" contains an',
-        'target_token': ' opnion',
+        'target_token': ' opinion',
         'examples': ["favorite", "preferences", "personal", "opinion"],
     },
     'd3_47_math': {
