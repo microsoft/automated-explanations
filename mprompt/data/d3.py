@@ -67,7 +67,7 @@ TASKS_D3 = {
         'examples': ["secular humanist", "atheist", "agnostic", "anti-religion"],
     },
     'd3_5_evacuate': {
-        'check_func': 'evacuate|flee|escape',
+        'check_func': 'evacuat|flee|escape',
         'groundtruth_explanation': 'involves a need for people to evacuate',
         'template': 'The phrase "{input}" involves',
         'target_token': ' evacuation',

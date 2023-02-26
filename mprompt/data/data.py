@@ -8,7 +8,7 @@ TASKS = {**TASKS_D3, **TASKS_TOY}
 
 def get_relevant_data(module_name, module_num) -> List[str]:
     if module_name == 'fmri':
-        """read in full text of 26 narrative stories
+        """read in full text of 26 narrative stories (includes train and test)
         """
         with open(join(SAVE_DIR_FMRI, 'narrative_stories.txt'), 'r') as f:
             narrative_stories = f.readlines()

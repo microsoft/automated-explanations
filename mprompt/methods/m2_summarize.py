@@ -82,6 +82,9 @@ def clean_summary(summary: str):
     # remove unnecessary suffix
     if summary.endswith('.'):
         summary = summary[:-1]
+    
+    # remove quotation marks
+    summary = summary.replace('"', '')
 
     # sometimes summary comes with a rationale, e.g.
     # Summary: [involve people and places.]
