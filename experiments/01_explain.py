@@ -92,6 +92,7 @@ if __name__ == '__main__':
     parser = add_computational_args(
         deepcopy(parser_without_computational_args))
     args = parser.parse_args()
+    assert not args.module_num == args.module_num_restrict, 'module_num and module_num_restrict should be different'
 
     # set up logging
     logging.basicConfig(level=logging.INFO)

@@ -18,7 +18,7 @@ params_shared_dict = {
 }
 
 # Ablations
-MODULE_NUMS = list(range(5))
+MODULE_NUMS = list(range(10, 15))
 params_coupled_dict = {
     # ablations
     ('module_num', 'noise_ngram_scores'): [
