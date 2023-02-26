@@ -9,9 +9,6 @@ params_shared_dict = {
     'save_dir': [join('/home/chansingh/mntv1/mprompt', 'feb18_synthetic_sweep')],
     'use_cache': [1],
     'subsample_frac': [1],
-    'module_num': list(range(54)),
-    # 'module_num': [3],
-    # [3, 7, 9, 12, 13, 16, 23, 32, 50, 53],
     'module_name': ['emb_diff_d3'],
     'num_top_ngrams_to_use': [30],
     'num_top_ngrams_to_consider': [50],
@@ -24,17 +21,20 @@ params_shared_dict = {
 params_coupled_dict = {
 
     # default params
-    ('noise_ngram_scores', 'module_num_restrict'): [
-        (0, -1),
+    ('module_num', 'noise_ngram_scores', 'module_num_restrict'): [
+        (module_num, 0, -1)
+        for module_num in range(54)
+        # [3, 7, 9, 12, 13, 16, 23, 32, 50, 53],
     ],
 
     # ablations
-    # ('noise_ngram_scores',): [
-        # (i,) for i in [3]
+    # ('module_num', 'noise_ngram_scores',): [
+        # (module_num, i) for i in [3]
+        # for module_num in range(54)
     # ],
-    ('module_num', 'module_num_restrict',): [
-        (i, (i + 1) % 54) for i in range(54)
-    ],
+    # ('module_num', 'module_num_restrict',): [
+    #     (i, (i + 1) % 54) for i in range(54)
+    # ],
 }
 
 # Args list is a list of dictionaries
@@ -49,6 +49,7 @@ submit_utils.run_args_list(
     script_name=join(repo_dir, 'experiments', '01_explain.py'),
     actually_run=True,
     # gpu_ids=[0],
-    n_cpus=1, # 20
+    n_cpus=27, # 20
     repeat_failed_jobs=True,
+    shuffle=False,
 )
