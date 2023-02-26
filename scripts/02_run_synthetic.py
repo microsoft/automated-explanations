@@ -15,7 +15,7 @@ params_shared_dict = {
     'generate_template_num': [1],
     'num_summaries': [5],
     'num_synthetic_strs': [10],
-    'module_num': list(range(54)),
+    'module_num': list(range(52, 54)),
 }
 
 # List of tuples to sweep over (these values are coupled, and swept over together)

@@ -18,6 +18,7 @@ import mprompt.modules.emb_diff_module
 import mprompt.methods.m1_ngrams
 import mprompt.methods.m2_summarize
 import mprompt.methods.m3_generate
+import mprompt.methods.m4_evaluate
 import mprompt.data.data
 from mprompt.data.data import TASKS_D3, TASKS_TOY
 from imodelsx import cache_save_utils
@@ -203,20 +204,9 @@ if __name__ == '__main__':
         r['top_' + k] = r[k][0]
 
     # evaluate how well explanation matches a "groundtruth"
-    if getattr(mod, "get_groundtruth_explanation", None):
+    if not args.module_name == 'fmri':
         logging.info('Scoring explanation....')
-
-        # get groundtruth explanation
-        explanation_groundtruth = mod.get_groundtruth_explanation()
-        check_func = mod.get_groundtruth_keywords_check_func()
-
-        for explanation_str in explanation_strs:
-            # compute bleu score with groundtruth explanation
-            # r['score_bleu'].append(
-            # calc_bleu_score(explanation_groundtruth, explanation_str))
-
-            # compute whether explanation contains any of the synthetic keywords
-            r['score_contains_keywords'].append(check_func(explanation_str))
+        r['score_contains_keywords'] = mprompt.methods.m4_evaluate.compute_recovery_metrics(args, r['explanation_init_strs'])
 
     # save results
     pkl.dump(r, open(join(save_dir_unique, 'results.pkl'), 'wb'))
