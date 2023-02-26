@@ -6,14 +6,14 @@ from imodelsx import submit_utils
 # List of values to sweep over (sweeps over all combinations of these)
 params_shared_dict = {
     'seed': [1],
-    'save_dir': [join('/home/chansingh/mntv1/mprompt', 'feb18_synthetic_sweep')],
+    'save_dir': [join('/home/chansingh/mntv1/mprompt', 'feb25')],
     'use_cache': [1],
     'subsample_frac': [1],
     'module_name': ['emb_diff_d3'],
     'num_top_ngrams_to_use': [30],
     'num_top_ngrams_to_consider': [50],
     'generate_template_num': [1],
-    'num_summaries': [2],
+    'num_summaries': [5],
     'num_synthetic_strs': [10],
     'module_num': list(range(54)),
 }

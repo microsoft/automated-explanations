@@ -25,4 +25,5 @@ def get_task_str(module_name, module_num) -> str:
     task_str = list(T.keys())[module_num]
     return task_str
 
-
+def get_task_keyword(task_name):
+    return TASKS[task_name]['target_token'].strip().split()[0]

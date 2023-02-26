@@ -13,9 +13,9 @@ DESCRIPTIONS_DICT = json.load(open(
 )
 
 
-def fetch_data(task_name_induction, return_df=False):
+def fetch_data(task_name, return_df=False):
     df = pd.read_csv(oj(D3_PROCESSED_DIR,
-                        task_name_induction[:task_name_induction.rindex('_')] + '.csv'))
+                        task_name[:task_name.rindex('_')] + '.csv'))
     # print('df', df.head())
     # Fix input: Encourage model to answer output as next token.
     # df['input'] = df['input'].map(lambda s: f'Input: {s} Answer:')
@@ -25,6 +25,8 @@ def fetch_data(task_name_induction, return_df=False):
         return df
     else:
         return df['input'].values.tolist()
+
+
 
 
 

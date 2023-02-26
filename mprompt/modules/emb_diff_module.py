@@ -14,6 +14,7 @@ import os.path
 import re
 import mprompt.llm
 import scipy.spatial.distance
+import mprompt.data.data
 from langchain import PromptTemplate
 from mprompt.data.data import TASKS
 from InstructorEmbedding import INSTRUCTOR
@@ -52,7 +53,7 @@ class EmbDiffModule():
         if 'target_str' in self.task:
             self.target_str = self.task['target_str']
         else:
-            self.target_str = self.task['target_token'].strip().split()[0]
+            self.target_str = mprompt.data.data.get_task_keyword(task_str)
         self.emb = self._get_emb(self.target_str)
         # embs = [
         # self._get_emb(x) for x in ['horse', 'dog', 'cat']

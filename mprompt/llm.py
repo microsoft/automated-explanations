@@ -45,7 +45,6 @@ def llm_openai(checkpoint='text-davinci-003') -> LLM:
             cache_file_raw = join(
                 self.cache_dir, f'raw_{hash_str}__num_tok={max_new_tokens}__seed={seed}.pkl')
             if os.path.exists(cache_file):
-                print(cache_file)
                 return pkl.load(open(cache_file, 'rb'))
 
             response = openai.Completion.create(
