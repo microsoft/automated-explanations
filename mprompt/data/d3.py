@@ -415,7 +415,7 @@ TASKS_D3 = {
 ks = list(TASKS_D3.keys())
 
 for k in ks:
-    TASKS_D3[k]['gen_func'] = partial(fetch_data, task_name_induction=k)
+    TASKS_D3[k]['gen_func'] = partial(fetch_data, task_name=k)
 
 if __name__ == '__main__':
     print(TASKS_D3)

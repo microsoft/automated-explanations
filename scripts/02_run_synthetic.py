@@ -33,7 +33,7 @@ submit_utils.run_args_list(
     script_name=join(repo_dir, 'experiments', '01_explain.py'),
     actually_run=True,
     # gpu_ids=[0],
-    n_cpus=27, # 20
+    n_cpus=2, # 20
     repeat_failed_jobs=True,
     shuffle=False,
 )
