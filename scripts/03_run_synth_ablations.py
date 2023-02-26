@@ -13,13 +13,23 @@ params_shared_dict = {
     'num_top_ngrams_to_use': [30],
     'num_top_ngrams_to_consider': [50],
     'generate_template_num': [1],
-    'num_summaries': [2],
+    'num_summaries': [5],
     'num_synthetic_strs': [10],
-    'module_num': list(range(54)),
 }
 
-# List of tuples to sweep over (these values are coupled, and swept over together)
-params_coupled_dict = {}
+# Ablations
+MODULE_NUMS = list(range(5))
+params_coupled_dict = {
+    # ablations
+    ('module_num', 'noise_ngram_scores'): [
+        (module_num, noise_ngram_scores)
+        for noise_ngram_scores in [3]
+        for module_num in MODULE_NUMS
+    ],
+    ('module_num', 'module_num_restrict'): [
+        (i, (i + 1) % 54) for i in MODULE_NUMS
+    ],
+}
 
 # Args list is a list of dictionaries
 # If you want to do something special to remove some of these runs, can remove them before calling run_args_list
@@ -32,8 +42,8 @@ submit_utils.run_args_list(
     args_list,
     script_name=join(repo_dir, 'experiments', '01_explain.py'),
     actually_run=True,
-    # gpu_ids=[0],
-    n_cpus=27, # 20
+    gpu_ids=[0],
+    # n_cpus=10, # 20
     repeat_failed_jobs=True,
     shuffle=False,
 )
