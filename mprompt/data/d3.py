@@ -216,14 +216,14 @@ TASKS_D3 = {
         'examples': ["number theory", "topology", "combinatorics"],
     },
     'd3_26_grammar': {
-        'check_func': 'grammar|syntax|punctuation|grammat',
+        'check_func': 'grammar|syntax|punctuation|grammat|linguistic',
         'groundtruth_explanation': 'is ungrammatical',
         'template': 'The phrase "{input}" is',
         'target_token': ' ungrammatical',
         'examples': ["Me no speak English good.", "Her don't like coffee.", "I is very happy."],
     },
     'd3_27_grammar': {
-        'check_func': 'grammar|syntax|punctuation|grammat',
+        'check_func': 'grammar|syntax|punctuation|grammat|linguistic',
         'groundtruth_explanation': 'is grammatical',
         'template': 'The phrase "{input}" is',
         'target_token': ' grammatical',
@@ -244,7 +244,7 @@ TASKS_D3 = {
         'examples': ["Equal pay for equal work.", "Reproductive rights for women.", "Girls can do anything boys can do."],
     },
     'd3_30_news': {
-        'check_func': 'news|international|current events',
+        'check_func': 'world|cosmopolitan|international|global',
         'groundtruth_explanation': 'is about world news',
         'template': 'The phrase "{input}" is about',
         'target_token': ' world',

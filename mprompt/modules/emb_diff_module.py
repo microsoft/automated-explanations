@@ -53,7 +53,7 @@ class EmbDiffModule():
         if 'target_str' in self.task:
             self.target_str = self.task['target_str']
         else:
-            self.target_str = mprompt.data.data.get_task_keyword(task_str)
+            self.target_str = mprompt.data.data.get_groundtruth_keyword(task_str)
         self.emb = self._get_emb(self.target_str)
         # embs = [
         # self._get_emb(x) for x in ['horse', 'dog', 'cat']
@@ -83,21 +83,6 @@ class EmbDiffModule():
             # neg_dists[i] = - np.linalg.norm(emb - self.emb, ord=2)
             neg_dists[i] = - scipy.spatial.distance.euclidean(emb, self.emb)
         return neg_dists
-
-    def get_groundtruth_explanation(self) -> str:
-        """Return the groundtruth explanation
-        """
-        return self.task['groundtruth_explanation']
-
-    def get_groundtruth_keywords_check_func(self) -> str:
-        """Return the groundtruth keywords
-        """
-        regex = self.task['check_func']
-        regex_compiled = re.compile(regex, re.IGNORECASE).search
-
-        def check_answer_func(x):
-            return bool(regex_compiled(x))
-        return check_answer_func
 
 
 if __name__ == '__main__':

@@ -206,7 +206,7 @@ if __name__ == '__main__':
     # evaluate how well explanation matches a "groundtruth"
     if not args.module_name == 'fmri':
         logging.info('Scoring explanation....')
-        r['score_contains_keywords'] = mprompt.methods.m4_evaluate.compute_recovery_metrics(args, r['explanation_init_strs'])
+        r['score_contains_keywords'] = mprompt.methods.m4_evaluate.compute_score_contains_keywords(args, r['explanation_init_strs'])
 
     # save results
     pkl.dump(r, open(join(save_dir_unique, 'results.pkl'), 'wb'))

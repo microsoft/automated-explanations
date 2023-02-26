@@ -18,7 +18,7 @@ def get_relevant_data(module_name, module_num) -> List[str]:
         task_str = get_task_str(module_name, module_num)
         return TASKS[task_str]['gen_func']()
 
-def get_task_keyword(task_name):
+def get_groundtruth_keyword(task_name):
     return TASKS[task_name]['target_token'].strip()
 
 def get_task_str(module_name, module_num) -> str:
