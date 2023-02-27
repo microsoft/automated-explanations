@@ -3,31 +3,33 @@ import sys
 import os.path
 from os.path import dirname, join
 repo_dir = dirname(dirname(os.path.abspath(__file__)))
+import pandas as pd
+import mprompt.data.data
+import mprompt.methods.m4_evaluate as m4_evaluate
+import numpy as np
 
+def process_and_add_scores(r: pd.DataFrame, add_bert_scores=False):
+    # metadata
+    r['task_str'] = r.apply(lambda row: mprompt.data.data.get_task_str(row['module_name'], row['module_num']), axis=1)
+    r['task_keyword'] = r['task_str'].apply(lambda task_str: mprompt.data.data.get_groundtruth_keyword(task_str))
+    r['task_name (groundtruth)'] = r['task_str'].apply(lambda s: s.split('_')[-1])
+    r['ngrams_restricted'] = ~(r['module_num_restrict'] == -1)
+    r['num_generated_explanations'] = r['explanation_init_strs'].apply(lambda x: len(x))
 
-def get_main_args_list(fname='01_train_model.py'):
-    """Returns main arguments from the argparser used by an experiments script
-    """
-    if fname.endswith('.py'):
-        fname = fname[:-3]
-    sys.path.append(join(repo_dir, 'experiments'))
-    train_script = __import__(fname)
-    args = train_script.add_main_args(argparse.ArgumentParser()).parse_args([])
-    return list(vars(args).keys())
+    # recompute recovery metrics
+    r['score_contains_keywords'] = r.apply(lambda row: m4_evaluate.compute_score_contains_keywords(row, row['explanation_init_strs']), axis=1)
+    if add_bert_scores:
+        r['score_bert'] = r.progress_apply(lambda row: m4_evaluate.compute_score_bert(row, row['explanation_init_strs']), axis=1)
 
-def fill_missing_args_with_default(df, fname='01_train_model.py'):
-    """Returns main arguments from the argparser used by an experiments script
-    """
-    if fname.endswith('.py'):
-        fname = fname[:-3]
-    sys.path.append(join(repo_dir, 'experiments'))
-    train_script = __import__(fname)
-    parser = train_script.add_main_args(argparse.ArgumentParser())
-    parser = train_script.add_computational_args(parser)
-    args = parser.parse_args([])
-    args_dict = vars(args)
-    for k, v in args_dict.items():
-        if k not in df.columns:
-            df[k] = v
-        df[k] = df[k].fillna(v)
-    return df
+    # metrics
+    # for met_suff in ['contains_keywords']:
+    for met_suff in ['contains_keywords', 'bert']:
+        if 'score_' + met_suff in r.columns:
+            met_val = r['score_' + met_suff]
+            r['top_' + met_suff] = met_val.apply(lambda x: x[0])
+            r['any_' + met_suff] = met_val.apply(lambda x: np.max(x))
+            r['mean_' + met_suff] = met_val.apply(lambda x: np.mean(x))
+            r[f'mean_{met_suff}_weighted'] = r[f'mean_{met_suff}'] * r['num_generated_explanations']
+    r['row_count_helper'] = 1
+    r = r.sort_values(by='top_score_synthetic', ascending=False).round(3)
+    return r
