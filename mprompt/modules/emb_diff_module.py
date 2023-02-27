@@ -11,10 +11,12 @@ import imodelsx.util
 import pickle as pkl
 from os.path import dirname, join
 import os.path
+import torch
 import re
 import mprompt.llm
 import scipy.spatial.distance
 import mprompt.data.data
+from typing import Union
 from langchain import PromptTemplate
 from mprompt.data.data import TASKS
 from InstructorEmbedding import INSTRUCTOR
@@ -62,26 +64,46 @@ class EmbDiffModule():
 
         # print('ref', self.emb.shape)
 
-    def _get_emb(self, x: str) -> np.ndarray:
+    def _get_emb(self, x: Union[str, List[str]]) -> np.ndarray:
         if self.use_instructor:
             instruction = f"Represent the short phrase for clustering: "
-            embs = self.extract_embs.encode([[instruction, x]])
-            return embs[0]
+            if isinstance(x, str):
+                embs = self.extract_embs.encode([[instruction, x]])
+                return embs[0]
+            elif isinstance(x, list):
+                # raising this batch_size to > 32 somehow doesn't speed up the model
+                embs = self.extract_embs.encode([[instruction, x_i] for x_i in x], batch_size=32)
+                return embs
         else:
+            if isinstance(x, list) and len(x) > 1:
+                raise NotImplementedError('batching not implemented for non-instructor models')
+            elif isinstance(x, str):
+                x = [x]
+            
             # emb is (batch_size, 1, (seq_len + 2), embedding_dim)
             # embedding_dim = 768 for bert-base-uncased and 1024 for roberta-large
-            emb = np.array(self.extract_embs([x]))
+            emb = np.array(self.extract_embs(x))
             return emb[0, 0].mean(axis=0)  # mean over seq_len
             # return emb[0, 0, 0] # take [CLS] token (first)
 
-    def __call__(self, X: List[str]) -> np.ndarray:
+    def __call__(self, X: Union[str, List[str]], batch_size=32) -> np.ndarray:
         """Returns a scalar continuous response for each element of X
         """
+        if isinstance(X, str):
+            X = [X]
         neg_dists = np.zeros(len(X))
-        for i, x in enumerate(tqdm(X)):
-            emb = self._get_emb(x)
-            # neg_dists[i] = - np.linalg.norm(emb - self.emb, ord=2)
-            neg_dists[i] = - scipy.spatial.distance.euclidean(emb, self.emb)
+        if batch_size == 1:
+            for i, x in enumerate(tqdm(X)):
+                emb = self._get_emb(x)
+                # neg_dists[i] = - np.linalg.norm(emb - self.emb, ord=2)
+                neg_dists[i] = - scipy.spatial.distance.euclidean(emb, self.emb)
+        else:
+            for i in tqdm(range(0, len(X), batch_size)):
+                batch_start = i
+                batch_end = min(i + batch_size, len(X))
+                batch = X[batch_start: batch_end]
+                embs = self._get_emb(batch)
+                neg_dists[i: i+batch_size] = - scipy.spatial.distance.cdist(embs, [self.emb], metric='euclidean').squeeze()
         return neg_dists
 
 
@@ -89,13 +111,19 @@ if __name__ == '__main__':
     mod = EmbDiffModule(
         task_str='toy_animal',
         # checkpoint='bert-base-uncased',
-        checkpoint='roberta-large',
+        checkpoint='gpt2',
     )
-    X = mod.get_relevant_data()
+    # X = mod.get_relevant_data()
+    X = ['horse', 'dog', 'cat']
     # X = sum([[a for a in x] for x in X], [])
-    resps = mod(X[:3])
-    for x, resp in zip(X, resps):
-        print(x, resp)
+    resps = mod(X[:3], batch_size=1)
+    resps2 = mod(X[:3], batch_size=3)
+    resps3 = mod(X[:3], batch_size=2)
+    print('shapes', resps.shape, resps2.shape, resps3.shape)
+    for i in range(len(X)):
+        print(X[i], resps[i], resps2[i])
+    assert np.allclose(resps, resps2)
+    assert np.allclose(resps, resps3)
     print('X', X)
     # print(X[0][:50])
     # print(resp)

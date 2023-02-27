@@ -15,7 +15,7 @@ params_shared_dict = {
     'generate_template_num': [1],
     'num_summaries': [5],
     'num_synthetic_strs': [10],
-    'module_num': list(range(52, 54)),
+    'module_num': [24, 25, 47, 48, 49, 51], # list(range(52, 54)),
 }
 
 # List of tuples to sweep over (these values are coupled, and swept over together)
@@ -32,8 +32,8 @@ submit_utils.run_args_list(
     args_list,
     script_name=join(repo_dir, 'experiments', '01_explain.py'),
     actually_run=True,
-    # gpu_ids=[0],
-    n_cpus=2, # 20
+    gpu_ids=[0],
+    # n_cpus=1, # 20
     repeat_failed_jobs=True,
     shuffle=False,
 )
