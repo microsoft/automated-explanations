@@ -5,7 +5,7 @@ from imodelsx import submit_utils
 
 # List of values to sweep over (sweeps over all combinations of these)
 params_shared_dict = {
-    'seed': [1],
+    'seed': [2],
     'save_dir': [join('/home/chansingh/mntv1/mprompt', 'feb25')],
     'use_cache': [1],
     'subsample_frac': [1],
@@ -15,7 +15,8 @@ params_shared_dict = {
     'generate_template_num': [1],
     'num_summaries': [5],
     'num_synthetic_strs': [10],
-    'module_num': [24, 25, 47, 48, 49, 51], # list(range(52, 54)),
+    # 'module_num': [24, 25, 47, 48, 49, 51], # list(range(52, 54)),
+    'module_num': list(range(54)),
 }
 
 # List of tuples to sweep over (these values are coupled, and swept over together)
