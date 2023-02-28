@@ -5,7 +5,7 @@ from imodelsx import submit_utils
 
 # List of values to sweep over (sweeps over all combinations of these)
 params_shared_dict = {
-    'seed': [1],
+    'seed': [2, 3],
     'save_dir': [join('/home/chansingh/mntv1/mprompt', 'feb25')],
     'use_cache': [1],
     'subsample_frac': [1],
@@ -42,8 +42,8 @@ submit_utils.run_args_list(
     args_list,
     script_name=join(repo_dir, 'experiments', '01_explain.py'),
     actually_run=True,
-    gpu_ids=[0],
-    # n_cpus=10, # 20
+    # gpu_ids=[0],
+    n_cpus=3, # 20
     repeat_failed_jobs=True,
     shuffle=False,
 )
