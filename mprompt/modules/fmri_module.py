@@ -70,6 +70,10 @@ def get_test_ngrams(voxel_num_best: int = 0):
     top_ngrams = pd.read_pickle(join(SAVE_DIR_FMRI, 'top_ngrams.pkl'))
     return top_ngrams['voxel_top_' + str(voxel_num_best)].values
 
+def get_roi(voxel_num_best: int = 0):
+    rois = pd.read_pickle(join(SAVE_DIR_FMRI, 'roi_dict.pkl'))
+    return rois.get(voxel_num_best, '--')
+
 if __name__ == '__main__':
     mod = fMRIModule()
     X = mod.get_relevant_data()
