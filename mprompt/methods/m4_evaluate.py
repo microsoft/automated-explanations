@@ -18,7 +18,9 @@ def compute_score_bert(args, explanation_strs):
     keyword_groundtruth = mprompt.data.data.get_groundtruth_keyword(task_str)
 
     # compute bert score with groundtruth explanation
-    scores_tup_PRF = bert_score.score(explanation_strs, [keyword_groundtruth] * len(explanation_strs), model_type='microsoft/deberta-xlarge-mnli')
+    scores_tup_PRF = bert_score.score(
+        explanation_strs, [keyword_groundtruth] * len(explanation_strs),
+        model_type='microsoft/deberta-xlarge-mnli')
     scores_bert = scores_tup_PRF[2].detach().cpu().numpy().tolist()
 
     return scores_bert
