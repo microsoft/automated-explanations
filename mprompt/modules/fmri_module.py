@@ -1,3 +1,4 @@
+import pandas as pd
 import logging
 from typing import List
 import datasets
@@ -65,6 +66,9 @@ class fMRIModule():
             pred_voxel = preds_fMRI[:, self.voxel_num_best]
             return pred_voxel
 
+def get_test_ngrams(voxel_num_best: int = 0):
+    top_ngrams = pd.read_pickle(join(SAVE_DIR_FMRI, 'top_ngrams.pkl'))
+    return top_ngrams['voxel_top_' + str(voxel_num_best)].values
 
 if __name__ == '__main__':
     mod = fMRIModule()
