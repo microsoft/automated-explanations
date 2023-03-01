@@ -125,18 +125,25 @@ batch_size]
                 all_scores = all_scores + scores
             return all_scores
 
-def calculate_test_correct_score(r: pd.Dataframe):
+def calculate_test_correct_score(r: pd.DataFrame, col_explanation='top_explanation_init_strs', col_ngrams='top_ngrams_test_100'):
     """Note: validator takes a lot of memory.
     """
     validator = D5_Validator()
     test_correct_score_list = []
     correct_ngrams_test_list = []
     for i in tqdm(range(r.shape[0])):
+        # get expl and ngrams
         row = r.iloc[i]
-        scores = validator.validate_w_scores(row['top_explanation_init_strs'], row['top_ngrams_test'].tolist())
+        explanation = row[col_explanation]
+        assert isinstance(explanation, str), explanation
+        ngrams = row[col_ngrams]
+        if isinstance(ngrams, list):
+            ngrams = np.array(ngrams)
+        assert isinstance(ngrams, np.ndarray), ngrams
+
+        scores = validator.validate_w_scores(explanation, ngrams.tolist())
         test_correct_score_list.append(np.mean(scores))
-        correct_ngrams_test_list.append(row['top_ngrams_test'][np.array(scores) 
-> 0.5])
+        correct_ngrams_test_list.append(ngrams[np.array(scores) > 0.5])
     return test_correct_score_list, correct_ngrams_test_list
 
 if __name__ == '__main__':
