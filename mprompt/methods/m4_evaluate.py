@@ -1,6 +1,8 @@
+import numpy as np
+import pandas as pd
 import torch
 from transformers import T5ForConditionalGeneration, T5Tokenizer
-from tqdm import trange
+from tqdm import tqdm, trange
 import torch.nn
 from typing import List
 import mprompt.data.data
@@ -19,7 +21,6 @@ def compute_score_contains_keywords(args, explanation_strs):
         score_contains_keywords.append(check_func(explanation_str))
 
     return score_contains_keywords
-
 
 def compute_score_bert(args, explanation_strs):
     # get groundtruth explanation
@@ -46,31 +47,23 @@ def test_ngrams_bert_score(explanation: str, top_ngrams_test: List[str]):
     bscore = F1.detach().cpu().numpy().mean()
     return bscore
 
-
-YES_NO_TOK_IDX = [150, 4273]
-MAX_SOURCE_LENGTH = 1024
-device = 'cuda' if torch.cuda.is_available() else 'cpu'
-BATCH_SIZE = 32
-MAX_TARGET_LENGTH = 2
-TEMPERATURE = 0.001
-from typing import Dict
-sm = torch.nn.Softmax(dim=-1)
-
-
 class D5_Validator:
     """Validator class from T5 paper https://github.com/ruiqi-zhong/D5
     """
-    def __init__(self, model_path: str = 'ruiqi-zhong/d5_t5_validator', batch_size: int = BATCH_SIZE, verbose: bool = False):
+    def __init__(self, model_path: str = 'ruiqi-zhong/d5_t5_validator', batch_size: int = 32, verbose: bool = False):
         '''
         model_path is the path to the T5 model weights used for validation
         can also any other model name
         the default is the best model we have trained
         '''
+        device = 'cuda' if torch.cuda.is_available() else 'cpu'
+        self.softmax = torch.nn.Softmax(dim=-1)
         self.tokenizer = T5Tokenizer.from_pretrained("google/flan-t5-xxl")
         print('loading model weights')
-        self.model = T5ForConditionalGeneration.from_pretrained(model_path)
+        self.model = T5ForConditionalGeneration.from_pretrained(model_path).to(device)
         print('done')
-        self.validator_template = '''Check whether the TEXT satisfies a PROPERTY. Respond with Yes or No. When uncertain, output No. 
+        self.validator_template = '''Check whether the TEXT satisfies a PROPERTY
+. Respond with Yes or No. When uncertain, output No. 
 Now complete the following example -
 input: PROPERTY: {hypothesis}
 TEXT: {text}
@@ -78,18 +71,26 @@ output:'''
         self.batch_size = batch_size
         self.verbose = verbose
 
-    def validate_w_scores(self, input_dicts: List[Dict[str, str]]) -> List[float]:
-        '''
-        input_dicts is a list of dictionaries, each dictionary has two keys: "explanation" (h) and "text" (x), mapping to the hypothesis and text to be validated
-        returns a list of scores, each score is a float between 0 and 1, corresponding to the probability that the hypothesis is true given the text for each input dictionary
-        note that it is an iterator, so you can use it in a for loop and save the results whenever some input dictionaries are processed
-        '''
-        prompts = []
-        for i, input_dict in enumerate(input_dicts):
-            hypothesis, text = input_dict['explanation'], input_dict['text']
-            prompts.append(self.validator_template.format(
-                hypothesis=hypothesis, text=text))
+    def test(self):
+        return 3
 
+    def validate_w_scores(self, explanation: str, top_ngrams_test: List[str]) -> List[float]:
+        '''
+        returns a list of scores, each score is a float between 0 and 1, corresp
+onding to the probability that the explanation is true given the text for each i
+nput dictionary
+        note that it is an iterator, so you can use it in a for loop and save th
+e results whenever some input dictionaries are processed
+        '''
+        
+        prompts = []
+        for top_ngram in top_ngrams_test:
+            prompts.append(self.validator_template.format(
+                hypothesis=explanation, text=top_ngram))
+        # print('prompts', prompts)
+
+        # return prompts
+        all_scores = []
         with torch.no_grad():
             self.model.eval()
             num_batches = (len(prompts) - 1) // self.batch_size + 1
@@ -101,34 +102,50 @@ output:'''
 
             for batch_idx in pbar:
                 input_prompts = prompts[batch_idx *
-                                        self.batch_size: (batch_idx + 1) * self.batch_size]
+                                        self.batch_size: (batch_idx + 1) * self.
+batch_size]
                 inputs = self.tokenizer(input_prompts,
                                         return_tensors="pt",
                                         padding="longest",
-                                        max_length=MAX_SOURCE_LENGTH,
+                                        max_length=1024,
                                         truncation=True,
-                                        ).to(device)
+                                        ).to(self.model.device)
                 generation_result = self.model.generate(
                     input_ids=inputs["input_ids"],
                     attention_mask=inputs["attention_mask"],
                     do_sample=True,
-                    temperature=TEMPERATURE,
-                    max_new_tokens=MAX_TARGET_LENGTH,
+                    temperature=0.001,
+                    max_new_tokens=2,
                     return_dict_in_generate=True,
                     output_scores=True
                 )
-                scores = sm(generation_result.scores[0][:, YES_NO_TOK_IDX])[
+                YES_NO_TOK_IDX = [150, 4273]
+                scores = self.softmax(generation_result.scores[0][:, YES_NO_TOK_IDX])[
                     :, 1].detach().cpu().numpy().tolist()
-                for s in scores:
-                    yield s
+                all_scores = all_scores + scores
+            return all_scores
 
+def calculate_test_correct_score(r: pd.Dataframe):
+    """Note: validator takes a lot of memory.
+    """
+    validator = D5_Validator()
+    test_correct_score_list = []
+    correct_ngrams_test_list = []
+    for i in tqdm(range(r.shape[0])):
+        row = r.iloc[i]
+        scores = validator.validate_w_scores(row['top_explanation_init_strs'], row['top_ngrams_test'].tolist())
+        test_correct_score_list.append(np.mean(scores))
+        correct_ngrams_test_list.append(row['top_ngrams_test'][np.array(scores) 
+> 0.5])
+    return test_correct_score_list, correct_ngrams_test_list
 
 if __name__ == '__main__':
-    scores_tup_PRF = bert_score.score(['hello world', 'hi world', 'hey world', 'hello worlds'], [
-                                      'hello worlds'] * 4, model_type='microsoft/deberta-xlarge-mnli')
-    scores = scores_tup_PRF[2].detach().cpu().numpy()
-    print(scores)
+    # scores_tup_PRF = bert_score.score(['hello world', 'hi world', 'hey world', 'hello worlds'], [
+                                    #   'hello worlds'] * 4, model_type='microsoft/deberta-xlarge-mnli')
+    # scores = scores_tup_PRF[2].detach().cpu().numpy()
+    # print(scores)
     # print([score[2].item()
     #   for score in bert_score.score(['hello world', 'hi world'], ['hello worlds'] * 2,
     #    model_type='microsoft/deberta-xlarge-mnli')
     #    ])
+    validator = D5_Validator()
