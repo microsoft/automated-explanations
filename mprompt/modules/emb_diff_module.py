@@ -1,5 +1,6 @@
 import logging
 from typing import List
+import warnings
 import datasets
 from transformers import pipeline
 import numpy as np
@@ -51,11 +52,15 @@ class EmbDiffModule():
 
     def _init_task(self, task_str: str):
         self.task_str = task_str
-        self.task = TASKS[task_str]
-        if 'target_str' in self.task:
-            self.target_str = self.task['target_str']
+        if task_str in TASKS:
+            task = TASKS[task_str]
+            if 'target_str' in task:
+                self.target_str = task['target_str']
+            else:
+                self.target_str = mprompt.data.data.get_groundtruth_keyword(task_str)
         else:
-            self.target_str = mprompt.data.data.get_groundtruth_keyword(task_str)
+            warnings.warn(f'no task found for {task_str}, using {task_str} as target_str')
+            self.target_str = task_str
         self.emb = self._get_emb(self.target_str)
         # embs = [
         # self._get_emb(x) for x in ['horse', 'dog', 'cat']
