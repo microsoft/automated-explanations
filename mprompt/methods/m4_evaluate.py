@@ -36,7 +36,6 @@ def compute_score_bert(args, explanation_strs):
 
     return scores_bert
 
-
 def test_ngrams_bert_score(explanation: str, top_ngrams_test: List[str]):
     n = len(top_ngrams_test)
     P, R, F1 = bert_score.score(
@@ -48,7 +47,7 @@ def test_ngrams_bert_score(explanation: str, top_ngrams_test: List[str]):
     return bscore
 
 class D5_Validator:
-    """Validator class from T5 paper https://github.com/ruiqi-zhong/D5
+    """Validator class from D5 paper https://github.com/ruiqi-zhong/D5
     """
     def __init__(self, model_path: str = 'ruiqi-zhong/d5_t5_validator', batch_size: int = 32, verbose: bool = False):
         '''
@@ -71,16 +70,13 @@ output:'''
         self.batch_size = batch_size
         self.verbose = verbose
 
-    def test(self):
-        return 3
-
     def validate_w_scores(self, explanation: str, top_ngrams_test: List[str]) -> List[float]:
         '''
-        returns a list of scores, each score is a float between 0 and 1, corresp
-onding to the probability that the explanation is true given the text for each i
-nput dictionary
-        note that it is an iterator, so you can use it in a for loop and save th
-e results whenever some input dictionaries are processed
+        Returns
+        -------
+        list of scores
+            each score is a float between 0 and 1
+            probability that the explanation is true given the text for each input
         '''
         
         prompts = []
