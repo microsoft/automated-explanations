@@ -1,8 +1,9 @@
+import json
 from transformers import T5Tokenizer, T5ForConditionalGeneration, StoppingCriteriaList, MaxLengthCriteria
 from transformers import AutoConfig, AutoModel, AutoTokenizer, AutoModelForCausalLM
 from langchain.cache import InMemoryCache
 import re
-from typing import Any, List, Mapping, Optional
+from typing import Any, Dict, List, Mapping, Optional
 import numpy as np
 import openai
 import os.path
@@ -24,8 +25,11 @@ langchain.llm_cache = InMemoryCache()
 def get_llm(checkpoint):
     if checkpoint.startswith('text-da'):
         return llm_openai()
+    elif checkpoint.startswith('gpt-3'):
+        return llm_openai_chat()
     else:
         return llm_hf(checkpoint)
+
 
 
 def llm_openai(checkpoint='text-davinci-003') -> LLM:
@@ -65,6 +69,57 @@ def llm_openai(checkpoint='text-davinci-003') -> LLM:
             return response_text
 
     return LLM_OpenAI(checkpoint)
+
+def llm_openai_chat(checkpoint='gpt-3.5-turbo') -> LLM:
+    class LLM_Chat():
+        '''Chat models take a different format: https://platform.openai.com/docs/guides/chat/introduction
+        '''
+        def __init__(self, checkpoint,
+                     cache_dir=join(CACHE_DIR, 'cache_openai')):
+            self.checkpoint = checkpoint
+            self.cache_dir = cache_dir
+
+        def __call__(self, prompts_list: List[Dict[str, str]] ,
+                     max_new_tokens=250, seed=1, do_sample=True):
+            """
+            prompts_list: list of dicts, each dict has keys 'role' and 'content'
+                Example: [
+                    {"role": "system", "content": "You are a helpful assistant."},
+                    {"role": "user", "content": "Who won the world series in 2020?"},
+                    {"role": "assistant", "content": "The Los Angeles Dodgers won the World Series in 2020."},
+                    {"role": "user", "content": "Where was it played?"}
+                ]
+            """
+            assert isinstance(prompts_list, list), prompts_list
+
+            # cache
+            os.makedirs(self.cache_dir, exist_ok=True)
+            prompts_list_dict = {str(i): sorted(v.items()) for i, v in enumerate(prompts_list)}
+            dict_as_str = json.dumps(prompts_list_dict, sort_keys=True)
+            hash_str = hashlib.sha256(dict_as_str.encode()).hexdigest()
+            cache_file_raw = join(
+                self.cache_dir, f'chat__raw_{hash_str}__num_tok={max_new_tokens}__seed={seed}.pkl')
+            if os.path.exists(cache_file_raw):
+                return pkl.load(open(cache_file_raw, 'rb'))
+            print(dict_as_str)
+
+            response = openai.ChatCompletion.create(
+                model=self.checkpoint,
+                messages=prompts_list,
+                max_tokens=max_new_tokens,
+                temperature=0.1,
+                top_p=1,
+                frequency_penalty=0.25,  # maximum is 2
+                presence_penalty=0,
+                # stop=["101"]
+            )
+
+            pkl.dump(response, open(cache_file_raw, 'wb'))
+            return response
+        
+
+    return LLM_Chat(checkpoint)
+
 
 
 def _get_tokenizer(checkpoint):
