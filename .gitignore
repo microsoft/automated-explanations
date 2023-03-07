@@ -142,3 +142,5 @@ slurm_files/
 slurm_files_out/
 scripts/data/
 **.npz
+mprompt/modules/fmri
+mprompt/modules/old_fmri

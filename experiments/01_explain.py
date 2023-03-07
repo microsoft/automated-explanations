@@ -12,7 +12,7 @@ import pickle as pkl
 import imodelsx
 import torch
 import mprompt.llm
-import mprompt.modules.fmri_module
+import mprompt.modules.old_fmri_module
 import mprompt.modules.prompted_module
 import mprompt.modules.emb_diff_module
 import mprompt.methods.m1_ngrams
@@ -56,7 +56,7 @@ def add_main_args(parser):
     # module args
     parser.add_argument('--module_name', type=str,
                         default='emb_diff_toy', help='name of module',
-                        choices=['fmri',
+                        choices=['fmri', 'old_fmri',
                                  'emb_diff_d3', 'emb_diff_toy',
                                  'prompted_d3', 'prompted_toy'])
     parser.add_argument('--module_num', type=int, # good task is d3_13_water or d3_16_hillary
@@ -124,7 +124,7 @@ if __name__ == '__main__':
 
     # load module to interpret
     if args.module_name == 'fmri':
-        mod = mprompt.modules.fmri_module.fMRIModule(
+        mod = mprompt.modules.old_fmri_module.OldFMRIModule(
             voxel_num_best=args.module_num)
         r['fmri_test_corr'] = mod.corr
     else:

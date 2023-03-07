@@ -11,7 +11,7 @@ import sys
 import bert_score
 from typing import List
 tqdm.pandas()
-from mprompt.modules.fmri_module import get_test_ngrams, get_roi
+from mprompt.modules.old_fmri_module import get_test_ngrams, get_roi
 import mprompt.methods.m4_evaluate as m4_evaluate
 # results_dir = '../results/feb12_fmri_sweep/'
 results_dir = '/home/chansingh/mntv1/mprompt/feb12_fmri_sweep_gen_template1/'

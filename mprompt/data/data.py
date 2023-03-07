@@ -2,7 +2,7 @@
 from typing import List
 from mprompt.data.d3 import TASKS_D3
 from mprompt.data.toy import TASKS_TOY
-from mprompt.modules.fmri_module import SAVE_DIR_FMRI
+from mprompt.modules.old_fmri_module import SAVE_DIR_FMRI
 from os.path import join
 import re
 TASKS = {**TASKS_D3, **TASKS_TOY}
