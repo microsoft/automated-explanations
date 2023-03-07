@@ -100,8 +100,9 @@ def llm_openai_chat(checkpoint='gpt-3.5-turbo') -> LLM:
             cache_file_raw = join(
                 self.cache_dir, f'chat__raw_{hash_str}__num_tok={max_new_tokens}__seed={seed}.pkl')
             if os.path.exists(cache_file_raw):
+                print('cached!')
                 return pkl.load(open(cache_file_raw, 'rb'))
-            print(dict_as_str)
+            print('not cached')
 
             response = openai.ChatCompletion.create(
                 model=self.checkpoint,
