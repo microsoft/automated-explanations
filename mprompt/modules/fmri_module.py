@@ -104,10 +104,6 @@ class fMRIModule():
             pred_voxel = preds_fMRI[:, self.voxel_num_best]
             return pred_voxel
 
-def get_test_ngrams(voxel_num_best: int = 0):
-    top_ngrams = pd.read_pickle(join(SAVE_DIR_FMRI, 'top_ngrams.pkl'))
-    return top_ngrams['voxel_top_' + str(voxel_num_best)].values
-
 def get_roi(voxel_num_best: int = 0, roi_type: str = 'anat', subject: str = 'UTS01'):
     if roi_type == 'anat':
         rois = joblib.load(join(SAVE_DIR_FMRI, 'voxel_rois', 'voxel_anat_rois', f'{subject}_voxel_anat_rois.jbl'))
