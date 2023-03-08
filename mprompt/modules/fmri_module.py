@@ -1,3 +1,4 @@
+from collections import defaultdict
 import pandas as pd
 import logging
 from typing import List
@@ -21,7 +22,7 @@ from huth.utils_ds import make_word_ds
 
 modules_dir = dirname(os.path.abspath(__file__))
 SAVE_DIR_FMRI = join(modules_dir, 'fmri')
-
+NUM_TOP_VOXELS = 500
 
 class fMRIModule():
 
@@ -40,20 +41,15 @@ class fMRIModule():
         self.ndel = 4
     
         # select voxel index
-        NUM_TOP_VOXELS = 500
         self.voxel_idxs = joblib.load(join(SAVE_DIR_FMRI, 'voxel_lists', f'{subject}_voxel_selectivity.jbl'))
         numpy.random.default_rng(seed=42).shuffle(self.voxel_idxs)
         self.voxel_idxs = self.voxel_idxs[:NUM_TOP_VOXELS]
+        joblib.dump(self.voxel_idxs, join(SAVE_DIR_FMRI, 'voxel_lists', f'{subject}_voxel_selectivity_shuffled.jbl'))
         self.voxel_idx = self.voxel_idxs[voxel_num_best]
 
         # look at metadata stuff
         corrs = joblib.load(join(SAVE_DIR_FMRI, 'voxel_performances', f'{subject}_voxel_performance.jbl'))
-        rois_anat = joblib.load(join(SAVE_DIR_FMRI, 'voxel_rois', 'voxel_anat_rois', f'{subject}_voxel_anat_rois.jbl'))
-        rois_func = joblib.load(join(SAVE_DIR_FMRI, 'voxel_rois', 'voxel_func_rois', f'{subject}_voxel_func_rois.jbl'))
-
         self.corr = corrs[self.voxel_idx]
-        # self.roi_anat = rois_anat[str(self.voxel_idx)]
-        # self.roi_func = rois_func[str(self.voxel_idx)]]
 
         # load weights
         weights_file = join(SAVE_DIR_FMRI, 'model_weights', f'wt_{subject}.jbl')
@@ -91,7 +87,6 @@ class fMRIModule():
         # get opt embeddings
         embs = self._get_embs(X)
         torch.cuda.empty_cache()
-        print('embs.shape', embs.shape)
 
         # apply StandardScaler (pre-trained)
         embs = self.preproc.transform(embs)
@@ -99,7 +94,6 @@ class fMRIModule():
         # apply fMRI transform
         embs_delayed = np.hstack([embs] * self.ndel)
         preds_fMRI = embs_delayed @ self.weights
-
         
         if return_all:
             # self.weights was already restricted to top voxels
@@ -114,12 +108,14 @@ def get_test_ngrams(voxel_num_best: int = 0):
     top_ngrams = pd.read_pickle(join(SAVE_DIR_FMRI, 'top_ngrams.pkl'))
     return top_ngrams['voxel_top_' + str(voxel_num_best)].values
 
-def get_roi(voxel_num_best: int = 0):
-    rois = pd.read_pickle(join(SAVE_DIR_FMRI, 'roi_dict.pkl'))
+def get_roi(voxel_num_best: int = 0, roi_type: str = 'anat', subject: str = 'UTS01'):
+    if roi_type == 'anat':
+        rois = joblib.load(join(SAVE_DIR_FMRI, 'voxel_rois', 'voxel_anat_rois', f'{subject}_voxel_anat_rois.jbl'))
+    elif roi_type == 'func':
+        rois = joblib.load(join(SAVE_DIR_FMRI, 'voxel_rois', 'voxel_func_rois', f'{subject}_voxel_func_rois.jbl'))
     return rois.get(voxel_num_best, '--')
 
 def get_train_story_texts(subject: str='UTS01'):
-    # TEST_STORIES = ['wheretheressmoke', 'onapproachtopluto', 'fromboyhoodtofatherhood']
     TRAIN_STORIES_01 = ['itsabox', 'odetostepfather', 'inamoment',  'hangtime', 'ifthishaircouldtalk', 'goingthelibertyway', 'golfclubbing', 'thetriangleshirtwaistconnection', 'igrewupinthewestborobaptistchurch', 'tetris', 'becomingindian', 'canplanetearthfeedtenbillionpeoplepart1', 'thetiniestbouquet', 'swimmingwithastronauts', 'lifereimagined', 'forgettingfear', 'stumblinginthedark', 'backsideofthestorm', 'food', 'theclosetthatateeverything', 'notontheusualtour', 'exorcism', 'adventuresinsayingyes', 'thefreedomridersandme', 'cocoonoflove', 'waitingtogo', 'thepostmanalwayscalls', 'googlingstrangersandkentuckybluegrass', 'mayorofthefreaks', 'learninghumanityfromdogs', 'shoppinginchina', 'souls', 'cautioneating', 'comingofageondeathrow', 'breakingupintheageofgoogle', 'gpsformylostidentity', 'eyespy', 'treasureisland', 'thesurprisingthingilearnedsailingsoloaroundtheworld', 'theadvancedbeginner', 'goldiethegoldfish', 'life', 'thumbsup', 'seedpotatoesofleningrad', 'theshower', 'adollshouse', 'canplanetearthfeedtenbillionpeoplepart2', 'sloth', 'howtodraw', 'quietfire', 'metsmagic', 'penpal', 'thecurse', 'canadageeseandddp', 'thatthingonmyarm', 'buck', 'wildwomenanddancingqueens', 'againstthewind', 'indianapolis', 'alternateithicatom', 'bluehope', 'kiksuya', 'afatherscover', 'haveyoumethimyet', 'firetestforlove', 'catfishingstrangerstofindmyself', 'christmas1940', 'tildeath', 'lifeanddeathontheoregontrail', 'vixenandtheussr', 'undertheinfluence', 'beneaththemushroomcloud', 'jugglingandjesus', 'superheroesjustforeachother', 'sweetaspie', 'naked', 'singlewomanseekingmanwich', 'avatar', 'whenmothersbullyback', 'myfathershands', 'reachingoutbetweenthebars', 'theinterview', 'stagefright', 'legacy', 'canplanetearthfeedtenbillionpeoplepart3', 'listo', 'gangstersandcookies', 'birthofanation', 'mybackseatviewofagreatromance', 'lawsthatchokecreativity', 'threemonths', 'whyimustspeakoutaboutclimatechange', 'leavingbaghdad']
     TRAIN_STORIES_02_03 = ['itsabox', 'odetostepfather', 'inamoment', 'afearstrippedbare', 'findingmyownrescuer', 'hangtime', 'ifthishaircouldtalk', 'goingthelibertyway', 'golfclubbing', 'thetriangleshirtwaistconnection', 'igrewupinthewestborobaptistchurch', 'tetris', 'becomingindian', 'canplanetearthfeedtenbillionpeoplepart1', 'thetiniestbouquet', 'swimmingwithastronauts', 'lifereimagined', 'forgettingfear', 'stumblinginthedark', 'backsideofthestorm', 'food', 'theclosetthatateeverything', 'escapingfromadirediagnosis', 'notontheusualtour', 'exorcism', 'adventuresinsayingyes', 'thefreedomridersandme', 'cocoonoflove', 'waitingtogo', 'thepostmanalwayscalls', 'googlingstrangersandkentuckybluegrass', 'mayorofthefreaks', 'learninghumanityfromdogs', 'shoppinginchina', 'souls', 'cautioneating', 'comingofageondeathrow', 'breakingupintheageofgoogle', 'gpsformylostidentity', 'marryamanwholoveshismother', 'eyespy', 'treasureisland', 'thesurprisingthingilearnedsailingsoloaroundtheworld', 'theadvancedbeginner', 'goldiethegoldfish', 'life', 'thumbsup', 'seedpotatoesofleningrad', 'theshower', 'adollshouse', 'canplanetearthfeedtenbillionpeoplepart2', 'sloth', 'howtodraw', 'quietfire', 'metsmagic', 'penpal', 'thecurse', 'canadageeseandddp', 'thatthingonmyarm', 'buck', 'thesecrettomarriage', 'wildwomenanddancingqueens', 'againstthewind', 'indianapolis', 'alternateithicatom', 'bluehope', 'kiksuya', 'afatherscover', 'haveyoumethimyet', 'firetestforlove', 'catfishingstrangerstofindmyself', 'christmas1940', 'tildeath', 'lifeanddeathontheoregontrail', 'vixenandtheussr', 'undertheinfluence', 'beneaththemushroomcloud', 'jugglingandjesus', 'superheroesjustforeachother', 'sweetaspie', 'naked', 'singlewomanseekingmanwich', 'avatar', 'whenmothersbullyback', 'myfathershands', 'reachingoutbetweenthebars', 'theinterview', 'stagefright', 'legacy', 'canplanetearthfeedtenbillionpeoplepart3', 'listo', 'gangstersandcookies', 'birthofanation', 'mybackseatviewofagreatromance', 'lawsthatchokecreativity', 'threemonths', 'whyimustspeakoutaboutclimatechange', 'leavingbaghdad']
     story_names_train = {
@@ -134,6 +130,41 @@ def get_train_story_texts(subject: str='UTS01'):
     texts = [' '.join(wordseqs[story].data) for story in story_names_train]
     return texts
 
+def cache_test_data():
+    '''Format the test data as a supervised task (text, resp) using 4 delays
+    '''
+    TEST_STORIES = ['wheretheressmoke', 'onapproachtopluto', 'fromboyhoodtofatherhood']
+    out = defaultdict(dict)
+    for subject in tqdm(['UTS01', 'UTS02', 'UTS03']):
+        voxel_idxs = joblib.load(join(SAVE_DIR_FMRI, 'voxel_lists', f'{subject}_voxel_selectivity.jbl'))[:NUM_TOP_VOXELS]
+        grids = joblib.load(join(SAVE_DIR_FMRI, 'stories', 'grids_all.jbl'))
+        trfiles = joblib.load(join(SAVE_DIR_FMRI, 'stories', 'trfiles_all.jbl'))
+        wordseqs = make_word_ds(grids, trfiles)    
+
+        # loop over stories
+        running_words = {}
+        for k in TEST_STORIES:
+            # get words from last 4 TRs, so -2 sec, -4 sec, -6 sec, -8 sec
+            wordseq = wordseqs[k]
+            words = np.array(wordseq.data)
+            tr_times = wordseq.tr_times[10:-5]
+            num_delays = 4
+            running_words[k] = []
+            for i in range(len(tr_times)):
+                tr_time_max = tr_times[max(0, i - 1)]
+                tr_time_min = tr_times[max(0, i - num_delays)]
+                valid_times = (tr_time_min <= wordseq.data_times) & (wordseq.data_times <= tr_time_max)
+                running_words[k].append(' '.join(words[valid_times]))
+
+        # get resp
+        resp = joblib.load(join(SAVE_DIR_FMRI, 'responses', f'{subject}_responses.jbl')) # these are already normalized
+        resp = {k: resp[k][:, voxel_idxs] for k in TEST_STORIES} # narrow down the stories/voxels
+
+        out[subject]['words'] = sum(list(running_words.values()), [])
+        out[subject]['resp'] = np.concatenate(list(resp.values()))
+        assert len(out[subject]['words']) == out[subject]['resp'].shape[0]
+    joblib.dump(out, join(SAVE_DIR_FMRI, 'stories', 'running_words.jbl'))
+
 def cache_preprocessor():
     embs_dict = joblib.load(join(SAVE_DIR_FMRI, 'stimulus_features', 'OPT_features.jbl'))
     embs = np.concatenate([embs_dict[k] for k in embs_dict])
@@ -142,11 +173,13 @@ def cache_preprocessor():
     pkl.dump(preproc, open(join(SAVE_DIR_FMRI, 'preproc.pkl'), 'wb'))
 
 if __name__ == '__main__':
-    # story_text = get_train_story_texts()
     # cache_preprocessor()
-    mod = fMRIModule()
-    X = ['I am happy', 'I am sad', 'I am angry']
-    print(X[0][:50])
-    resp = mod(X[:3])
-    print(resp)
+    # cache_test_data()
+    # story_text = get_train_story_texts()
+    
+    # mod = fMRIModule()
+    # X = ['I am happy', 'I am sad', 'I am angry']
+    # print(X[0][:50])
+    # resp = mod(X[:3])
+    # print(resp)
     # print(mod.corrs[:20])
