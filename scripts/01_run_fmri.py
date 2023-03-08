@@ -14,11 +14,12 @@ params_shared_dict = {
     # 'save_dir': [join(repo_dir, 'results', 'feb12_fmri_sweep_gen_template1')],
     'use_cache': [1], # pass binary values with 0/1 instead of the ambiguous strings True/False
     'subsample_frac': [1],
-    'module_num': list(range(50)),
+    'module_num': list(range(1)),
     'module_name': ['fmri'],
     # 'subject': ['UTS03', 'UTS01'], #, 'UTS02'],
-    # 'subject': ['UTS02'], #, 'UTS02'],
-    'subject': ['UTS03', 'UTS02'],
+    'subject': ['UTS01'], #, 'UTS02'],
+    # 'subject': ['UTS02', 'UTS03'],
+    # 'subject': ['UTS03', 'UTS02'],
     'num_top_ngrams_to_use': [30],
     'num_top_ngrams_to_consider': [50],
     'num_summaries': [2],
@@ -40,6 +41,6 @@ submit_utils.run_args_list(
     script_name=join(repo_dir, 'experiments', '01_explain.py'),
     actually_run=True,
     # gpu_ids=[0, 1],
-    n_cpus=3,
+    # n_cpus=1,
     shuffle=False,
 )

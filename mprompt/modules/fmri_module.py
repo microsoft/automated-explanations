@@ -173,7 +173,7 @@ if __name__ == '__main__':
     # cache_test_data()
     # story_text = get_train_story_texts()
     
-    # mod = fMRIModule()
+    mod = fMRIModule()
     # X = ['I am happy', 'I am sad', 'I am angry']
     # print(X[0][:50])
     # resp = mod(X[:3])

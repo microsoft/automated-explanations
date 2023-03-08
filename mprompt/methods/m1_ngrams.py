@@ -41,7 +41,7 @@ def explain_ngrams(
     if args.module_name == 'fmri':
         cache_file = join(CACHE_DIR, 'cache_ngrams',
                             f'{args.module_name}_{args.subject}.pkl')
-    if args.module_name == 'old_fmri':
+    elif args.module_name == 'old_fmri':
         cache_file = join(CACHE_DIR, 'cache_ngrams',
                             f'{args.module_name}.pkl')
     else:
