@@ -44,7 +44,7 @@ Also contains a PDF of a flattened cortical surface with all anatomical and func
 
 **Example story data loading code:**
 
-(Requires `pip install -e setup.py` in the `csinva/fmri` directory)
+(Requires `pip install -e setup.py` in the `csinva/fmri` directory, needs the package to be named `huth` and `ridge_utils`)
 
 ```python
 # Load stories

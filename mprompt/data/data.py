@@ -3,14 +3,16 @@ from typing import List
 from mprompt.data.d3 import TASKS_D3
 from mprompt.data.toy import TASKS_TOY
 from mprompt.modules.old_fmri_module import SAVE_DIR_FMRI
+from mprompt.modules.fmri_module import get_train_story_texts
 from os.path import join
 import re
 TASKS = {**TASKS_D3, **TASKS_TOY}
 
-def get_relevant_data(module_name, module_num) -> List[str]:
+def get_relevant_data(module_name: str, module_num: int, subject: str='UTS03') -> List[str]:
     if module_name == 'fmri':
-        """read in full text of 26 narrative stories (includes train and test)
-        """
+        return get_train_story_texts(subject)
+    elif module_name == 'old_fmri':
+        # read in full text of 26 narrative stories (includes train and test)
         with open(join(SAVE_DIR_FMRI, 'narrative_stories.txt'), 'r') as f:
             narrative_stories = f.readlines()
         return narrative_stories

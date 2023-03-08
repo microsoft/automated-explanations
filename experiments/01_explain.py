@@ -13,6 +13,7 @@ import imodelsx
 import torch
 import mprompt.llm
 import mprompt.modules.old_fmri_module
+import mprompt.modules.fmri_module
 import mprompt.modules.prompted_module
 import mprompt.modules.emb_diff_module
 import mprompt.methods.m1_ngrams
@@ -61,6 +62,8 @@ def add_main_args(parser):
                                  'prompted_d3', 'prompted_toy'])
     parser.add_argument('--module_num', type=int, # good task is d3_13_water or d3_16_hillary
                         default=0, help='number of module to select')
+    parser.add_argument('--subject', type=str,
+                        default='UTS03', help='for fMRI, which subject to use')
 
     # algo args
     parser.add_argument('--method_name', type=str, choices=['ngrams'],
@@ -124,6 +127,10 @@ if __name__ == '__main__':
 
     # load module to interpret
     if args.module_name == 'fmri':
+        mod = mprompt.modules.fmri_module.fMRIModule(
+            voxel_num_best=args.module_num, subject=args.subject)
+        r['fmri_test_corr'] = mod.corr
+    elif args.module_name == 'old_fmri':
         mod = mprompt.modules.old_fmri_module.OldFMRIModule(
             voxel_num_best=args.module_num)
         r['fmri_test_corr'] = mod.corr
@@ -142,10 +149,11 @@ if __name__ == '__main__':
             )
 
     # load text data
-    text_str_list = mprompt.data.data.get_relevant_data(args.module_name, args.module_num)
+    text_str_list = mprompt.data.data.get_relevant_data(
+        args.module_name, args.module_num, args.subject)
 
     # subsample data
-    if args.subsample_frac < 1 and not args.module_name == 'fmri':
+    if args.subsample_frac < 1: # and not args.module_name == 'fmri':
         assert False, 'dont subsample data right now, since explain_ngrams is using caching'
         # n_subsample = int(len(text_str_list) * args.subsample_frac)
 
@@ -155,9 +163,9 @@ if __name__ == '__main__':
 
     # explain with method
     explanation_init_ngrams = mprompt.methods.m1_ngrams.explain_ngrams(
-        args,
-        text_str_list,
-        mod,
+        args=args,
+        X=text_str_list,
+        mod=mod,
         num_top_ngrams=75,
     )
     r['explanation_init_ngrams'] = explanation_init_ngrams

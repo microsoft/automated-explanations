@@ -11,13 +11,13 @@ import mprompt.data.data
 
 
 def explain_ngrams(
-        args,
-        X: List[str],
-        mod,
-        ngrams: int = 3,
-        all_ngrams: bool = True,
-        num_top_ngrams: int = 75,
-        use_cache: bool = True,
+    args,
+    X: List[str],
+    mod,
+    ngrams: int = 3,
+    all_ngrams: bool = True,
+    num_top_ngrams: int = 75,
+    use_cache: bool = True,
 ) -> List[str]:
     """Note: this caches the call that gets the scores
     """
@@ -40,6 +40,9 @@ def explain_ngrams(
     # fmri should cache all preds together, since they are efficiently computed together
     if use_cache:
         if args.module_name == 'fmri':
+            cache_file = join(CACHE_DIR, 'cache_ngrams',
+                              f'{args.module_name}_{args.subject}.pkl')
+        if args.module_name == 'old_fmri':
             cache_file = join(CACHE_DIR, 'cache_ngrams',
                               f'{args.module_name}.pkl')
         else:

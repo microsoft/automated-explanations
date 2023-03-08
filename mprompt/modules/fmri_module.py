@@ -37,24 +37,28 @@ class fMRIModule():
         self.voxel_num_best = voxel_num_best
         self.subject = subject
         self.ndel = 4
-        weights_file = join(SAVE_DIR_FMRI, 'model_weights', f'wt_{subject}.jbl')
-
-
-        # load weights
-        self.weights = joblib.load(weights_file)
-        self.preproc = pkl.load(
-            open(join(SAVE_DIR_FMRI, 'preproc.pkl'), 'rb'))
-
-        # # load test corrs for each voxel
-        # # this has all voxels, so can infer voxel locations from this
-        # self.corrs = np.sort(
-        #     np.load(join(SAVE_DIR_FMRI, 'corrs.npz'))['arr_0'])[::-1]
+    
+        # select voxel index
+        NUM_TOP_VOXELS = 500
         self.voxel_idxs = joblib.load(join(SAVE_DIR_FMRI, 'voxel_lists', f'{subject}_voxel_selectivity.jbl'))
         numpy.random.default_rng(seed=42).shuffle(self.voxel_idxs)
-        self.voxel_idxs = self.voxel_idxs[:500]
+        self.voxel_idxs = self.voxel_idxs[:NUM_TOP_VOXELS]
+        self.voxel_idx = self.voxel_idxs[voxel_num_best]
 
+        # look at metadata stuff
+        corrs = joblib.load(join(SAVE_DIR_FMRI, 'voxel_performances', f'{subject}_voxel_performance.jbl'))
+        rois_anat = joblib.load(join(SAVE_DIR_FMRI, 'voxel_rois', 'voxel_anat_rois', f'{subject}_voxel_anat_rois.jbl'))
+        rois_func = joblib.load(join(SAVE_DIR_FMRI, 'voxel_rois', 'voxel_func_rois', f'{subject}_voxel_func_rois.jbl'))
 
-        # self.corr = self.corrs[voxel_num_best]
+        self.corr = corrs[self.voxel_idx]
+        # self.roi_anat = rois_anat[str(self.voxel_idx)]
+        # self.roi_func = rois_func[str(self.voxel_idx)]]
+
+        # load weights
+        weights_file = join(SAVE_DIR_FMRI, 'model_weights', f'wt_{subject}.jbl')
+        self.weights = joblib.load(weights_file)
+        self.preproc = pkl.load(open(join(SAVE_DIR_FMRI, 'preproc.pkl'), 'rb'))
+        self.weights = self.weights[:, self.voxel_idxs]
 
     def _get_embs(self, X: List[str]):
         """
@@ -95,7 +99,8 @@ class fMRIModule():
 
         
         if return_all:
-            return preds_fMRI[:, :200]
+            # self.weights was already restricted to top voxels
+            return preds_fMRI
             
         # select voxel
         else:
@@ -110,7 +115,7 @@ def get_roi(voxel_num_best: int = 0):
     rois = pd.read_pickle(join(SAVE_DIR_FMRI, 'roi_dict.pkl'))
     return rois.get(voxel_num_best, '--')
 
-def get_train_stories(subject: str='UTS01'):
+def get_train_story_texts(subject: str='UTS01'):
     # TEST_STORIES = ['wheretheressmoke', 'onapproachtopluto', 'fromboyhoodtofatherhood']
     TRAIN_STORIES_01 = ['itsabox', 'odetostepfather', 'inamoment',  'hangtime', 'ifthishaircouldtalk', 'goingthelibertyway', 'golfclubbing', 'thetriangleshirtwaistconnection', 'igrewupinthewestborobaptistchurch', 'tetris', 'becomingindian', 'canplanetearthfeedtenbillionpeoplepart1', 'thetiniestbouquet', 'swimmingwithastronauts', 'lifereimagined', 'forgettingfear', 'stumblinginthedark', 'backsideofthestorm', 'food', 'theclosetthatateeverything', 'notontheusualtour', 'exorcism', 'adventuresinsayingyes', 'thefreedomridersandme', 'cocoonoflove', 'waitingtogo', 'thepostmanalwayscalls', 'googlingstrangersandkentuckybluegrass', 'mayorofthefreaks', 'learninghumanityfromdogs', 'shoppinginchina', 'souls', 'cautioneating', 'comingofageondeathrow', 'breakingupintheageofgoogle', 'gpsformylostidentity', 'eyespy', 'treasureisland', 'thesurprisingthingilearnedsailingsoloaroundtheworld', 'theadvancedbeginner', 'goldiethegoldfish', 'life', 'thumbsup', 'seedpotatoesofleningrad', 'theshower', 'adollshouse', 'canplanetearthfeedtenbillionpeoplepart2', 'sloth', 'howtodraw', 'quietfire', 'metsmagic', 'penpal', 'thecurse', 'canadageeseandddp', 'thatthingonmyarm', 'buck', 'wildwomenanddancingqueens', 'againstthewind', 'indianapolis', 'alternateithicatom', 'bluehope', 'kiksuya', 'afatherscover', 'haveyoumethimyet', 'firetestforlove', 'catfishingstrangerstofindmyself', 'christmas1940', 'tildeath', 'lifeanddeathontheoregontrail', 'vixenandtheussr', 'undertheinfluence', 'beneaththemushroomcloud', 'jugglingandjesus', 'superheroesjustforeachother', 'sweetaspie', 'naked', 'singlewomanseekingmanwich', 'avatar', 'whenmothersbullyback', 'myfathershands', 'reachingoutbetweenthebars', 'theinterview', 'stagefright', 'legacy', 'canplanetearthfeedtenbillionpeoplepart3', 'listo', 'gangstersandcookies', 'birthofanation', 'mybackseatviewofagreatromance', 'lawsthatchokecreativity', 'threemonths', 'whyimustspeakoutaboutclimatechange', 'leavingbaghdad']
     TRAIN_STORIES_02_03 = ['itsabox', 'odetostepfather', 'inamoment', 'afearstrippedbare', 'findingmyownrescuer', 'hangtime', 'ifthishaircouldtalk', 'goingthelibertyway', 'golfclubbing', 'thetriangleshirtwaistconnection', 'igrewupinthewestborobaptistchurch', 'tetris', 'becomingindian', 'canplanetearthfeedtenbillionpeoplepart1', 'thetiniestbouquet', 'swimmingwithastronauts', 'lifereimagined', 'forgettingfear', 'stumblinginthedark', 'backsideofthestorm', 'food', 'theclosetthatateeverything', 'escapingfromadirediagnosis', 'notontheusualtour', 'exorcism', 'adventuresinsayingyes', 'thefreedomridersandme', 'cocoonoflove', 'waitingtogo', 'thepostmanalwayscalls', 'googlingstrangersandkentuckybluegrass', 'mayorofthefreaks', 'learninghumanityfromdogs', 'shoppinginchina', 'souls', 'cautioneating', 'comingofageondeathrow', 'breakingupintheageofgoogle', 'gpsformylostidentity', 'marryamanwholoveshismother', 'eyespy', 'treasureisland', 'thesurprisingthingilearnedsailingsoloaroundtheworld', 'theadvancedbeginner', 'goldiethegoldfish', 'life', 'thumbsup', 'seedpotatoesofleningrad', 'theshower', 'adollshouse', 'canplanetearthfeedtenbillionpeoplepart2', 'sloth', 'howtodraw', 'quietfire', 'metsmagic', 'penpal', 'thecurse', 'canadageeseandddp', 'thatthingonmyarm', 'buck', 'thesecrettomarriage', 'wildwomenanddancingqueens', 'againstthewind', 'indianapolis', 'alternateithicatom', 'bluehope', 'kiksuya', 'afatherscover', 'haveyoumethimyet', 'firetestforlove', 'catfishingstrangerstofindmyself', 'christmas1940', 'tildeath', 'lifeanddeathontheoregontrail', 'vixenandtheussr', 'undertheinfluence', 'beneaththemushroomcloud', 'jugglingandjesus', 'superheroesjustforeachother', 'sweetaspie', 'naked', 'singlewomanseekingmanwich', 'avatar', 'whenmothersbullyback', 'myfathershands', 'reachingoutbetweenthebars', 'theinterview', 'stagefright', 'legacy', 'canplanetearthfeedtenbillionpeoplepart3', 'listo', 'gangstersandcookies', 'birthofanation', 'mybackseatviewofagreatromance', 'lawsthatchokecreativity', 'threemonths', 'whyimustspeakoutaboutclimatechange', 'leavingbaghdad']
@@ -134,7 +139,7 @@ def cache_preprocessor():
     pkl.dump(preproc, open(join(SAVE_DIR_FMRI, 'preproc.pkl'), 'wb'))
 
 if __name__ == '__main__':
-    # story_text = get_train_stories()
+    # story_text = get_train_story_texts()
     # cache_preprocessor()
     mod = fMRIModule()
     X = ['I am happy', 'I am sad', 'I am angry']
