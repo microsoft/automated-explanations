@@ -14,6 +14,13 @@ tqdm.pandas()
 from mprompt.modules.fmri_module import get_roi
 import mprompt.methods.m4_evaluate as m4_evaluate
 from mprompt.config import RESULTS_DIR
+import joblib
+from mprompt.modules.fmri_module import SAVE_DIR_FMRI
+import imodelsx.util
+from mprompt.modules.emb_diff_module import EmbDiffModule
+import scipy.stats
+from mprompt.methods.m4_evaluate import D5_Validator
+import torch.cuda
 
 # results_dir = '../results/feb12_fmri_sweep/'
 # results_dir = '/home/chansingh/mntv1/mprompt/feb12_fmri_sweep_gen_template1/'
@@ -21,6 +28,7 @@ results_dir = '/home/chansingh/mntv1/mprompt/mar7_test/'
 
 
 r = imodelsx.process_results.get_results_df(results_dir, use_cached=False)
+print(f'Loaded {r.shape[0]} results...')
 for num in [25, 50, 75, 100]:
     r[f'top_ngrams_module_{num}'] = r['explanation_init_ngrams'].apply(lambda x: x[:num])
     # r[f'top_ngrams_test_{num}'] = r.apply(lambda row: get_test_ngrams(voxel_num_best=row.module_num)[:num], axis=1)
@@ -49,3 +57,41 @@ r['frac_top_ngrams_module_correct'] = r['top_ngrams_module_correct'].apply(lambd
 
 
 r.to_pickle(join(RESULTS_DIR, 'results_fmri.pkl'))
+
+
+# add prediction evaluations (these are slow)
+print('Saved original results, now computing prediction evaluations')
+dsets = joblib.load(join(SAVE_DIR_FMRI, 'stories', 'running_words.jbl'))
+neg_dists_list = []
+rankcorr_list = []
+for i in tqdm(range(r.shape[0])):
+    row = r.iloc[i]
+    expl = row['top_explanation_init_strs']
+    dset = dsets[row['subject']]
+    strs_list = dset['words']
+    resp = dset['resp'][:, row['module_num']]
+
+    mod = EmbDiffModule(task_str=expl)
+    neg_dists = [
+        mod(
+            imodelsx.util.generate_ngrams_list(strs_list[j], ngrams=3, all_ngrams=True),
+            verbose=False,
+        ).mean()
+        for j in range(len(strs_list))
+    ]
+    neg_dists_list.append(neg_dists)
+    rankcorr_list.append(scipy.stats.spearmanr(neg_dists, resp, nan_policy='omit', alternative='greater').statistic)
+r['neg_dists_expl_test'] = neg_dists_list
+r['rankcorr_expl_test'] = rankcorr_list
+
+r.to_pickle(join(RESULTS_DIR, 'results_fmri_full.pkl'))
+# mod = None
+# torch.cuda.empty_cache()
+# val = D5_Validator()
+# frac_valid = [
+#     np.mean(
+#         val.validate_w_scores(
+#             expl,
+#             imodelsx.util.generate_ngrams_list(strs_list[j], ngrams=3, all_ngrams=False)))
+#     for j in tqdm(range(len(strs_list)))
+# ]

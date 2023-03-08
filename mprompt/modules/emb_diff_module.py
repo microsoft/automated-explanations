@@ -11,6 +11,7 @@ import imodelsx
 import imodelsx.util
 import pickle as pkl
 from os.path import dirname, join
+from tqdm import trange
 import os.path
 import torch
 import re
@@ -91,7 +92,7 @@ class EmbDiffModule():
             return emb[0, 0].mean(axis=0)  # mean over seq_len
             # return emb[0, 0, 0] # take [CLS] token (first)
 
-    def __call__(self, X: Union[str, List[str]], batch_size=32) -> np.ndarray:
+    def __call__(self, X: Union[str, List[str]], batch_size=32, verbose=True) -> np.ndarray:
         """Returns a scalar continuous response for each element of X
         """
         if isinstance(X, str):
@@ -103,7 +104,11 @@ class EmbDiffModule():
                 # neg_dists[i] = - np.linalg.norm(emb - self.emb, ord=2)
                 neg_dists[i] = - scipy.spatial.distance.euclidean(emb, self.emb)
         else:
-            for i in tqdm(range(0, len(X), batch_size)):
+            if verbose:
+                loop = trange
+            else:
+                loop = range
+            for i in loop(0, len(X), batch_size):
                 batch_start = i
                 batch_end = min(i + batch_size, len(X))
                 batch = X[batch_start: batch_end]

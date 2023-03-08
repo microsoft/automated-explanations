@@ -142,7 +142,8 @@ def cache_test_data():
         # loop over stories
         running_words = {}
         for k in TEST_STORIES:
-            # get words from last 4 TRs, so -2 sec, -4 sec, -6 sec, -8 sec
+            # get words from last 4 TRs
+            # given TR with time t, words between [t-8 sec, t-2 sec]
             wordseq = wordseqs[k]
             words = np.array(wordseq.data)
             tr_times = wordseq.tr_times[10:-5]
