@@ -36,7 +36,6 @@ r['frac_top_ngrams_module_correct'] = r['top_ngrams_module_correct'].apply(lambd
 
 # Calculate match between expl and test resp
 
-
 # Unnecessary metrics
 # r['top_ngrams_test_correct_score'] = test_correct_score_list # these scores are basically just 0/1 for each ngram
 # r['expl_test_bert_score'] = r.progress_apply(lambda row: m4_evaluate.test_ngrams_bert_score(
