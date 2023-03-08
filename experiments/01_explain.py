@@ -200,8 +200,11 @@ if __name__ == '__main__':
         r['strs_removed'].append(strs_removed)
 
         # evaluate synthetic data (higher score is better)
+        mod_responses = mod(strs_added + strs_removed)
         r['score_synthetic'].append(
-            np.mean(mod(strs_added)) - np.mean(mod(strs_removed)))
+            np.mean(mod_responses[:len(strs_added)]) -
+            np.mean(mod_responses[len(strs_added):])
+        )
     logging.info(f'{explanation_strs[0]}\n+++++++++\n\t' + '\n\t'.join(r['strs_added'][0][:3]) +
                  '\n--------\n\t' + '\n\t'.join(r['strs_removed'][0][:3]))
 

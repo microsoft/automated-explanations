@@ -34,7 +34,6 @@ def explain_ngrams(
     # get unique ngrams
     ngrams_list = sorted(list(set(ngrams_list)))
     # print(f'{ngrams_list=}')
-    print('num ngrams', len(ngrams_list), 'examples', ngrams_list[:5])
 
     # compute scores and cache...
     # fmri should cache all preds together, since they are efficiently computed together
