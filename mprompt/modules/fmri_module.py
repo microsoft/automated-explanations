@@ -11,6 +11,7 @@ import imodelsx
 import imodelsx.util
 import pickle as pkl
 from os.path import dirname, join
+import torch.cuda
 import os.path
 import torch
 import numpy.random
@@ -67,12 +68,13 @@ class fMRIModule():
         embs: np.ndarray
             (n_examples, 7168)
         """
-        model = AutoModelForCausalLM.from_pretrained(self.checkpoint, device_map='auto')
+        model = AutoModelForCausalLM.from_pretrained(
+            self.checkpoint, device_map='auto', torch_dtype=torch.float16)
         tokenizer = AutoTokenizer.from_pretrained(self.checkpoint)
 
         embs = []
         for i in tqdm(range(len(X))):
-            # have to to this or get some weird opt error
+            # have to do this or get some weird opt error
             text = tokenizer.encode(X[i])
             inputs = {}
             inputs['input_ids'] = torch.tensor([text]).int()
@@ -86,8 +88,9 @@ class fMRIModule():
     def __call__(self, X: List[str], return_all=False) -> np.ndarray:
         """Returns a scalar continuous response for each element of X
         """
-        # get bert embeddings
+        # get opt embeddings
         embs = self._get_embs(X)
+        torch.cuda.empty_cache()
         print('embs.shape', embs.shape)
 
         # apply StandardScaler (pre-trained)
