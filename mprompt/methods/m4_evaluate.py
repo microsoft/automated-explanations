@@ -55,11 +55,12 @@ class D5_Validator:
         can also any other model name
         the default is the best model we have trained
         '''
-        device = 'cuda' if torch.cuda.is_available() else 'cpu'
+        # device = 'cuda' if torch.cuda.is_available() else 'cpu'
         self.softmax = torch.nn.Softmax(dim=-1)
         self.tokenizer = T5Tokenizer.from_pretrained("google/flan-t5-xxl")
         print('loading model weights')
-        self.model = T5ForConditionalGeneration.from_pretrained(model_path).to(device)
+        self.model = T5ForConditionalGeneration.from_pretrained(
+            model_path, device_map='auto', torch_dtype=torch.float16) #.to(device)
         print('done')
         self.validator_template = '''Check whether the TEXT satisfies a PROPERTY
 . Respond with Yes or No. When uncertain, output No. 
@@ -121,7 +122,7 @@ batch_size]
                 all_scores = all_scores + scores
             return all_scores
 
-def calculate_test_correct_score(r: pd.DataFrame, col_explanation='top_explanation_init_strs', col_ngrams='top_ngrams_test_100'):
+def calc_frac_correct_score(r: pd.DataFrame, col_explanation='top_explanation_init_strs', col_ngrams='top_ngrams_test_100'):
     """Note: validator takes a lot of memory.
     """
     validator = D5_Validator()
