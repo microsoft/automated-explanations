@@ -13,8 +13,11 @@ import pickle as pkl
 from os.path import dirname, join
 import os.path
 import torch
+import numpy.random
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import joblib
+from huth.utils_ds import make_word_ds
+
 modules_dir = dirname(os.path.abspath(__file__))
 SAVE_DIR_FMRI = join(modules_dir, 'fmri')
 
@@ -31,7 +34,6 @@ class fMRIModule():
 
         # hyperparams for loaded model
         self.checkpoint = 'facebook/opt-30b'
-        self.save_dir_fmri = SAVE_DIR_FMRI
         self.voxel_num_best = voxel_num_best
         self.subject = subject
         self.ndel = 4
@@ -40,13 +42,18 @@ class fMRIModule():
 
         # load weights
         self.weights = joblib.load(weights_file)
-        # self.preproc = pkl.load(
-        #     open(join(self.save_dir_fmri, 'preproc.pkl'), 'rb'))
+        self.preproc = pkl.load(
+            open(join(SAVE_DIR_FMRI, 'preproc.pkl'), 'rb'))
 
         # # load test corrs for each voxel
         # # this has all voxels, so can infer voxel locations from this
         # self.corrs = np.sort(
-        #     np.load(join(self.save_dir_fmri, 'corrs.npz'))['arr_0'])[::-1]
+        #     np.load(join(SAVE_DIR_FMRI, 'corrs.npz'))['arr_0'])[::-1]
+        self.voxel_idxs = joblib.load(join(SAVE_DIR_FMRI, 'voxel_lists', f'{subject}_voxel_selectivity.jbl'))
+        numpy.random.default_rng(seed=42).shuffle(self.voxel_idxs)
+        self.voxel_idxs = self.voxel_idxs[:500]
+
+
         # self.corr = self.corrs[voxel_num_best]
 
     def _get_embs(self, X: List[str]):
@@ -80,7 +87,7 @@ class fMRIModule():
         print('embs.shape', embs.shape)
 
         # apply StandardScaler (pre-trained)
-        # embs = self.preproc.transform(embs)
+        embs = self.preproc.transform(embs)
 
         # apply fMRI transform
         embs_delayed = np.hstack([embs] * self.ndel)
@@ -103,20 +110,35 @@ def get_roi(voxel_num_best: int = 0):
     rois = pd.read_pickle(join(SAVE_DIR_FMRI, 'roi_dict.pkl'))
     return rois.get(voxel_num_best, '--')
 
+def get_train_stories(subject: str='UTS01'):
+    # TEST_STORIES = ['wheretheressmoke', 'onapproachtopluto', 'fromboyhoodtofatherhood']
+    TRAIN_STORIES_01 = ['itsabox', 'odetostepfather', 'inamoment',  'hangtime', 'ifthishaircouldtalk', 'goingthelibertyway', 'golfclubbing', 'thetriangleshirtwaistconnection', 'igrewupinthewestborobaptistchurch', 'tetris', 'becomingindian', 'canplanetearthfeedtenbillionpeoplepart1', 'thetiniestbouquet', 'swimmingwithastronauts', 'lifereimagined', 'forgettingfear', 'stumblinginthedark', 'backsideofthestorm', 'food', 'theclosetthatateeverything', 'notontheusualtour', 'exorcism', 'adventuresinsayingyes', 'thefreedomridersandme', 'cocoonoflove', 'waitingtogo', 'thepostmanalwayscalls', 'googlingstrangersandkentuckybluegrass', 'mayorofthefreaks', 'learninghumanityfromdogs', 'shoppinginchina', 'souls', 'cautioneating', 'comingofageondeathrow', 'breakingupintheageofgoogle', 'gpsformylostidentity', 'eyespy', 'treasureisland', 'thesurprisingthingilearnedsailingsoloaroundtheworld', 'theadvancedbeginner', 'goldiethegoldfish', 'life', 'thumbsup', 'seedpotatoesofleningrad', 'theshower', 'adollshouse', 'canplanetearthfeedtenbillionpeoplepart2', 'sloth', 'howtodraw', 'quietfire', 'metsmagic', 'penpal', 'thecurse', 'canadageeseandddp', 'thatthingonmyarm', 'buck', 'wildwomenanddancingqueens', 'againstthewind', 'indianapolis', 'alternateithicatom', 'bluehope', 'kiksuya', 'afatherscover', 'haveyoumethimyet', 'firetestforlove', 'catfishingstrangerstofindmyself', 'christmas1940', 'tildeath', 'lifeanddeathontheoregontrail', 'vixenandtheussr', 'undertheinfluence', 'beneaththemushroomcloud', 'jugglingandjesus', 'superheroesjustforeachother', 'sweetaspie', 'naked', 'singlewomanseekingmanwich', 'avatar', 'whenmothersbullyback', 'myfathershands', 'reachingoutbetweenthebars', 'theinterview', 'stagefright', 'legacy', 'canplanetearthfeedtenbillionpeoplepart3', 'listo', 'gangstersandcookies', 'birthofanation', 'mybackseatviewofagreatromance', 'lawsthatchokecreativity', 'threemonths', 'whyimustspeakoutaboutclimatechange', 'leavingbaghdad']
+    TRAIN_STORIES_02_03 = ['itsabox', 'odetostepfather', 'inamoment', 'afearstrippedbare', 'findingmyownrescuer', 'hangtime', 'ifthishaircouldtalk', 'goingthelibertyway', 'golfclubbing', 'thetriangleshirtwaistconnection', 'igrewupinthewestborobaptistchurch', 'tetris', 'becomingindian', 'canplanetearthfeedtenbillionpeoplepart1', 'thetiniestbouquet', 'swimmingwithastronauts', 'lifereimagined', 'forgettingfear', 'stumblinginthedark', 'backsideofthestorm', 'food', 'theclosetthatateeverything', 'escapingfromadirediagnosis', 'notontheusualtour', 'exorcism', 'adventuresinsayingyes', 'thefreedomridersandme', 'cocoonoflove', 'waitingtogo', 'thepostmanalwayscalls', 'googlingstrangersandkentuckybluegrass', 'mayorofthefreaks', 'learninghumanityfromdogs', 'shoppinginchina', 'souls', 'cautioneating', 'comingofageondeathrow', 'breakingupintheageofgoogle', 'gpsformylostidentity', 'marryamanwholoveshismother', 'eyespy', 'treasureisland', 'thesurprisingthingilearnedsailingsoloaroundtheworld', 'theadvancedbeginner', 'goldiethegoldfish', 'life', 'thumbsup', 'seedpotatoesofleningrad', 'theshower', 'adollshouse', 'canplanetearthfeedtenbillionpeoplepart2', 'sloth', 'howtodraw', 'quietfire', 'metsmagic', 'penpal', 'thecurse', 'canadageeseandddp', 'thatthingonmyarm', 'buck', 'thesecrettomarriage', 'wildwomenanddancingqueens', 'againstthewind', 'indianapolis', 'alternateithicatom', 'bluehope', 'kiksuya', 'afatherscover', 'haveyoumethimyet', 'firetestforlove', 'catfishingstrangerstofindmyself', 'christmas1940', 'tildeath', 'lifeanddeathontheoregontrail', 'vixenandtheussr', 'undertheinfluence', 'beneaththemushroomcloud', 'jugglingandjesus', 'superheroesjustforeachother', 'sweetaspie', 'naked', 'singlewomanseekingmanwich', 'avatar', 'whenmothersbullyback', 'myfathershands', 'reachingoutbetweenthebars', 'theinterview', 'stagefright', 'legacy', 'canplanetearthfeedtenbillionpeoplepart3', 'listo', 'gangstersandcookies', 'birthofanation', 'mybackseatviewofagreatromance', 'lawsthatchokecreativity', 'threemonths', 'whyimustspeakoutaboutclimatechange', 'leavingbaghdad']
+    story_names_train = {
+        'UTS01': TRAIN_STORIES_01,
+        'UTS02': TRAIN_STORIES_02_03,
+        'UTS03': TRAIN_STORIES_02_03,
+    }[subject]
 
-def cache_preprocessor(X):
+    grids = joblib.load(join(SAVE_DIR_FMRI, 'stories', 'grids_all.jbl'))
+    trfiles = joblib.load(join(SAVE_DIR_FMRI, 'stories', 'trfiles_all.jbl'))
+    wordseqs = make_word_ds(grids, trfiles)
+    texts = [' '.join(wordseqs[story].data) for story in story_names_train]
+    return texts
 
-
-    mod = fMRIModule()
-    embs = mod._get_embs(X)
+def cache_preprocessor():
+    embs_dict = joblib.load(join(SAVE_DIR_FMRI, 'stimulus_features', 'OPT_features.jbl'))
+    embs = np.concatenate([embs_dict[k] for k in embs_dict])
     preproc = sklearn.preprocessing.StandardScaler()
-    preproc.fit(X)
+    preproc.fit(embs)
     pkl.dump(preproc, open(join(SAVE_DIR_FMRI, 'preproc.pkl'), 'wb'))
 
 if __name__ == '__main__':
+    # story_text = get_train_stories()
+    # cache_preprocessor()
     mod = fMRIModule()
     X = ['I am happy', 'I am sad', 'I am angry']
     print(X[0][:50])
     resp = mod(X[:3])
     print(resp)
-    print(mod.corrs[:20])
+    # print(mod.corrs[:20])

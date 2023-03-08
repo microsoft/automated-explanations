@@ -44,6 +44,8 @@ Also contains a PDF of a flattened cortical surface with all anatomical and func
 
 **Example story data loading code:**
 
+(Requires `pip install -e setup.py` in the `csinva/fmri` directory)
+
 ```python
 # Load stories
 grids = joblib.load("grids_all.jbl")
