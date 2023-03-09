@@ -43,9 +43,15 @@ def add_expl_preds_and_save(r, fname='results_fmri_full.pkl'):
         # check cache
         cache_fname = join(CACHE_DIR, 'expl_preds', f'expl_test_{subject}_{expl}.jbl')
         os.makedirs(join(CACHE_DIR, 'expl_preds'), exist_ok=True)
+        loaded = False
         if os.path.exists(cache_fname):
-            neg_dists = joblib.load(cache_fname)
-        else:
+            try:
+                neg_dists = joblib.load(cache_fname)
+                loaded = True
+            except:
+                pass
+            
+        if not loaded:
             mod._init_task(task_str=expl)
             strs_list = dset['words']
             neg_dists = [

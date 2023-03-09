@@ -46,7 +46,6 @@ def add_main_args(parser):
                         (noise stddev = noise_ngram_scores * stddev(top-100 ngram responses)''')
     parser.add_argument('--module_num_restrict', type=int, default=-1,
                         help='''ablation: alternative module_num to specify a corpus to restrict the ngram responses''')
-    
 
     # training misc args
     parser.add_argument('--seed', type=int, default=1,
@@ -60,7 +59,7 @@ def add_main_args(parser):
                         choices=['fmri', 'old_fmri',
                                  'emb_diff_d3', 'emb_diff_toy',
                                  'prompted_d3', 'prompted_toy'])
-    parser.add_argument('--module_num', type=int, # good task is d3_13_water or d3_16_hillary
+    parser.add_argument('--module_num', type=int,  # good task is d3_13_water or d3_16_hillary
                         default=0, help='number of module to select')
     parser.add_argument('--subject', type=str,
                         default='UTS03', help='for fMRI, which subject to use')
@@ -135,7 +134,8 @@ if __name__ == '__main__':
             voxel_num_best=args.module_num)
         r['fmri_test_corr'] = mod.corr
     else:
-        task_str = mprompt.data.data.get_task_str(args.module_name, args.module_num)
+        task_str = mprompt.data.data.get_task_str(
+            args.module_name, args.module_num)
         logging.info('running ' + task_str)
         if args.module_name.startswith('prompted'):
             mod = mprompt.modules.prompted_module.PromptedModule(
@@ -153,13 +153,12 @@ if __name__ == '__main__':
         args.module_name, args.module_num, args.subject)
 
     # subsample data
-    if args.subsample_frac < 1: # and not args.module_name == 'fmri':
+    if args.subsample_frac < 1:  # and not args.module_name == 'fmri':
         assert False, 'dont subsample data right now, since explain_ngrams is using caching'
         # n_subsample = int(len(text_str_list) * args.subsample_frac)
 
         # randomly subsample list
         # text_str_list, size=n_subsample, replace=False).tolist()
-            # text_str_list, size=n_subsample, replace=False).tolist()
 
     # explain with method
     explanation_init_ngrams, explanation_init_scores = mprompt.methods.m1_ngrams.explain_ngrams(
@@ -202,9 +201,8 @@ if __name__ == '__main__':
 
         # evaluate synthetic data (higher score is better)
         r['score_synthetic'].append(
-            np.mean(mod(strs_added)) -
-            np.mean(mod(strs_removed))
-        )
+            np.mean(mod(strs_added)) - np.mean(mod(strs_removed)))
+
     logging.info(f'{explanation_strs[0]}\n+++++++++\n\t' + '\n\t'.join(r['strs_added'][0][:3]) +
                  '\n--------\n\t' + '\n\t'.join(r['strs_removed'][0][:3]))
 
@@ -217,7 +215,8 @@ if __name__ == '__main__':
     # evaluate how well explanation matches a "groundtruth"
     if not args.module_name == 'fmri':
         logging.info('Scoring explanation....')
-        r['score_contains_keywords'] = mprompt.methods.m4_evaluate.compute_score_contains_keywords(args, r['explanation_init_strs'])
+        r['score_contains_keywords'] = mprompt.methods.m4_evaluate.compute_score_contains_keywords(
+            args, r['explanation_init_strs'])
 
     # save results
     pkl.dump(r, open(join(save_dir_unique, 'results.pkl'), 'wb'))

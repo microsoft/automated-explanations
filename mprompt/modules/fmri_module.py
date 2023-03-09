@@ -35,8 +35,17 @@ class fMRIModule():
             Which voxel to predict (0 for best-predicted voxel, then 1, 2, ...1000)
         """
 
-        # hyperparams for loaded model
+        # load opt model & tokenizer
         self.checkpoint = 'facebook/opt-30b'
+        self.tokenizer = AutoTokenizer.from_pretrained(self.checkpoint)
+        self.model = AutoModelForCausalLM.from_pretrained(
+            self.checkpoint, device_map='auto', torch_dtype=torch.float16)
+        
+        # load fmri-specific stuff
+        self._init_fmri(voxel_num_best, subject)
+
+
+    def _init_fmri(self, voxel_num_best: int, subject: str):
         self.voxel_num_best = voxel_num_best
         self.subject = subject
         self.ndel = 4
@@ -50,7 +59,7 @@ class fMRIModule():
                     f'{subject}_voxel_selectivity_shuffled.jbl'))
         self.voxel_idx = self.voxel_idxs[voxel_num_best]
 
-        # look at metadata stuff
+        # load corr performance
         corrs = joblib.load(
             join(SAVE_DIR_FMRI, 'voxel_performances', f'{subject}_voxel_performance.jbl'))
         self.corr = corrs[self.voxel_idx]
@@ -62,13 +71,7 @@ class fMRIModule():
         self.preproc = pkl.load(open(join(SAVE_DIR_FMRI, 'preproc.pkl'), 'rb'))
         self.weights = self.weights[:, self.voxel_idxs]
 
-        # load model and tokenizer
-        self.tokenizer = AutoTokenizer.from_pretrained(self.checkpoint)
-        # if torch.cuda.device_count() > 0:
-        self.model = AutoModelForCausalLM.from_pretrained(
-            self.checkpoint, device_map='auto', torch_dtype=torch.float16)
-        # else:
-        # model = AutoModelForCausalLM.from_pretrained(self.checkpoint)
+        
 
     def _get_embs(self, X: List[str]):
         """
