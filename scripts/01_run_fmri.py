@@ -16,13 +16,8 @@ params_shared_dict = {
     'subsample_frac': [1],
     'module_num': list(range(80)),
     'module_name': ['fmri'],
-<<<<<<< HEAD
     'subject': ['UTS02'], #'UTS01', 'UTS03'],
     # 'subject': ['UTS01'],
-=======
-    # 'subject': ['UTS03', 'UTS01'], #, 'UTS02'],
-    'subject': ['UTS02', 'UTS03', 'UTS01'], #, 'UTS02'],
->>>>>>> update branch
     # 'subject': ['UTS02', 'UTS03'],
     # 'subject': ['UTS02', 'UTS01', 'UTS03'],
     'num_top_ngrams_to_use': [30],
