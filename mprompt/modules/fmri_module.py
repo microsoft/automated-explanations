@@ -21,7 +21,8 @@ import joblib
 from huth.utils_ds import make_word_ds
 
 modules_dir = dirname(os.path.abspath(__file__))
-SAVE_DIR_FMRI = join(modules_dir, 'fmri')
+# SAVE_DIR_FMRI = join(modules_dir, 'fmri')
+SAVE_DIR_FMRI = '/home/chansingh/mntv1/deep-fMRI/opt_model'
 NUM_TOP_VOXELS = 500
 
 class fMRIModule():
