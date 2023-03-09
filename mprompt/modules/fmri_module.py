@@ -56,6 +56,7 @@ class fMRIModule():
         self.weights = joblib.load(weights_file)
         self.preproc = pkl.load(open(join(SAVE_DIR_FMRI, 'preproc.pkl'), 'rb'))
         self.weights = self.weights[:, self.voxel_idxs]
+    
 
     def _get_embs(self, X: List[str]):
         """
