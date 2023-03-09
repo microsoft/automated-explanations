@@ -62,6 +62,14 @@ class fMRIModule():
         self.preproc = pkl.load(open(join(SAVE_DIR_FMRI, 'preproc.pkl'), 'rb'))
         self.weights = self.weights[:, self.voxel_idxs]
 
+        # load model and tokenizer
+        self.tokenizer = AutoTokenizer.from_pretrained(self.checkpoint)
+        # if torch.cuda.device_count() > 0:
+        self.model = AutoModelForCausalLM.from_pretrained(
+            self.checkpoint, device_map='auto', torch_dtype=torch.float16)
+        # else:
+        # model = AutoModelForCausalLM.from_pretrained(self.checkpoint)
+
     def _get_embs(self, X: List[str]):
         """
         Returns
@@ -69,22 +77,15 @@ class fMRIModule():
         embs: np.ndarray
             (n_examples, 7168)
         """
-        tokenizer = AutoTokenizer.from_pretrained(self.checkpoint)
-        # if torch.cuda.device_count() > 0:
-        model = AutoModelForCausalLM.from_pretrained(
-            self.checkpoint, device_map='auto', torch_dtype=torch.float16)
-        # else:
-        # model = AutoModelForCausalLM.from_pretrained(self.checkpoint)
-
         embs = []
         for i in tqdm(range(len(X))):
-            text = tokenizer.encode(X[i])
+            text = self.tokenizer.encode(X[i])
             inputs = {}
             inputs['input_ids'] = torch.tensor([text]).int()
             inputs['attention_mask'] = torch.ones(inputs['input_ids'].shape)
 
             # Ideally, you would use downsampled features instead of copying features across time delays
-            emb = list(model(**inputs, output_hidden_states=True)
+            emb = list(self.model(**inputs, output_hidden_states=True)
                        [2])[33][0][-1].cpu().detach().numpy()
             embs.append(emb)
         return np.array(embs)

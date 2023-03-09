@@ -78,7 +78,8 @@ if __name__ == '__main__':
     # results_dir = '../results/feb12_fmri_sweep/'
     # results_dir = '/home/chansingh/mntv1/mprompt/feb12_fmri_sweep_gen_template1/'
     # results_dir = '/home/chansingh/mntv1/mprompt/mar7_test/'
-    results_dir = '/home/chansingh/mntv1/mprompt/mar8/'
+    # results_dir = '/home/chansingh/mntv1/mprompt/mar8/'
+    results_dir = '/home/chansingh/mntv1/mprompt/mar9/'
 
     r = imodelsx.process_results.get_results_df(results_dir, use_cached=False)
     print(f'Loaded {r.shape[0]} results.')
