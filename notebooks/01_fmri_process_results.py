@@ -94,8 +94,8 @@ if __name__ == '__main__':
         # r[f'top_ngrams_test_{num}'] = r.apply(lambda row: get_test_ngrams(voxel_num_best=row.module_num)[:num], axis=1)
         
     print(f'Adding roi...')
-    r['roi_anat'] = r.apply(lambda row: get_roi(voxel_num_best=row.module_num, roi_type='anat', subject=row.subject), axis=1)
-    r['roi_func'] = r.apply(lambda row: get_roi(voxel_num_best=row.module_num, roi_type='func', subject=row.subject), axis=1)
+    r['roi_anat'] = r.progress_apply(lambda row: get_roi(voxel_num_best=row.module_num, roi_type='anat', subject=row.subject), axis=1)
+    r['roi_func'] = r.progress_apply(lambda row: get_roi(voxel_num_best=row.module_num, roi_type='func', subject=row.subject), axis=1)
 
     # Calculate train ngram correctness
     print(f'Finding matching ngrams_module...')
@@ -108,6 +108,7 @@ if __name__ == '__main__':
     r.to_pickle(join(RESULTS_DIR, 'results_fmri.pkl'))
 
     # Add explanation<>test response match
+    torch.cuda.empty_cache()
     print('Saved original results, now computing expl<>resp match...')
     add_expl_preds_and_save(r, fname='results_fmri_full.pkl')
 
