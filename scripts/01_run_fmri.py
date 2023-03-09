@@ -17,7 +17,7 @@ params_shared_dict = {
     'module_num': list(range(1)),
     'module_name': ['fmri'],
     # 'subject': ['UTS03', 'UTS01'], #, 'UTS02'],
-    'subject': ['UTS01'], #, 'UTS02'],
+    'subject': ['UTS02', 'UTS03', 'UTS01'], #, 'UTS02'],
     # 'subject': ['UTS02', 'UTS03'],
     # 'subject': ['UTS03', 'UTS02'],
     'num_top_ngrams_to_use': [30],
