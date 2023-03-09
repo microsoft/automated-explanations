@@ -36,18 +36,18 @@ def add_expl_preds_and_save(r, fname='results_fmri_full.pkl'):
         expl = row['top_explanation_init_strs']
         subject = row['subject']
 
+        # get resp
+        dset = dsets[subject]
+        resp = dset['resp'][:, row['module_num']]
+
         # check cache
         cache_fname = join(CACHE_DIR, 'expl_preds', f'expl_test_{subject}_{expl}.jbl')
         os.makedirs(join(CACHE_DIR, 'expl_preds'), exist_ok=True)
         if os.path.exists(cache_fname):
             neg_dists = joblib.load(cache_fname)
         else:
-            # get data and model
-            dset = dsets[subject]
-            strs_list = dset['words']
-            resp = dset['resp'][:, row['module_num']]
             mod._init_task(task_str=expl)
-            
+            strs_list = dset['words']
             neg_dists = [
                 mod(
                     imodelsx.util.generate_ngrams_list(strs_list[j], ngrams=3, all_ngrams=True),
@@ -77,7 +77,8 @@ def add_expl_preds_and_save(r, fname='results_fmri_full.pkl'):
 if __name__ == '__main__':
     # results_dir = '../results/feb12_fmri_sweep/'
     # results_dir = '/home/chansingh/mntv1/mprompt/feb12_fmri_sweep_gen_template1/'
-    results_dir = '/home/chansingh/mntv1/mprompt/mar7_test/'
+    # results_dir = '/home/chansingh/mntv1/mprompt/mar7_test/'
+    results_dir = '/home/chansingh/mntv1/mprompt/mar8/'
 
     r = imodelsx.process_results.get_results_df(results_dir, use_cached=False)
     print(f'Loaded {r.shape[0]} results.')
@@ -95,6 +96,13 @@ if __name__ == '__main__':
     correct_ngrams_module_scores, correct_ngrams_module_list = m4_evaluate.calc_frac_correct_score(r, col_ngrams=f'top_ngrams_module_{num_top_ngrams_expl}')    
     r['top_ngrams_module_correct'] = correct_ngrams_module_list
     r['frac_top_ngrams_module_correct'] = r['top_ngrams_module_correct'].apply(lambda x: len(x) / num_top_ngrams_expl)
+    
+    # Save results
+    r.to_pickle(join(RESULTS_DIR, 'results_fmri.pkl'))
+
+    # Add explanation<>test response match
+    print('Saved original results, now computing expl<>resp match...')
+    add_expl_preds_and_save(r, fname='results_fmri_full.pkl')
 
     # Unnecessary metrics
     # r['top_ngrams_test_correct_score'] = correct_ngrams_module_scores # these scores are basically just 0/1 for each ngram
@@ -106,13 +114,3 @@ if __name__ == '__main__':
     # test_correct_score_list, correct_ngrams_test_list = m4_evaluate.calc_frac_correct_score(r, col_ngrams=f'top_ngrams_test_{num_top_ngrams_test}')    
     # r['top_ngrams_test_correct'] = correct_ngrams_test_list
     # r['frac_top_ngrams_test_correct'] = r['top_ngrams_test_correct'].apply(lambda x: len(x) / num_top_ngrams_test)
-
-
-    r.to_pickle(join(RESULTS_DIR, 'results_fmri.pkl'))
-
-    # Add explanation<>test response match
-    print('Saved original results, now computing expl<>resp match...')
-    add_expl_preds_and_save(r, fname='results_fmri_full.pkl')
-
-
-    

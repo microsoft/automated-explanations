@@ -162,13 +162,14 @@ if __name__ == '__main__':
             # text_str_list, size=n_subsample, replace=False).tolist()
 
     # explain with method
-    explanation_init_ngrams = mprompt.methods.m1_ngrams.explain_ngrams(
+    explanation_init_ngrams, explanation_init_scores = mprompt.methods.m1_ngrams.explain_ngrams(
         args=args,
         X=text_str_list,
         mod=mod,
         num_top_ngrams=75,
     )
     r['explanation_init_ngrams'] = explanation_init_ngrams
+    r['explanation_init_outputs'] = explanation_init_scores
     logging.info(
         f'{explanation_init_ngrams[:3]=} {len(explanation_init_ngrams)}')
 

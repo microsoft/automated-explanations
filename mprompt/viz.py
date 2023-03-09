@@ -27,3 +27,15 @@ def colorize(words: List[str], color_array: np.ndarray[float],
     if title:
         colored_string = f'<h3>{title}</h3>\n' + colored_string
     return colored_string
+
+def moving_average(a, n=3):
+    assert n % 2 == 1, 'n should be odd'
+    diff = n // 2
+    vals = []
+    # calculate moving average in a window 2
+    # (1, 4)
+    for i in range(diff, len(a) + diff):
+        l = i - diff
+        r = i + diff + 1
+        vals.append(np.mean(a[l: r]))
+    return np.nan_to_num(vals)
