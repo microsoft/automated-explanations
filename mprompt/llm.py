@@ -213,8 +213,8 @@ def llm_hf(checkpoint='google/flan-t5-xl') -> LLM:
 def get_paragraphs(
     prompts,
     checkpoint='gpt-3.5-turbo',
-    PROMPT_FIRST_PREFIX='Write the next paragraph of the story, but now make it about',
-    PROMPT_NEXT_PREFIX='Write the beginning paragraph of a story about'
+    PROMPT_FIRST_PREFIX='Write the beginning paragraph of a story about',
+    PROMPT_NEXT_PREFIX='Write the next paragraph of the story, but now make it about',
 ):
     """
     Example messages
@@ -252,7 +252,7 @@ def get_paragraphs(
             messages = [messages[0]] + messages[3:]
 
             # rewrite the original prompt to now say beginning paragraph rather than next paragraph
-            messages[1]['content'] = messages[1]['content'].replace(PROMPT_FIRST_PREFIX, PROMPT_NEXT_PREFIX)
+            messages[1]['content'] = messages[1]['content'].replace(PROMPT_NEXT_PREFIX, PROMPT_FIRST_PREFIX)
     
     # extract out paragraphs
     paragraphs = [d['content'] for d in all_content if d['role'] == 'assistant']
