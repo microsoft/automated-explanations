@@ -64,8 +64,11 @@ class fMRIModule():
         embs: np.ndarray
             (n_examples, 7168)
         """
-        model = AutoModelForCausalLM.from_pretrained(
-            self.checkpoint, device_map='auto', torch_dtype=torch.float16)
+        if torch.cuda.device_count() > 0:
+            model = AutoModelForCausalLM.from_pretrained(
+                self.checkpoint, device_map='auto', torch_dtype=torch.float16)
+        else:
+            model = AutoModelForCausalLM.from_pretrained(self.checkpoint)
         tokenizer = AutoTokenizer.from_pretrained(self.checkpoint)
 
         embs = []
