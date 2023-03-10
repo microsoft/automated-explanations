@@ -39,6 +39,45 @@ def process_and_add_scores(r: pd.DataFrame, add_bert_scores=False):
     r = r.sort_values(by='top_score_synthetic', ascending=False).round(3)
     return r
 
+def get_prompt_templates(version):
+    PROMPTS = {
+        'v0': {
+            'prefix_first': 'Write the beginning paragraph of a story about',
+            'prefix_next': 'Write the next paragraph of the story, but now make it about',
+            'suffix': ' "{expl}". Make sure it contains several references to "{expl}".',
+        },
+
+        # first-person
+        'v1': {
+            'prefix_first': 'Write the beginning paragraph of a story told in first person. The story should be about',
+            'prefix_next': 'Write the next paragraph of the story, but now make it about',
+            'suffix': ' "{expl}". Make sure it contains several references to "{expl}".',
+        },
+
+        # add example ngrams
+        'v2': {
+            'prefix_first': 'Write the beginning paragraph of a story told in first person. The story should be about',
+            'prefix_next': 'Write the next paragraph of the story, but now make it about',
+            'suffix': ' "{expl}". Make sure it contains several references to "{expl}", such as {examples}.',
+        }
+    }
+    return PROMPTS[version]
+
+def get_prompts(rows, version):
+    # get a list of prompts
+    expls = rows.expl.values
+    examples = rows.top_ngrams_module_correct.apply(lambda l: ', '.join([f'"{x}"' for x in l[:3]])).values
+
+    PV = get_prompt_templates(version)
+
+    prompt_init = PV['prefix_first'] + PV['suffix']
+    prompt_continue = PV['prefix_next'] + PV['suffix']
+    if version in ['v0', 'v1']:
+        prompts = [prompt_init.format(expl=expls[0])] + [prompt_continue.format(expl=expl) for expl in expls[1:]]
+    elif version in ['v2']:
+        prompts = [prompt_init.format(expl=expls[0], examples=examples[0])] + \
+            [prompt_continue.format(expl=expl, examples=examples) for (expl, examples) in zip(expls[1:], examples[1:])] 
+    return prompts
 
 def compute_expl_data_match_heatmap(val, expls, paragraphs):
     n = len(expls)
@@ -57,17 +96,15 @@ def compute_expl_data_match_heatmap(val, expls, paragraphs):
             scores[i, j] = probs.mean()
     return scores
 
-def compute_expl_module_match_heatmap(expls, paragraphs, voxels):
+def compute_expl_module_match_heatmap(expls, paragraphs, voxel_nums, subjects):
     n = len(expls)
     scores = np.zeros((n, n))
     scores_max = np.zeros((n, n))
     all_scores = {}
     all_ngrams = {}
-    mod = fMRIModule(voxel_num_best=voxel_num_best, subject=subject)
+    mod = fMRIModule()
     for i in tqdm(range(n)):
-        # expl = expls[i]
-        (expl, subject, voxel_num_best) = voxels[i]
-        mod._init_fmri(subject, voxel_num_best)
+        mod._init_fmri(subject=subjects[i], voxel_num_best=voxel_nums[i])
         ngrams_list = []
         ngrams_scores_list = []
         for j in range(n):

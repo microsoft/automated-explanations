@@ -82,7 +82,7 @@ def visualize_story_html(val, expls, paragraphs, prompts, fname='../results/stor
 
     with open(fname, 'w') as f:
         f.write(story_running)
-    return s
+    return story_running
 
 def heatmap(data, labels, xlab='Explanation for matching', ylab='Explanation for generation', clab='Fraction of matching ngrams'):
     plt.style.use('dark_background')

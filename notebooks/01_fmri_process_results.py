@@ -41,7 +41,7 @@ def add_expl_preds_and_save(r, fname='results_fmri_full.pkl'):
         resp = dset['resp'][:, row['module_num']]
 
         # check cache
-        cache_fname = join(CACHE_DIR, 'expl_preds', f'expl_test_{subject}_{expl}.jbl')
+        cache_fname = join(CACHE_DIR, 'expl_preds', f'expl_test_{subject}_{expl.replace("/", "__")}.jbl')
         os.makedirs(join(CACHE_DIR, 'expl_preds'), exist_ok=True)
         loaded = False
         if os.path.exists(cache_fname):
