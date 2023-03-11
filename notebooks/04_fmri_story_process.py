@@ -35,7 +35,7 @@ paragraphs = rows.paragraph.values
 prompts = rows.prompt.values
 
 
-# Test Data<>Concept match
+# Test Explanation<>Story match
 val = D5_Validator()
 
 # visualize single story
@@ -48,7 +48,7 @@ scores_data = notebook_helper.compute_expl_data_match_heatmap(
 joblib.dump(scores_data, join(RESULTS_DIR, 'stories',
             f'{EXPT_NAME}_scores_data.pkl'))
 
-# Test Module<>Concept match
+# Test Module<>Story match
 expls = rows.expl.values
 voxel_nums = rows.module_num.values
 subjects = rows.subject.values
@@ -61,3 +61,4 @@ joblib.dump({
     'all_scores': all_scores,
     'all_ngrams': all_ngrams,
 }, join(RESULTS_DIR, 'stories', f'{EXPT_NAME}_scores_mod.pkl'))
+

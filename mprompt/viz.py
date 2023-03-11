@@ -75,7 +75,7 @@ def get_story_scores(val, expls, paragraphs):
 
 def heatmap(data, labels, xlab='Explanation for matching', ylab='Explanation for generation', clab='Fraction of matching ngrams'):
     # plt.style.use('dark_background')
-    plt.figure(figsize=(6, 5))
+    plt.figure(figsize=(7, 6))
     plt.imshow(data)
     plt.xticks(range(data.shape[0]), labels, rotation=90)
     plt.yticks(range(data.shape[0]), labels)
@@ -83,4 +83,4 @@ def heatmap(data, labels, xlab='Explanation for matching', ylab='Explanation for
     plt.xlabel(xlab)
     plt.colorbar(label=clab)
     plt.tight_layout()
-    plt.show()
+    # plt.show()
