@@ -39,21 +39,14 @@ prompts = rows.prompt.values
 val = D5_Validator()
 
 # visualize single story
-s = mprompt.viz.visualize_story_html(
-    val, expls, paragraphs, prompts, fname=join(RESULTS_DIR, 'stories', f'{EXPT_NAME}_story.html'))
-# display(HTML(s))
+scores_data_story = mprompt.viz.get_story_scores(val, expls, paragraphs)
+joblib.dump(scores_data_story, join(RESULTS_DIR, 'stories', f'{EXPT_NAME}_scores_data_story.pkl'))
 
 # compute scores heatmap
 scores_data = notebook_helper.compute_expl_data_match_heatmap(
     val, expls, paragraphs)
 joblib.dump(scores_data, join(RESULTS_DIR, 'stories',
             f'{EXPT_NAME}_scores_data.pkl'))
-
-# s = scores_data
-# s = scipy.special.softmax(scores, axis=1)
-# s = (s - s.min()) / (s.max() - s.min())
-# mprompt.viz.heatmap(scores_data, expls)
-
 
 # Test Module<>Concept match
 expls = rows.expl.values
@@ -62,14 +55,9 @@ subjects = rows.subject.values
 scores_mod, scores_max_mod, all_scores, all_ngrams = \
     notebook_helper.compute_expl_module_match_heatmap(
         expls, paragraphs, voxel_nums, subjects)
-
-s = scores_mod
 joblib.dump({
     'scores_mod': scores_mod,
     'scores_max_mod': scores_max_mod,
     'all_scores': all_scores,
     'all_ngrams': all_ngrams,
 }, join(RESULTS_DIR, 'stories', f'{EXPT_NAME}_scores_mod.pkl'))
-# s = scipy.special.softmax(s, axis=1)
-# s = (s - s.min()) / (s.max() - s.min())
-# mprompt.viz.heatmap(scores_data, expls, xlab='Explanation of voxel used for evaluation', clab='Mean voxel response')

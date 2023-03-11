@@ -44,16 +44,14 @@ def moving_average(a, n=3):
     return np.nan_to_num(vals)
 
 
-def visualize_story_html(val, expls, paragraphs, prompts, fname='../results/story_running.html'):
+def get_story_scores(val, expls, paragraphs):
     # mod = EmbDiffModule()
-    
-    story_running = ''
+    scores_list = []
     for i in range(len(expls)):
     # for i in range(1):
         expl = expls[i].lower()
         text = paragraphs[i]
         words = text.split()
-        prompt = prompts[i]
 
         ngrams = imodelsx.util.generate_ngrams_list(text.lower(), ngrams=3)
         ngrams = [words[0], words[0] + ' ' + words[1]] + ngrams
@@ -72,20 +70,11 @@ def visualize_story_html(val, expls, paragraphs, prompts, fname='../results/stor
 
         # validator-based viz
         probs = np.array(val.validate_w_scores(expl, ngrams))
-        probs_disp = moving_average(probs, n=3)
-        probs_disp = probs_disp / 2 + 0.5 # shift to 0.5-1 range
-        s = colorize(words, probs_disp, title=expl, subtitle=prompt)
-        
-        # viz
-        # display(HTML(s))
-        story_running += ' ' + s
-
-    with open(fname, 'w') as f:
-        f.write(story_running)
-    return story_running
+        scores_list.append(probs)
+    return scores_list
 
 def heatmap(data, labels, xlab='Explanation for matching', ylab='Explanation for generation', clab='Fraction of matching ngrams'):
-    plt.style.use('dark_background')
+    # plt.style.use('dark_background')
     plt.figure(figsize=(6, 5))
     plt.imshow(data)
     plt.xticks(range(data.shape[0]), labels, rotation=90)

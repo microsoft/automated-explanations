@@ -41,10 +41,5 @@ args_list = submit_utils.get_args_list(
 submit_utils.run_args_list(
     args_list,
     script_name=join(repo_dir, 'experiments', '01_explain.py'),
-    actually_run=True,
-    # gpu_ids=[0, 1],
-    # n_cpus=1,
-    shuffle=False,
-    # reverse=True,
     repeat_failed_jobs=True,
 )
