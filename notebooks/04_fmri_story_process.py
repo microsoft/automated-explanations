@@ -43,10 +43,12 @@ scores_data_story = mprompt.viz.get_story_scores(val, expls, paragraphs)
 joblib.dump(scores_data_story, join(RESULTS_DIR, 'stories', f'{EXPT_NAME}_scores_data_story.pkl'))
 
 # compute scores heatmap
-scores_data = notebook_helper.compute_expl_data_match_heatmap(
+scores_mean, scores_all = notebook_helper.compute_expl_data_match_heatmap(
     val, expls, paragraphs)
-joblib.dump(scores_data, join(RESULTS_DIR, 'stories',
-            f'{EXPT_NAME}_scores_data.pkl'))
+joblib.dump(
+    {'scores_mean': scores_mean,
+     'scores_all': scores_all},
+     join(RESULTS_DIR, 'stories', f'{EXPT_NAME}_scores_data.pkl'))
 
 # Test Module<>Story match
 expls = rows.expl.values
@@ -56,9 +58,9 @@ scores_mod, scores_max_mod, all_scores, all_ngrams = \
     notebook_helper.compute_expl_module_match_heatmap(
         expls, paragraphs, voxel_nums, subjects)
 joblib.dump({
-    'scores_mod': scores_mod,
-    'scores_max_mod': scores_max_mod,
-    'all_scores': all_scores,
-    'all_ngrams': all_ngrams,
+    'scores_mean': scores_mod,
+    # 'scores_max': scores_max_mod,
+    'scores_all': all_scores,
+    # 'ngrams_all': all_ngrams,
 }, join(RESULTS_DIR, 'stories', f'{EXPT_NAME}_scores_mod.pkl'))
 

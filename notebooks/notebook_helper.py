@@ -81,9 +81,11 @@ def get_prompts(rows, version):
 
 def compute_expl_data_match_heatmap(val, expls, paragraphs):
     n = len(expls)
-    scores = np.zeros((n, n))
+    scores_mean = np.zeros((n, n))
+    scores_full = []
     for i in tqdm(range(n)):
         expl = expls[i]
+        scores_list = []
         for j in range(n):
             text = paragraphs[j].lower()
             words = text.split()
@@ -93,15 +95,17 @@ def compute_expl_data_match_heatmap(val, expls, paragraphs):
 
             # validator-based viz
             probs = np.array(val.validate_w_scores(expl, ngrams)) > 0.5
-            scores[i, j] = probs.mean()
-    return scores
+            scores_mean[i, j] = probs.mean()
+            scores_list.append(deepcopy(probs))
+        scores_full.append(scores_list)
+    return scores_mean, scores_full
 
 def compute_expl_module_match_heatmap(expls, paragraphs, voxel_nums, subjects):
     n = len(expls)
     scores = np.zeros((n, n))
     scores_max = np.zeros((n, n))
-    all_scores = {}
-    all_ngrams = {}
+    all_scores = []
+    all_ngrams = []
     mod = fMRIModule()
     for i in tqdm(range(n)):
         mod._init_fmri(subject=subjects[i], voxel_num_best=voxel_nums[i])
@@ -120,6 +124,6 @@ def compute_expl_module_match_heatmap(expls, paragraphs, voxel_nums, subjects):
             scores[i, j] = ngrams_scores_story.mean()
             scores_max[i, j] = ngrams_scores_story.max()
         
-        all_scores[i] = deepcopy(ngrams_scores_list)
-        all_ngrams[i] = deepcopy(ngrams_list)
+        all_scores.append(deepcopy(ngrams_scores_list))
+        all_ngrams.append(deepcopy(ngrams_list))
     return scores, scores_max, all_scores, all_ngrams
