@@ -9,12 +9,12 @@ from imodelsx import submit_utils
 # List of values to sweep over (sweeps over all combinations of these)
 params_shared_dict = {
     'seed': [1],
-    'save_dir': [join('/home/chansingh/mntv1/mprompt', 'mar9')],
+    'save_dir': [join('/home/chansingh/mntv1/mprompt', 'mar13')],
     # 'save_dir': [join('/home/chansingh/mntv1/mprompt', 'feb12_fmri_sweep_gen_template1')],
     # 'save_dir': [join(repo_dir, 'results', 'feb12_fmri_sweep_gen_template1')],
     'use_cache': [1], # pass binary values with 0/1 instead of the ambiguous strings True/False
     'subsample_frac': [1],
-    'module_num': list(range(60)), # list(range(60)),
+    'module_num': list(range(120)), # list(range(60)),
     # 'module_num': [0],
     # 'module_num': list(range(60)),
     'module_name': ['fmri'],
@@ -24,7 +24,7 @@ params_shared_dict = {
     'subject': ['UTS02', 'UTS01', 'UTS03'],
     'num_top_ngrams_to_use': [30],
     'num_top_ngrams_to_consider': [50],
-    'num_summaries': [2],
+    'num_summaries': [5],
     'num_synthetic_strs': [10],
 }
 
@@ -42,4 +42,5 @@ submit_utils.run_args_list(
     args_list,
     script_name=join(repo_dir, 'experiments', '01_explain.py'),
     repeat_failed_jobs=True,
+    reverse=True,
 )
