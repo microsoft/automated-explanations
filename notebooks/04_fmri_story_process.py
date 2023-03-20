@@ -34,7 +34,6 @@ subjects = rows.subject.values
 paragraphs = rows.paragraph.values
 prompts = rows.prompt.values
 
-
 # Test Explanation<>Story match
 val = D5_Validator()
 
@@ -50,17 +49,26 @@ joblib.dump(
      'scores_all': scores_all},
      join(RESULTS_DIR, 'stories', f'{EXPT_NAME}_scores_data.pkl'))
 
-# Test Module<>Story match
-expls = rows.expl.values
-voxel_nums = rows.module_num.values
-subjects = rows.subject.values
+# Test Module<>Story match (with overlaps)
+ngram_lengths = [10, 50, 100, 384]
+for i, ngram_length in enumerate(ngram_lengths):
+    print(i, '/', len(ngram_lengths), 'ngram length', ngram_length)
+    scores_mod, scores_max_mod, all_scores, all_ngrams = \
+        notebook_helper.compute_expl_module_match_heatmap_running(
+            expls, paragraphs, voxel_nums, subjects,
+            ngram_length=ngram_length, paragraph_start_offset_max=50,
+        )
+    joblib.dump({
+        'scores_mean': scores_mod,
+        'scores_all': all_scores,
+    }, join(RESULTS_DIR, 'stories', f'{EXPT_NAME}_scores_mod_ngram_length={ngram_length}.pkl'))
+
+# Test Module<>Story match (basic with no overlap)
 scores_mod, scores_max_mod, all_scores, all_ngrams = \
-    notebook_helper.compute_expl_module_match_heatmap(
+    notebook_helper.compute_expl_module_match_heatmap_running(
         expls, paragraphs, voxel_nums, subjects)
 joblib.dump({
     'scores_mean': scores_mod,
-    # 'scores_max': scores_max_mod,
     'scores_all': all_scores,
-    # 'ngrams_all': all_ngrams,
-}, join(RESULTS_DIR, 'stories', f'{EXPT_NAME}_scores_mod.pkl'))
+}, join(RESULTS_DIR, 'stories', f'{EXPT_NAME}_scores_mod_ngram_length={0}.pkl'))
 

@@ -113,17 +113,60 @@ def compute_expl_module_match_heatmap(expls, paragraphs, voxel_nums, subjects):
         ngrams_scores_list = []
         for j in range(n):
             text = paragraphs[j].lower()
-            words = text.split()
-            ngrams_story = imodelsx.util.generate_ngrams_list(text, ngrams=3)
-            ngrams_story = [words[0], words[0] + ' ' + words[1]] + ngrams_story
-            ngrams_list.append(ngrams_story)
+            ngrams_paragraph = imodelsx.util.generate_ngrams_list(text, ngrams=3, pad_starting_ngrams=True)
+            ngrams_list.append(ngrams_paragraph)
 
             # get mean score for each story
-            ngrams_scores_story = mod(ngrams_story)
-            ngrams_scores_list.append(ngrams_scores_story)
-            scores[i, j] = ngrams_scores_story.mean()
-            scores_max[i, j] = ngrams_scores_story.max()
+            ngrams_scores_paragraph = mod(ngrams_paragraph)
+            ngrams_scores_list.append(ngrams_scores_paragraph)
+            scores[i, j] = ngrams_scores_paragraph.mean()
+            scores_max[i, j] = ngrams_scores_paragraph.max()
         
         all_scores.append(deepcopy(ngrams_scores_list))
         all_ngrams.append(deepcopy(ngrams_list))
+    return scores, scores_max, all_scores, all_ngrams
+
+def compute_expl_module_match_heatmap_running(
+        expls, paragraphs, voxel_nums, subjects,
+        ngram_length=10, paragraph_start_offset_max=50
+):
+    """Computes the heatmap of the match between explanations and the module scores.
+    Allows for running the module on a sliding window of the story (with overlapping paragraphs)
+
+    Params
+    ------
+    ngram_length: int
+        The length of the ngrams to use for the module (longer will blend together paragraphs more)
+    start_offset_max: int
+
+    """
+    paragraph_start_offset = min(ngram_length, paragraph_start_offset_max)
+    n = len(expls)
+    scores = np.zeros((n, n))
+    scores_max = np.zeros((n, n))
+    all_scores = []
+    all_ngrams = []
+    mod = fMRIModule()
+
+    for i in tqdm(range(n)):
+        mod._init_fmri(subject=subjects[i], voxel_num_best=voxel_nums[i])
+        story = '\n'.join(paragraphs).lower()
+        ngrams_story = imodelsx.util.generate_ngrams_list(story, ngrams=ngram_length, pad_starting_ngrams=True)
+
+        # each score corresponds to the position of the last word of the ngram
+        ngrams_scores_story = mod(ngrams_story)
+
+        story_start = 0
+        for j in range(n):
+            
+            # get mean score for each story (after applying offset)
+            story_end = story_start + len(paragraphs[j].split())
+            ngrams_scores_paragraph = ngrams_scores_story[story_start + paragraph_start_offset: story_end]
+            story_start = story_end
+            
+            scores[i, j] = np.mean(ngrams_scores_paragraph)
+            scores_max[i, j] = np.max(ngrams_scores_paragraph)
+        
+        all_scores.append(deepcopy(ngrams_scores_story))
+        all_ngrams.append(deepcopy(ngrams_story))
     return scores, scores_max, all_scores, all_ngrams
