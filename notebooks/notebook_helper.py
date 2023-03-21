@@ -3,6 +3,7 @@ from copy import deepcopy
 import sys
 import os.path
 from os.path import dirname, join
+from typing import List
 
 from mprompt.modules.fmri_module import fMRIModule
 repo_dir = dirname(dirname(os.path.abspath(__file__)))
@@ -59,24 +60,36 @@ def get_prompt_templates(version):
             'prefix_first': 'Write the beginning paragraph of a story told in first person. The story should be about',
             'prefix_next': 'Write the next paragraph of the story, but now make it about',
             'suffix': ' "{expl}". Make sure it contains several references to "{expl}", such as {examples}.',
-        }
+        },
+
+        # make story "interesting"
+        'v4': {
+            'prefix_first': 'Write the beginning paragraph of an interesting story told in first person. The story should place a heavy focus on ',
+            'prefix_next': 'Write the next paragraph of the story, but now make it about',
+            'suffix': ' {expl} words. Make sure it contains several references to "{expl}" words, such as {examples}.',
+        },
+
     }
     return PROMPTS[version]
 
-def get_prompts(rows, version):
-    # get a list of prompts
-    expls = rows.expl.values
-    examples = rows.top_ngrams_module_correct.apply(lambda l: ', '.join([f'"{x}"' for x in l[:3]])).values
-
+def get_prompts(expls: List[str], examples_list: List[List[str]], version, n_examples=3):
+    # select first n_examples from each list of examples
+    examples_list = [', '.join([f'"{x}"' for x in examples[:n_examples]])
+                     for examples in examples_list]
+    
+    # get templates
     PV = get_prompt_templates(version)
-
     prompt_init = PV['prefix_first'] + PV['suffix']
     prompt_continue = PV['prefix_next'] + PV['suffix']
+
+    # create prompts
     if version in ['v0', 'v1']:
         prompts = [prompt_init.format(expl=expls[0])] + [prompt_continue.format(expl=expl) for expl in expls[1:]]
-    elif version in ['v2']:
-        prompts = [prompt_init.format(expl=expls[0], examples=examples[0])] + \
-            [prompt_continue.format(expl=expl, examples=examples) for (expl, examples) in zip(expls[1:], examples[1:])] 
+    elif version in ['v2', 'v4']:
+        prompts = [prompt_init.format(expl=expls[0], examples=examples_list[0])] + \
+            [prompt_continue.format(expl=expl, examples=examples) for (expl, examples) in zip(expls[1:], examples_list[1:])] 
+    else:
+        raise ValueError(version, 'not supported in get_prompts')
     return prompts
 
 def compute_expl_data_match_heatmap(val, expls, paragraphs):
