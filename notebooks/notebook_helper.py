@@ -42,17 +42,11 @@ def process_and_add_scores(r: pd.DataFrame, add_bert_scores=False):
 
 def get_prompt_templates(version):
     PROMPTS = {
-        'v0': {
-            'prefix_first': 'Write the beginning paragraph of a story about',
-            'prefix_next': 'Write the next paragraph of the story, but now make it about',
-            'suffix': ' "{expl}". Make sure it contains several references to "{expl}".',
-        },
-
-        # first-person
-        'v1': {
-            'prefix_first': 'Write the beginning paragraph of a story told in first person. The story should be about',
-            'prefix_next': 'Write the next paragraph of the story, but now make it about',
-            'suffix': ' "{expl}". Make sure it contains several references to "{expl}".',
+        # make story "interesting"
+        'v4': {
+            'prefix_first': 'Write the beginning paragraph of an interesting story told in first person. The story should place a heavy focus on',
+            'prefix_next': 'Write the next paragraph of the story, but now make it emphasize',
+            'suffix': ' {expl} words. Make sure it contains several references to {expl} words, such as {examples}.',
         },
 
         # add example ngrams
@@ -62,11 +56,17 @@ def get_prompt_templates(version):
             'suffix': ' "{expl}". Make sure it contains several references to "{expl}", such as {examples}.',
         },
 
-        # make story "interesting"
-        'v4': {
-            'prefix_first': 'Write the beginning paragraph of an interesting story told in first person. The story should place a heavy focus on ',
+        # first-person
+        'v1': {
+            'prefix_first': 'Write the beginning paragraph of a story told in first person. The story should be about',
             'prefix_next': 'Write the next paragraph of the story, but now make it about',
-            'suffix': ' {expl} words. Make sure it contains several references to "{expl}" words, such as {examples}.',
+            'suffix': ' "{expl}". Make sure it contains several references to "{expl}".',
+        },
+
+        'v0': {
+            'prefix_first': 'Write the beginning paragraph of a story about',
+            'prefix_next': 'Write the next paragraph of the story, but now make it about',
+            'suffix': ' "{expl}". Make sure it contains several references to "{expl}".',
         },
 
     }
