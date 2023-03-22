@@ -26,7 +26,8 @@ import joblib
 from mprompt.config import RESULTS_DIR
 import torch.cuda
 
-EXPT_NAME = 'huth2016clusters_mar21_i_time_traveled'
+# EXPT_NAME = 'huth2016clusters_mar21_i_time_traveled'
+EXPT_NAME = 'voxels_mar21_hands_arms_emergency'
 EXPT_DIR = join(RESULTS_DIR, 'stories', EXPT_NAME)
 rows = joblib.load(join(EXPT_DIR, 'rows.pkl'))
 expls = rows.expl.values
