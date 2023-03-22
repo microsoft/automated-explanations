@@ -82,7 +82,7 @@ for i, ngram_length in enumerate(ngram_lengths):
     joblib.dump({
         'scores_mean': scores_mod,
         'scores_all': all_scores,
-    }, join(EXPT_DIR, 'scores_mod_ngram_length={ngram_length}.pkl'))
+    }, join(EXPT_DIR, f'scores_mod_ngram_length={ngram_length}.pkl'))
 
 # basic with no overlaps
 scores_mod, scores_max_mod, all_scores, all_ngrams = \
@@ -91,5 +91,5 @@ scores_mod, scores_max_mod, all_scores, all_ngrams = \
 joblib.dump({
     'scores_mean': scores_mod,
     'scores_all': all_scores,
-}, join(EXPT_DIR, 'scores_mod_ngram_length={0}.pkl'))
+}, join(EXPT_DIR, f'scores_mod_ngram_length={0}.pkl'))
 
