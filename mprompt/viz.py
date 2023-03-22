@@ -14,7 +14,9 @@ def colorize(words: List[str], color_array: np.ndarray[float],
         an array of numbers between 0 and 1 of length equal to words
     '''
     cmap = matplotlib.cm.get_cmap('viridis')
+    # cmap = matplotlib.cm.get_cmap('viridis_r')
     template = '<span class="barcode"; style="color: black; background-color: {}">{}</span>'
+    # template = '<span class="barcode"; style="color: {}; background-color: white">{}</span>'
     colored_string = ''
     char_width = 0
     for word, color in zip(words, color_array):

@@ -14,7 +14,7 @@ params_shared_dict = {
     # 'save_dir': [join(repo_dir, 'results', 'feb12_fmri_sweep_gen_template1')],
     'use_cache': [1], # pass binary values with 0/1 instead of the ambiguous strings True/False
     'subsample_frac': [1],
-    'module_num': list(range(120)), # list(range(60)),
+    'module_num': list(range(250)), # list(range(60)),
     # 'module_num': [0],
     # 'module_num': list(range(60)),
     'module_name': ['fmri'],
@@ -43,4 +43,5 @@ submit_utils.run_args_list(
     script_name=join(repo_dir, 'experiments', '01_explain.py'),
     repeat_failed_jobs=True,
     reverse=True,
+    n_cpus=2,
 )

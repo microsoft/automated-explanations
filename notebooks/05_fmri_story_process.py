@@ -26,20 +26,29 @@ import joblib
 from mprompt.config import RESULTS_DIR
 import torch.cuda
 
-EXPT_NAME = 'relationships_mar9'
-rows = joblib.load(join(RESULTS_DIR, 'stories', f'{EXPT_NAME}_rows.pkl'))
+EXPT_NAME = 'huth2016clusters_mar21_i_time_traveled'
+EXPT_DIR = join(RESULTS_DIR, 'stories', EXPT_NAME)
+rows = joblib.load(join(EXPT_DIR, 'rows.pkl'))
 expls = rows.expl.values
-voxel_nums = rows.module_num.values
-subjects = rows.subject.values
 paragraphs = rows.paragraph.values
 prompts = rows.prompt.values
 
+#########################################################
 # Test Explanation<>Story match
+#########################################################
 val = D5_Validator()
 
 # visualize single story
+text = '\n'.join(rows.paragraph.values)
+with open(join(EXPT_DIR, 'story.txt'), 'w') as f:
+    f.write(text)
 scores_data_story = mprompt.viz.get_story_scores(val, expls, paragraphs)
-joblib.dump(scores_data_story, join(RESULTS_DIR, 'stories', f'{EXPT_NAME}_scores_data_story.pkl'))
+joblib.dump(scores_data_story, join(EXPT_DIR, 'scores_data_story.pkl'))
+s_data = notebook_helper.viz_paragraphs(
+    paragraphs, scores_data_story, expls, prompts,
+    normalize_to_range=True, moving_average=True, shift_to_range=True)
+with open(join(EXPT_DIR, 'story.html'), 'w') as f:
+    f.write(s_data)
 
 # compute scores heatmap
 scores_mean, scores_all = notebook_helper.compute_expl_data_match_heatmap(
@@ -47,9 +56,20 @@ scores_mean, scores_all = notebook_helper.compute_expl_data_match_heatmap(
 joblib.dump(
     {'scores_mean': scores_mean,
      'scores_all': scores_all},
-     join(RESULTS_DIR, 'stories', f'{EXPT_NAME}_scores_data.pkl'))
+     join(EXPT_DIR, 'scores_data.pkl'))
+mprompt.viz.heatmap(scores_mean, expls, ylab='Story', xlab='Explanation')
+plt.savefig(join(EXPT_DIR, 'story_data_match.png'), dpi=300)
+plt.savefig(join(EXPT_DIR, 'story_data_match.pdf'), bbox_inches='tight')
 
-# Test Module<>Story match (with overlaps)
+#########################################################
+# Test Module<>Story match 
+#########################################################
+if not 'module_num' in rows.columns:
+    raise ValueError('module_num not in rows.columns!')
+voxel_nums = rows.module_num.values
+subjects = rows.subject.values
+
+# with overlaps
 ngram_lengths = [10, 50, 100, 384]
 for i, ngram_length in enumerate(ngram_lengths):
     print(i, '/', len(ngram_lengths), 'ngram length', ngram_length)
@@ -61,14 +81,14 @@ for i, ngram_length in enumerate(ngram_lengths):
     joblib.dump({
         'scores_mean': scores_mod,
         'scores_all': all_scores,
-    }, join(RESULTS_DIR, 'stories', f'{EXPT_NAME}_scores_mod_ngram_length={ngram_length}.pkl'))
+    }, join(EXPT_DIR, 'scores_mod_ngram_length={ngram_length}.pkl'))
 
-# Test Module<>Story match (basic with no overlap)
+# basic with no overlaps
 scores_mod, scores_max_mod, all_scores, all_ngrams = \
     notebook_helper.compute_expl_module_match_heatmap_running(
         expls, paragraphs, voxel_nums, subjects)
 joblib.dump({
     'scores_mean': scores_mod,
     'scores_all': all_scores,
-}, join(RESULTS_DIR, 'stories', f'{EXPT_NAME}_scores_mod_ngram_length={0}.pkl'))
+}, join(EXPT_DIR, 'scores_mod_ngram_length={0}.pkl'))
 

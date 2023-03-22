@@ -183,3 +183,24 @@ def compute_expl_module_match_heatmap_running(
         all_scores.append(deepcopy(ngrams_scores_story))
         all_ngrams.append(deepcopy(ngrams_story))
     return scores, scores_max, all_scores, all_ngrams
+
+def viz_paragraphs(paragraphs, scores_data_story, expls, prompts, normalize_to_range=True, moving_average=True, shift_to_range=True):
+    s_data = ''
+    for i in range(len(paragraphs)):
+        scores_i = np.array(scores_data_story[i])
+
+        # normalize to 0-1 range
+        if normalize_to_range:
+            scores_i = (scores_i - scores_i.min()) / (scores_i.max() - scores_i.min())
+        # scores_mod_i = scipy.special.softmax(scores_mod_i)
+        if moving_average:
+            scores_i = mprompt.viz.moving_average(scores_i, n=3)
+        if shift_to_range:
+            scores_i = scores_i / 2 + 0.5 # shift to 0.5-1 range
+        s_data += ' ' + mprompt.viz.colorize(
+            paragraphs[i].split(), scores_i,
+            title=expls[i], subtitle=prompts[i],
+            char_width_max=60,
+            )
+    return s_data
+
