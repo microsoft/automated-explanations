@@ -44,12 +44,12 @@ def get_prompt_templates(version):
     PROMPTS = {
         # make story "interesting"
         'v4_noun': {
-            'prefix_first': 'Write the beginning paragraph of an interesting story told in first person. The story should place be about',
+            'prefix_first': 'Write the beginning paragraph of an interesting story told in first person. The story should have a plot and characters. The story should be about',
             'prefix_next': 'Write the next paragraph of the story, but now make it about',
             'suffix': ' "{expl}". Make sure it contains several words related to "{expl}", such as {examples}.',
         },
         'v4': {
-            'prefix_first': 'Write the beginning paragraph of an interesting story told in first person. The story should place a heavy focus on',
+            'prefix_first': 'Write the beginning paragraph of an interesting story told in first person. The story should have a plot and characters. The story should place a heavy focus on',
             'prefix_next': 'Write the next paragraph of the story, but now make it emphasize',
             'suffix': ' {expl} words. Make sure it contains several references to {expl} words, such as {examples}.',
         },
@@ -145,30 +145,7 @@ def compute_expl_module_match_heatmap(expls, paragraphs, voxel_nums, subjects):
     return scores, scores_max, all_scores, all_ngrams
 
 def compute_expl_module_match_heatmap_cached_single_subject(expls, paragraphs, voxel_nums, subject):
-    n = len(expls)
-    scores = np.zeros((n, n))
-    scores_max = np.zeros((n, n))
-    all_scores = []
-    all_ngrams = []
-    mod = fMRIModule()
-    for i in tqdm(range(n)):
-        mod._init_fmri(subject=subject, voxel_num_best=voxel_nums)
-        ngrams_list = []
-        ngrams_scores_list = []
-        for j in range(n):
-            text = paragraphs[j].lower()
-            ngrams_paragraph = imodelsx.util.generate_ngrams_list(text, ngrams=3, pad_starting_ngrams=True)
-            ngrams_list.append(ngrams_paragraph)
-
-            # get mean score for each story
-            ngrams_scores_paragraph = mod(ngrams_paragraph)
-            ngrams_scores_list.append(ngrams_scores_paragraph)
-            scores[i, j] = ngrams_scores_paragraph.mean()
-            scores_max[i, j] = ngrams_scores_paragraph.max()
-        
-        all_scores.append(deepcopy(ngrams_scores_list))
-        all_ngrams.append(deepcopy(ngrams_list))
-    return scores, scores_max, all_scores, all_ngrams
+    return
 
 def compute_expl_module_match_heatmap_running(
         expls, paragraphs, voxel_nums, subjects,
