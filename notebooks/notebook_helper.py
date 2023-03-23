@@ -125,7 +125,7 @@ def compute_expl_data_match_heatmap(val, expls, paragraphs):
         scores_full.append(scores_list)
     return scores_mean, scores_full
 
-def compute_expl_module_match_heatmap(expls, paragraphs, voxel_nums, subjects):
+def compute_expl_module_match_heatmap(expls, paragraphs, voxel_nums, subjects, ngram_length=15):
     '''
     Returns
     -------
@@ -148,7 +148,7 @@ def compute_expl_module_match_heatmap(expls, paragraphs, voxel_nums, subjects):
         ngrams_scores_list = []
         for j in range(n):
             text = paragraphs[j].lower()
-            ngrams_paragraph = imodelsx.util.generate_ngrams_list(text, ngrams=3, pad_starting_ngrams=True)
+            ngrams_paragraph = imodelsx.util.generate_ngrams_list(text, ngrams=ngram_length, pad_starting_ngrams=True)
             ngrams_list.append(ngrams_paragraph)
 
             # get mean score for each story
@@ -163,33 +163,36 @@ def compute_expl_module_match_heatmap(expls, paragraphs, voxel_nums, subjects):
 
 def compute_expl_module_match_heatmap_cached_single_subject(expls, paragraphs, voxel_nums, subject, ngram_length=15):
     """Assume subject is the same for all stories - let's us easily run all voxels in parallel
+    Returns exactly the same as compute_expl_module_match_heatmap
+
+    Returns
+    -------
+    scores: np.array (n, n) (voxels x paragraphs)
+        Mean score for each story
+    scores_max: np.array (n, n) (voxels x paragraphs)
+        Max score for each story
+    all_scores: List[np.array] (n, n)  (voxels x paragraphs)
+        Scores for each voxel for each ngram
     """
     n = len(expls)
     scores = np.zeros((n, n))
     scores_max = np.zeros((n, n))
     all_scores = []
-    all_ngrams = []
     mod = fMRIModule()
     mod._init_fmri(subject=subject, voxel_num_best=voxel_nums)
 
+    # loop over paragraphs
     for idx_paragraph in tqdm(range(n)):
         text = paragraphs[idx_paragraph].lower()
-        ngrams_paragraph = imodelsx.util.generate_ngrams_list(text, ngram_length=15, pad_starting_ngrams=True)
-        ngrams_list.append(ngrams_paragraph)
+        ngrams_paragraph = imodelsx.util.generate_ngrams_list(text, ngrams=ngram_length, pad_starting_ngrams=True)
 
-        for i in tqdm(range(n)):
-            ngrams_list = []
-            ngrams_scores_list = []
-
-            # get mean score for each story
-            ngrams_scores_paragraph = mod(ngrams_paragraph)
-            ngrams_scores_list.append(ngrams_scores_paragraph)
-            scores[i, j] = ngrams_scores_paragraph.mean()
-            scores_max[i, j] = ngrams_scores_paragraph.max()
+        # get mean score for each paragraph
+        ngrams_scores_paragraph = mod(ngrams_paragraph)
+        all_scores.append(deepcopy(ngrams_scores_paragraph))
+        scores[idx_paragraph] = ngrams_scores_paragraph.mean(axis=0)
+        scores_max[idx_paragraph] = ngrams_scores_paragraph.max(axis=0)
             
-            all_scores.append(deepcopy(ngrams_scores_list))
-            all_ngrams.append(deepcopy(ngrams_list))
-    return scores, scores_max, all_scores, all_ngrams
+    return scores.T, scores_max.T, all_scores
 
 def compute_expl_module_match_heatmap_running(
         expls, paragraphs, voxel_nums, subjects,
@@ -256,3 +259,21 @@ def viz_paragraphs(paragraphs, scores_data_story, expls, prompts, normalize_to_r
             )
     return s_data
 
+if __name__ == '__main__':
+    expls = ['good', 'bad']
+    paragraphs = ['this is a sample good story', 'this is a sample bad story']
+    voxel_nums = [0, 1]
+    subjects = ['UTS02', 'UTS02']
+
+    scores_mod, scores_max_mod, all_scores = \
+        compute_expl_module_match_heatmap_cached_single_subject(
+            expls, paragraphs, voxel_nums, subject='UTS02')
+    assert scores_mod.shape == (2, 2) 
+
+    scores_mod1, scores_max_mod1, all_scores1 = \
+        compute_expl_module_match_heatmap(
+            expls, paragraphs, voxel_nums, subjects)
+    assert scores_mod1.shape == (2, 2)
+
+    assert np.allclose(scores_mod, scores_mod1)
+    assert np.allclose(scores_max_mod, scores_max_mod1)
