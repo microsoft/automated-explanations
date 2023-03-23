@@ -71,18 +71,18 @@ voxel_nums = rows.module_num.values
 subjects = rows.subject.values
 
 # with overlaps
-ngram_lengths = [10, 50, 100, 384]
-for i, ngram_length in enumerate(ngram_lengths):
-    print(i, '/', len(ngram_lengths), 'ngram length', ngram_length)
-    scores_mod, scores_max_mod, all_scores, all_ngrams = \
-        notebook_helper.compute_expl_module_match_heatmap_running(
-            expls, paragraphs, voxel_nums, subjects,
-            ngram_length=ngram_length, paragraph_start_offset_max=50,
-        )
-    joblib.dump({
-        'scores_mean': scores_mod,
-        'scores_all': all_scores,
-    }, join(EXPT_DIR, f'scores_mod_ngram_length={ngram_length}.pkl'))
+# ngram_lengths = [10, 50, 100, 384]
+# for i, ngram_length in enumerate(ngram_lengths):
+#     print(i, '/', len(ngram_lengths), 'ngram length', ngram_length)
+#     scores_mod, scores_max_mod, all_scores, all_ngrams = \
+#         notebook_helper.compute_expl_module_match_heatmap_running(
+#             expls, paragraphs, voxel_nums, subjects,
+#             ngram_length=ngram_length, paragraph_start_offset_max=50,
+#         )
+#     joblib.dump({
+#         'scores_mean': scores_mod,
+#         'scores_all': all_scores,
+#     }, join(EXPT_DIR, f'scores_mod_ngram_length={ngram_length}.pkl'))
 
 # basic with no overlaps
 scores_mod, scores_max_mod, all_scores, all_ngrams = \

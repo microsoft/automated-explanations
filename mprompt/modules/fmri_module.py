@@ -1,7 +1,7 @@
 from collections import defaultdict
 import pandas as pd
 import logging
-from typing import List
+from typing import List, Union
 import datasets
 from transformers import pipeline
 import numpy as np
@@ -45,32 +45,32 @@ class fMRIModule():
         self._init_fmri(voxel_num_best, subject)
 
 
-    def _init_fmri(self, voxel_num_best: int, subject: str):
+    def _init_fmri(self, voxel_num_best: Union[int, List[int]], subject: str):
         self.voxel_num_best = voxel_num_best
         self.subject = subject
         self.ndel = 4
 
         # select voxel index
-        self.voxel_idxs = joblib.load(
+        voxel_idxs = joblib.load(
             join(SAVE_DIR_FMRI, 'voxel_lists', f'{subject}_voxel_selectivity.jbl'))
-        numpy.random.default_rng(seed=42).shuffle(self.voxel_idxs)
-        self.voxel_idxs = self.voxel_idxs[:NUM_TOP_VOXELS]
-        joblib.dump(self.voxel_idxs, join(SAVE_DIR_FMRI, 'voxel_lists',
+        numpy.random.default_rng(seed=42).shuffle(voxel_idxs)
+        voxel_idxs = voxel_idxs[:NUM_TOP_VOXELS]
+        joblib.dump(voxel_idxs, join(SAVE_DIR_FMRI, 'voxel_lists',
                     f'{subject}_voxel_selectivity_shuffled.jbl'))
-        self.voxel_idx = self.voxel_idxs[voxel_num_best]
-
-        # load corr performance
-        corrs = joblib.load(
-            join(SAVE_DIR_FMRI, 'voxel_performances', f'{subject}_voxel_performance.jbl'))
-        self.corr = corrs[self.voxel_idx]
 
         # load weights
         weights_file = join(SAVE_DIR_FMRI, 'model_weights',
                             f'wt_{subject}.jbl')
         self.weights = joblib.load(weights_file)
         self.preproc = pkl.load(open(join(SAVE_DIR_FMRI, 'preproc.pkl'), 'rb'))
-        self.weights = self.weights[:, self.voxel_idxs]
+        self.weights = self.weights[:, voxel_idxs]
 
+        # load corr performance
+        if isinstance(voxel_num_best, int):
+            voxel_idx = voxel_idxs[voxel_num_best]
+            corrs = joblib.load(
+                join(SAVE_DIR_FMRI, 'voxel_performances', f'{subject}_voxel_performance.jbl'))
+            self.corr = corrs[voxel_idx]
         
 
     def _get_embs(self, X: List[str]):
@@ -95,6 +95,7 @@ class fMRIModule():
 
     def __call__(self, X: List[str], return_all=False) -> np.ndarray:
         """Returns a scalar continuous response for each element of X
+        self.voxel_num_best may be a list, in which case it will return a 2d array (len(X), len(self.voxel_num_best))
         """
         # get opt embeddings
         embs = self._get_embs(X)
@@ -109,9 +110,8 @@ class fMRIModule():
 
         if return_all:
             return preds_fMRI  # self.weights was already restricted to top voxels
-
         else:
-            pred_voxel = preds_fMRI[:, self.voxel_num_best]  # select voxel
+            pred_voxel = preds_fMRI[:, np.array(self.voxel_num_best)]  # select voxel (or potentially many voxels)
             return pred_voxel
 
 
@@ -206,9 +206,10 @@ if __name__ == '__main__':
     # cache_test_data()
     # story_text = get_train_story_texts()
 
-    mod = fMRIModule()
-    # X = ['I am happy', 'I am sad', 'I am angry']
+    mod = fMRIModule(voxel_num_best=[1, 2, 3])
+    X = ['I am happy', 'I am sad', 'I am angry']
     # print(X[0][:50])
-    # resp = mod(X[:3])
-    # print(resp)
+    resp = mod(X[:3])
+    print(resp.shape)
+    print(resp)
     # print(mod.corrs[:20])

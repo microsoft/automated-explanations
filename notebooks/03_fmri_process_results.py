@@ -1,3 +1,6 @@
+"""Process the explanations of each fMRI voxel
+"""
+
 import os
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -63,6 +66,7 @@ def add_expl_preds_and_save(r, fname='results_fmri_full.pkl'):
             ]
             joblib.dump(neg_dists, cache_fname)
 
+        # neg dist closer to 0 should elicit higher response
         r['neg_dists_expl_test'].iloc[i] = neg_dists
         r['rankcorr_expl_test'].iloc[i] = scipy.stats.spearmanr(
             neg_dists, resp, nan_policy='omit', alternative='greater').statistic

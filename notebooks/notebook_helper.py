@@ -144,6 +144,32 @@ def compute_expl_module_match_heatmap(expls, paragraphs, voxel_nums, subjects):
         all_ngrams.append(deepcopy(ngrams_list))
     return scores, scores_max, all_scores, all_ngrams
 
+def compute_expl_module_match_heatmap_cached_single_subject(expls, paragraphs, voxel_nums, subject):
+    n = len(expls)
+    scores = np.zeros((n, n))
+    scores_max = np.zeros((n, n))
+    all_scores = []
+    all_ngrams = []
+    mod = fMRIModule()
+    for i in tqdm(range(n)):
+        mod._init_fmri(subject=subject, voxel_num_best=voxel_nums)
+        ngrams_list = []
+        ngrams_scores_list = []
+        for j in range(n):
+            text = paragraphs[j].lower()
+            ngrams_paragraph = imodelsx.util.generate_ngrams_list(text, ngrams=3, pad_starting_ngrams=True)
+            ngrams_list.append(ngrams_paragraph)
+
+            # get mean score for each story
+            ngrams_scores_paragraph = mod(ngrams_paragraph)
+            ngrams_scores_list.append(ngrams_scores_paragraph)
+            scores[i, j] = ngrams_scores_paragraph.mean()
+            scores_max[i, j] = ngrams_scores_paragraph.max()
+        
+        all_scores.append(deepcopy(ngrams_scores_list))
+        all_ngrams.append(deepcopy(ngrams_list))
+    return scores, scores_max, all_scores, all_ngrams
+
 def compute_expl_module_match_heatmap_running(
         expls, paragraphs, voxel_nums, subjects,
         ngram_length=10, paragraph_start_offset_max=50
