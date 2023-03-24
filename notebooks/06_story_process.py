@@ -50,7 +50,7 @@ def explanation_story_match():
         {'scores_mean': scores_mean,
         'scores_all': scores_all},
         join(EXPT_DIR, 'scores_data.pkl'))
-    mprompt.viz.heatmap(scores_mean, expls, ylab='Story', xlab='Explanation')
+    mprompt.viz.heatmap(scores_mean.T, expls, ylab='Story', xlab='Explanation')
     plt.savefig(join(EXPT_DIR, 'story_data_match.png'), dpi=300)
     plt.savefig(join(EXPT_DIR, 'story_data_match.pdf'), bbox_inches='tight')
 
@@ -65,6 +65,7 @@ def module_story_match():
     # basic with no overlaps
     if 'uts0' in EXPT_NAME:
         compute_func = notebook_helper.compute_expl_module_match_heatmap_cached_single_subject
+        subjects = subjects[0]
     else:
         compute_func = notebook_helper.compute_expl_module_match_heatmap
     scores_mod, scores_max_mod, all_scores = \
@@ -91,7 +92,7 @@ def module_story_match():
 if __name__ == '__main__':
     # EXPT_NAME = 'huth2016clusters_mar21_i_time_traveled'
     # EXPT_NAME = 'voxels_mar21_hands_arms_emergency'
-    for seed in [1, 2, 3]:
+    for seed in [5, 6, 7, 8]:
         EXPT_NAME = f'uts02_concepts_pilot_mar22_seed={seed}'
         EXPT_DIR = join(RESULTS_DIR, 'stories', EXPT_NAME)
         rows = joblib.load(join(EXPT_DIR, 'rows.pkl'))
@@ -99,5 +100,7 @@ if __name__ == '__main__':
         paragraphs = rows.paragraph.values
         prompts = rows.prompt.values
 
-        explanation_story_match()
         module_story_match()
+        torch.cuda.empty_cache()
+        explanation_story_match()
+        torch.cuda.empty_cache()
