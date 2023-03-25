@@ -61,9 +61,11 @@ def speech_to_text(speech_fname, timings_fname_prefix):
 
 
 if __name__ == '__main__':
-    for EXPT_NAME in ['huth2016clusters_mar21_i_time_traveled', 'voxels_mar21_hands_arms_emergency']:
+    # for EXPT_NAME in ['huth2016clusters_mar21_i_time_traveled', 'voxels_mar21_hands_arms_emergency']:
+    for EXPT_NAME in [f'uts02_concepts_pilot_selected_mar24_seed={seed}' for seed in [1, 2, 3]]:
         EXPT_DIR = join(RESULTS_DIR, 'stories', EXPT_NAME)
-        text = open(join(EXPT_DIR, 'story.txt'), 'r').read()
+        rows = joblib.load(join(EXPT_DIR, 'rows.pkl'))
+        text = '\n'.join(rows.paragraph.values)
 
         
         # initialize TTS (tacotron2) and Vocoder (HiFIGAN)
@@ -110,7 +112,7 @@ if __name__ == '__main__':
                 timings = [np.mean([word_dict['end'], word_dict['start']]) for word_dict in word_dicts]
                 # assert len(ngram.split()) == len(words), f'{ngram} {str(words)}'
                 # print('words_new', words)
-                print(ngram, timings)
+                # print(ngram, timings)
 
             
                 timing_running.append(timings[1] - timings[0])
@@ -118,7 +120,7 @@ if __name__ == '__main__':
             except:
                 timing_running.append(np.nan)
                 # timing_running2.append(np.nan)
-                print(ngram, timings)
+                # print(ngram, timings)
             
             if i % 20 == 0:
                 # save

@@ -92,8 +92,11 @@ def module_story_match():
 if __name__ == '__main__':
     # EXPT_NAME = 'huth2016clusters_mar21_i_time_traveled'
     # EXPT_NAME = 'voxels_mar21_hands_arms_emergency'
-    for seed in [5, 6, 7, 8]:
-        EXPT_NAME = f'uts02_concepts_pilot_mar22_seed={seed}'
+
+    # for seed in range(1, 11):
+    for seed in range(1, 4):
+        # EXPT_NAME = f'uts02_concepts_pilot_mar22_seed={seed}'
+        EXPT_NAME = f'uts02_concepts_pilot_selected_mar24_seed={seed}'
         EXPT_DIR = join(RESULTS_DIR, 'stories', EXPT_NAME)
         rows = joblib.load(join(EXPT_DIR, 'rows.pkl'))
         expls = rows.expl.values
