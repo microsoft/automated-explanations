@@ -32,9 +32,6 @@ def explanation_story_match():
     val = D5_Validator()
 
     # visualize single story
-    text = '\n'.join(rows.paragraph.values)
-    with open(join(EXPT_DIR, 'story.txt'), 'w') as f:
-        f.write(text)
     scores_data_story = mprompt.viz.get_story_scores(val, expls, paragraphs)
     joblib.dump(scores_data_story, join(EXPT_DIR, 'scores_data_story.pkl'))
     s_data = notebook_helper.viz_paragraphs(

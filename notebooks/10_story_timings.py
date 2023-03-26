@@ -98,15 +98,16 @@ if __name__ == '__main__':
             # Save the waveform
             torchaudio.save(speech_fname, waveforms.squeeze(1), 22050)
 
-            # Transcribe and save
-            result = model.transcribe(speech_fname)
-            result.save_as_json(timings_fname_prefix + '.json')
-            # result.to_srt_vtt(timings_fname_prefix + '.srt')
-
-            # Load and process
-            timings = json.load(open(timings_fname_prefix + '.json', 'r'))
-            # print('words_orig', ngram.split())
             try:
+                # Transcribe and save
+                result = model.transcribe(speech_fname)
+                result.save_as_json(timings_fname_prefix + '.json')
+                # result.to_srt_vtt(timings_fname_prefix + '.srt')
+
+                # Load and process
+                timings = json.load(open(timings_fname_prefix + '.json', 'r'))
+                # print('words_orig', ngram.split())
+
                 word_dicts = timings['segments'][0]['words']
                 words = [word_dict['word'].strip() for word_dict in word_dicts]
                 timings = [np.mean([word_dict['end'], word_dict['start']]) for word_dict in word_dicts]
