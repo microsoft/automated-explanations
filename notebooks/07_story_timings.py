@@ -67,9 +67,14 @@ def speech_to_text(speech_fname, timings_fname_prefix):
 if __name__ == '__main__':
     # for EXPT_NAME in ['huth2016clusters_mar21_i_time_traveled', 'voxels_mar21_hands_arms_emergency']:
     # for EXPT_NAME in [f'uts02_concepts_pilot_selected_mar24_seed={seed}' for seed in [1, 2, 3]]:
-    EXPT_NAMES = [f'uts02_concepts_pilot_selected_mar28___ver={version}___seed={seed}'
-                  for version in ['v4_noun', 'v5_noun']
-                  for seed in [1, 2, 3, 4, 5, 6, 7]]
+    seeds = [1, 2, 3, 4]
+    # seeds = [1, 2, 3, 4, 5, 6, 7]
+    EXPT_NAMES = [
+        # f'uts02_concepts_pilot_selected_mar28___ver={version}___seed={seed}'
+        f'uts02_pilot_gpt4_mar28___ver={version}___seed={seed}'
+            for version in ['v4_noun', 'v5_noun']
+            for seed in seeds
+    ]
     random.shuffle(EXPT_NAMES)
 
     for EXPT_NAME in tqdm(EXPT_NAMES):
