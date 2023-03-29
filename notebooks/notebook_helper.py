@@ -42,6 +42,14 @@ def process_and_add_scores(r: pd.DataFrame, add_bert_scores=False):
 
 def get_prompt_templates(version):
     PROMPTS = {
+        # make story "coherent"
+        'v5_noun': {
+            'prefix_first': 'Write the beginning paragraph of a long, coherent story. The story should be about',
+            'prefix_next': 'Write the next paragraph of the story, staying consistent with the story so far, but now make it about',
+            'suffix': ' "{expl}". Make sure it contains several words related to "{expl}", such as {examples}.',
+        },
+
+
         # make story "interesting"
         'v4_noun': {
             'prefix_first': 'Write the beginning paragraph of an interesting story told in first person. The story should have a plot and characters. The story should be about',
@@ -90,7 +98,7 @@ def get_prompts(expls: List[str], examples_list: List[List[str]], version, n_exa
     # create prompts
     if version in ['v0', 'v1']:
         prompts = [prompt_init.format(expl=expls[0])] + [prompt_continue.format(expl=expl) for expl in expls[1:]]
-    elif version in ['v2', 'v4', 'v4_noun']:
+    elif version in ['v2', 'v4', 'v4_noun', 'v5_noun']:
         prompts = [prompt_init.format(expl=expls[0], examples=examples_list[0])] + \
             [prompt_continue.format(expl=expl, examples=examples) for (expl, examples) in zip(expls[1:], examples_list[1:])] 
     else:

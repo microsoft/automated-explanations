@@ -226,11 +226,6 @@
 334
 ],
 [
-"birthdays",
-"UTS02",
-442
-],
-[
 "time passing",
 "UTS02",
 464
@@ -1221,6 +1216,38 @@
 "repetition",
 "UTS02",
 444
+]
+],
+"manual": [
+[
+"death",
+"UTS02",
+155
+],
+[
+"negativity",
+"UTS02",
+248
+],
+[
+"physical injury or trauma",
+"UTS02",
+339
+],
+[
+"hair and clothing",
+"UTS02",
+154
+],
+[
+"birthdays",
+"UTS02",
+442
+],
+[
+"rejection",
+"UTS02",
+342
 ]
 ]
 }

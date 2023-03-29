@@ -28,6 +28,8 @@ import torch.cuda
 
 
 def explanation_story_match():
+    if os.path.exists(join(EXPT_DIR, 'story_data_match.pdf')):
+        return
     print('Computing expl<>story match', EXPT_NAME)
     val = D5_Validator()
 
@@ -53,6 +55,8 @@ def explanation_story_match():
 
 
 def module_story_match():
+    if os.path.exists(join(EXPT_DIR, f'scores_mod_ngram_length={0}.pkl')):
+        return
     print('Computing module<>story match', EXPT_NAME)
     if not 'module_num' in rows.columns:
         raise ValueError('module_num not in rows.columns!')
@@ -90,17 +94,20 @@ if __name__ == '__main__':
     # EXPT_NAME = 'huth2016clusters_mar21_i_time_traveled'
     # EXPT_NAME = 'voxels_mar21_hands_arms_emergency'
 
-    # for seed in range(1, 11):
-    for seed in range(1, 4):
-        # EXPT_NAME = f'uts02_concepts_pilot_mar22_seed={seed}'
-        EXPT_NAME = f'uts02_concepts_pilot_selected_mar24_seed={seed}'
-        EXPT_DIR = join(RESULTS_DIR, 'stories', EXPT_NAME)
-        rows = joblib.load(join(EXPT_DIR, 'rows.pkl'))
-        expls = rows.expl.values
-        paragraphs = rows.paragraph.values
-        prompts = rows.prompt.values
+    # iterate over seeds
+    for seed in [1, 2, 3, 4, 5, 6, 7]:
+        for version in ['v4_noun', 'v5_noun']:
+            
+            EXPT_NAME = f'uts02_concepts_pilot_selected_mar28___ver={version}___seed={seed}'
+            # EXPT_NAME = f'uts02_concepts_pilot_mar22_seed={seed}'
+            # EXPT_NAME = f'uts02_concepts_pilot_selected_mar24_seed={seed}'
+            EXPT_DIR = join(RESULTS_DIR, 'stories', EXPT_NAME)
+            rows = joblib.load(join(EXPT_DIR, 'rows.pkl'))
+            expls = rows.expl.values
+            paragraphs = rows.paragraph.values
+            prompts = rows.prompt.values
 
-        module_story_match()
-        torch.cuda.empty_cache()
-        explanation_story_match()
-        torch.cuda.empty_cache()
+            module_story_match()
+            torch.cuda.empty_cache()
+            explanation_story_match()
+            torch.cuda.empty_cache()

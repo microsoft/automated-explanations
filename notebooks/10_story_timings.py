@@ -9,7 +9,11 @@ from mprompt.config import RESULTS_DIR
 import json
 import stable_whisper
 import pandas as pd
+import os.path
 import numpy as np
+import fire
+import random
+
 
 def text_to_speech(text, speech_fname):
     # Intialize TTS (tacotron2) and Vocoder (HiFIGAN)
@@ -62,14 +66,25 @@ def speech_to_text(speech_fname, timings_fname_prefix):
 
 if __name__ == '__main__':
     # for EXPT_NAME in ['huth2016clusters_mar21_i_time_traveled', 'voxels_mar21_hands_arms_emergency']:
-    for EXPT_NAME in [f'uts02_concepts_pilot_selected_mar24_seed={seed}' for seed in [1, 2, 3]]:
+    # for EXPT_NAME in [f'uts02_concepts_pilot_selected_mar24_seed={seed}' for seed in [1, 2, 3]]:
+    EXPT_NAMES = [f'uts02_concepts_pilot_selected_mar28___ver={version}___seed={seed}'
+                  for version in ['v4_noun', 'v5_noun']
+                  for seed in [1, 2, 3, 4, 5, 6, 7]]
+    random.shuffle(EXPT_NAMES)
+
+    for EXPT_NAME in tqdm(EXPT_NAMES):
         EXPT_DIR = join(RESULTS_DIR, 'stories', EXPT_NAME)
         rows = joblib.load(join(EXPT_DIR, 'rows.pkl'))
         text = '\n'.join(rows.paragraph.values)
 
+        if os.path.exists(join(EXPT_DIR, 'timings.csv')):
+            print('already cached', EXPT_NAME)
+            continue
+        else:
+            print('running', EXPT_NAME)
         
         # initialize TTS (tacotron2) and Vocoder (HiFIGAN)
-        device = 'cuda'
+        # device = 'cuda'
         tacotron2 = Tacotron2.from_hparams(source="speechbrain/tts-tacotron2-ljspeech", savedir=".tmp/.tmpdir_tts")
         hifi_gan = HIFIGAN.from_hparams(source="speechbrain/tts-hifigan-ljspeech", savedir=".tmp/.tmpdir_vocoder")
 
@@ -93,7 +108,7 @@ if __name__ == '__main__':
             mel_output, mel_length, alignment = tacotron2.encode_text(ngram)
 
             # Running Vocoder (spectrogram-to-waveform)
-            waveforms = hifi_gan.decode_batch(mel_output.to(device))
+            waveforms = hifi_gan.decode_batch(mel_output)
 
             # Save the waveform
             torchaudio.save(speech_fname, waveforms.squeeze(1), 22050)
@@ -123,15 +138,15 @@ if __name__ == '__main__':
                 # timing_running2.append(np.nan)
                 # print(ngram, timings)
             
-            if i % 20 == 0:
-                # save
-                n = len(timing_running)
-                pd.DataFrame.from_dict({
-                    'word': text.split()[:n],
-                    'timing': timing_running[:n], # difference between word2 middle and word1 middle
-                    # 'timing2': timing_running2[:n], # difference between word3 middle and word2 middle (no offsetting needed)
-                    'time_running': np.nancumsum(timing_running)
-                }).to_csv(join(EXPT_DIR, 'timings.csv'), index=False)
+            # if i % 20 == 0:
+            #     # save early
+            #     n = len(timing_running)
+            #     pd.DataFrame.from_dict({
+            #         'word': text.split()[:n],
+            #         'timing': timing_running[:n], # difference between word2 middle and word1 middle
+            #         # 'timing2': timing_running2[:n], # difference between word3 middle and word2 middle (no offsetting needed)
+            #         'time_running': np.nancumsum(timing_running)
+            #     }).to_csv(join(EXPT_DIR, 'timings.csv'), index=False)
 
 
         n = len(timing_running)
