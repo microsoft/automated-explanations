@@ -8,7 +8,7 @@ from imodelsx import submit_utils
 
 # List of values to sweep over (sweeps over all combinations of these)
 params_shared_dict = {
-    'dummy_arg': list(range(50)),
+    'dummy_arg': list(range(10)), # not used
 }
 
 # List of tuples to sweep over (these values are coupled, and swept over together)
@@ -23,9 +23,9 @@ args_list = submit_utils.get_args_list(
 # print('args_list', args_list)
 submit_utils.run_args_list(
     args_list,
-    script_name=join(repo_dir, 'notebooks', '10_story_timings.py'),
-    repeat_failed_jobs=False,
+    script_name=join(repo_dir, 'notebooks', '05_story_generate.py'),
+    repeat_failed_jobs=True,
     # reverse=True,
-    # n_cpus=15,
-    gpu_ids=[0, 1],
+    n_cpus=5,
+    # gpu_ids=[0, 1],
 )
