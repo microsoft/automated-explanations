@@ -18,10 +18,10 @@ import torch
 import numpy.random
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import joblib
-from huth.utils_ds import make_word_ds
 
 modules_dir = dirname(os.path.abspath(__file__))
-SAVE_DIR_FMRI = join(modules_dir, 'fmri')
+from mprompt.config import SAVE_DIR_FMRI
+# SAVE_DIR_FMRI = join(modules_dir, 'fmri')
 NUM_TOP_VOXELS = 500
 
 
@@ -143,6 +143,7 @@ def get_train_story_texts(subject: str = 'UTS01'):
 
     grids = joblib.load(join(SAVE_DIR_FMRI, 'stories', 'grids_all.jbl'))
     trfiles = joblib.load(join(SAVE_DIR_FMRI, 'stories', 'trfiles_all.jbl'))
+    from huth.utils_ds import make_word_ds
     wordseqs = make_word_ds(grids, trfiles)
     texts = [' '.join(wordseqs[story].data) for story in story_names_train]
     return texts
