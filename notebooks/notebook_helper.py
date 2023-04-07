@@ -9,7 +9,7 @@ from mprompt.modules.fmri_module import fMRIModule
 repo_dir = dirname(dirname(os.path.abspath(__file__)))
 import pandas as pd
 import mprompt.data.data
-import mprompt.methods.m4_evaluate as m4_evaluate
+import mprompt.methods.evaluate as evaluate
 import numpy as np
 import imodelsx.util
 from tqdm import tqdm
@@ -23,9 +23,9 @@ def process_and_add_scores(r: pd.DataFrame, add_bert_scores=False):
     r['num_generated_explanations'] = r['explanation_init_strs'].apply(lambda x: len(x))
 
     # recompute recovery metrics
-    r['score_contains_keywords'] = r.apply(lambda row: m4_evaluate.compute_score_contains_keywords(row, row['explanation_init_strs']), axis=1)
+    r['score_contains_keywords'] = r.apply(lambda row: evaluate.compute_score_contains_keywords(row, row['explanation_init_strs']), axis=1)
     if add_bert_scores:
-        r['score_bert'] = r.progress_apply(lambda row: m4_evaluate.compute_score_bert(row, row['explanation_init_strs']), axis=1)
+        r['score_bert'] = r.progress_apply(lambda row: evaluate.compute_score_bert(row, row['explanation_init_strs']), axis=1)
 
     # metrics
     # for met_suff in ['contains_keywords']:

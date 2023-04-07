@@ -16,14 +16,14 @@ import numpy as np
 from typing import List
 tqdm.pandas()
 from mprompt.modules.fmri_module import get_roi
-import mprompt.methods.m4_evaluate as m4_evaluate
+import mprompt.methods.evaluate as evaluate
 from mprompt.config import RESULTS_DIR
 import joblib
 from mprompt.modules.fmri_module import SAVE_DIR_FMRI
 import imodelsx.util
 from mprompt.modules.emb_diff_module import EmbDiffModule
 import scipy.stats
-from mprompt.methods.m4_evaluate import D5_Validator
+from mprompt.methods.evaluate import D5_Validator
 import torch.cuda
 from mprompt.config import CACHE_DIR
 
@@ -105,7 +105,7 @@ if __name__ == '__main__':
     # Calculate train ngram correctness
     print(f'Finding matching ngrams_module...')
     num_top_ngrams_expl = 75
-    correct_ngrams_module_scores, correct_ngrams_module_list = m4_evaluate.calc_frac_correct_score(r, col_ngrams=f'top_ngrams_module_{num_top_ngrams_expl}')    
+    correct_ngrams_module_scores, correct_ngrams_module_list = evaluate.calc_frac_correct_score(r, col_ngrams=f'top_ngrams_module_{num_top_ngrams_expl}')    
     r['top_ngrams_module_correct'] = correct_ngrams_module_list
     r['frac_top_ngrams_module_correct'] = r['top_ngrams_module_correct'].apply(lambda x: len(x) / num_top_ngrams_expl)
     

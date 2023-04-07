@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from typing import List
 import imodelsx.util
 
-from mprompt.methods.m4_evaluate import D5_Validator
+from mprompt.methods.evaluate import D5_Validator
 
 def colorize(words: List[str], color_array: np.ndarray[float],
              char_width_max=60, title: str=None, subtitle: str=None):

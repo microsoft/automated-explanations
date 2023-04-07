@@ -18,7 +18,7 @@ import mprompt.viz
 import scipy.special
 from spacy.tokenizer import Tokenizer
 from spacy.lang.en import English
-from mprompt.methods.m4_evaluate import D5_Validator
+from mprompt.methods.evaluate import D5_Validator
 import openai
 from mprompt.modules.fmri_module import fMRIModule
 from pprint import pprint
