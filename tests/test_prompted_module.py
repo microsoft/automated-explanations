@@ -26,7 +26,7 @@ def plot_mean_preds_matrix(mean_preds_matrix, task_names, save_name):
     plt.savefig(save_name, dpi=300)
     plt.close()
 
-def test_mean_preds_matrix(plot=False):
+def test_mean_preds_matrix(plot=False, assert_checks=False):
     mean_preds_matrix_dict = {}
     checkpoints = ['facebook/opt-iml-30b']
     # checkpoints = ['roberta-large']
@@ -35,7 +35,7 @@ def test_mean_preds_matrix(plot=False):
         mod = EmbDiffModule(checkpoint=checkpoint)
         task_names = list(TASKS_TOY.keys())
         mean_preds_matrix = prompted_module_exp.calculate_mean_preds_matrix_over_tasks(
-            mod, task_names, assert_checks=True,
+            mod, task_names, assert_checks=assert_checks,
         )
         # mean_preds_matrix = normalize(mean_preds_matrix, axis=1, norm='max')
 

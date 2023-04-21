@@ -24,9 +24,9 @@ langchain.llm_cache = InMemoryCache()
 
 def get_llm(checkpoint):
     if checkpoint.startswith('text-da'):
-        return llm_openai()
-    elif checkpoint.startswith('gpt-3'):
-        return llm_openai_chat()
+        return llm_openai(checkpoint)
+    elif checkpoint.startswith('gpt-3') or checkpoint.startswith('gpt-4'):
+        return llm_openai_chat(checkpoint)
     else:
         return llm_hf(checkpoint)
 
@@ -95,6 +95,8 @@ def llm_openai_chat(checkpoint='gpt-3.5-turbo') -> LLM:
             # cache
             os.makedirs(self.cache_dir, exist_ok=True)
             prompts_list_dict = {str(i): sorted(v.items()) for i, v in enumerate(prompts_list)}
+            if not self.checkpoint == 'gpt-3.5-turbo':
+                prompts_list_dict['checkpoint'] = self.checkpoint
             dict_as_str = json.dumps(prompts_list_dict, sort_keys=True)
             hash_str = hashlib.sha256(dict_as_str.encode()).hexdigest()
             cache_file_raw = join(
@@ -210,6 +212,59 @@ def llm_hf(checkpoint='google/flan-t5-xl') -> LLM:
 
     return LLM_HF(checkpoint)
 
+def get_paragraphs(
+    prompts,
+    checkpoint='gpt-4-0314',
+    prefix_first='Write the beginning paragraph of a story about',
+    prefix_next='Write the next paragraph of the story, but now make it about',
+):
+    """
+    Example messages
+    ----------------
+    [
+      {'role': 'system', 'content': 'You are a helpful assistant.'},
+      {'role': 'user', 'content': 'Write the beginning paragraph of a story about "baseball". Make sure it contains several references to "baseball".'},
+      {'role': 'assistant', 'content': 'The crack of the bat echoed through the stadium as the ball soared over the outfield fence. The crowd erupted into cheers, their excitement palpable. It was a beautiful day for baseball, with the sun shining down on the field and the smell of freshly cut grass filling the air. The players on the field were focused and determined, each one ready to give their all for their team. Baseball was more than just a game to them; it was a passion, a way of life. And as they took their positions on the field, they knew that anything was possible in this great game of baseball.'},
+      {'role': 'user', 'content': 'Write the next paragraph of the story, but now make it about "animals". Make sure it contains several references to "animals".'},
+    ]
+    """
+    token_limit = {
+        'gpt-3.5-turbo': 3200,
+        'gpt-4-0314': 30000,
+    }[checkpoint]
+
+    llm = get_llm(checkpoint)
+    response = None
+    messages = [{"role": "system", "content": "You are a helpful assistant."}]
+    all_content = []
+    for i in range(len(prompts)):
+        messages.append({"role": "user", "content": prompts[i]})
+        all_content.append(messages[-1])
+        # for message in messages:
+            # print(message)
+        response = llm(messages)
+
+        if response is not None:
+            response_text = response['choices'][0]['message']['content']
+            messages.append({"role": "assistant", "content": response_text})
+            all_content.append(messages[-1])
+
+        # need to drop beginning of story whenever we approach the tok limit
+        # gpt-3.5.turbo has a limit of 4096, and it cant generate beyond that
+        num_tokens = response['usage']['total_tokens']
+        # print('num_tokens', num_tokens)
+        if num_tokens >= token_limit:
+            # drop the first (assistant, user) pair in messages
+            messages = [messages[0]] + messages[3:]
+
+            # rewrite the original prompt to now say beginning paragraph rather than next paragraph
+            messages[1]['content'] = messages[1]['content'].replace(prefix_next, prefix_first)
+    
+    # extract out paragraphs
+    paragraphs = [d['content'] for d in all_content if d['role'] == 'assistant']
+    paragraphs
+    assert len(paragraphs) == len(prompts)
+    return paragraphs
 
 if __name__ == '__main__':
     llm = get_llm('text-davinci-003')

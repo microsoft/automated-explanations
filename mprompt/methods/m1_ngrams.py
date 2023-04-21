@@ -97,9 +97,10 @@ def explain_ngrams(
         print('after', ngrams_list)
 
     # print(f'{ngram_scores=}')
-    scores_top_idxs = np.argsort(ngram_scores)[::-1]
-    ngrams_top = np.array(ngrams_list)[scores_top_idxs][:num_top_ngrams]
-    return ngrams_top.flatten().tolist()
+    scores_top_idxs = np.argsort(ngram_scores)[::-1][:num_top_ngrams]
+    scores_top = ngram_scores[scores_top_idxs]
+    ngrams_top = np.array(ngrams_list)[scores_top_idxs]
+    return ngrams_top.flatten().tolist(), scores_top.flatten().tolist()
 
 
 if __name__ == '__main__':
