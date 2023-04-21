@@ -156,45 +156,13 @@ if __name__ == '__main__':
                 task_str=task_str,
                 # checkpoint=args.checkpoint_module,
             )
-
-    # load text data
-    text_str_list = mprompt.data.data.get_relevant_data(
-        args.module_name, args.module_num, args.subject)
-
-    # subsample data
-    if args.subsample_frac < 1: # and not args.module_name == 'fmri':
-        assert False, 'dont subsample data right now, since explain_ngrams is using caching'
-        # n_subsample = int(len(text_str_list) * args.subsample_frac)
-
-        # randomly subsample list
-        # text_str_list, size=n_subsample, replace=False).tolist()
-            # text_str_list, size=n_subsample, replace=False).tolist()
-
-    # explain with method
-    explanation_init_ngrams = mprompt.methods.m1_ngrams.explain_ngrams(
-        args=args,
-        X=text_str_list,
-        mod=mod,
-        num_top_ngrams=75,
-    )
-    r['explanation_init_ngrams'] = explanation_init_ngrams
-    logging.info(
-        f'{explanation_init_ngrams[:3]=} {len(explanation_init_ngrams)}')
-
-    # summarize the ngrams into some candidate strings
+    
     llm = mprompt.llm.get_llm(args.checkpoint)
-    explanation_strs, explanation_rationales = mprompt.methods.m2_summarize.summarize_ngrams(
-        args,
-        llm,
-        explanation_init_ngrams,
-        num_summaries=args.num_summaries,
-        num_top_ngrams_to_use=args.num_top_ngrams_to_use,
-        num_top_ngrams_to_consider=args.num_top_ngrams_to_consider,
-        seed=args.seed,
-    )
+
+    # load explanation result
+    explanation_strs, control_data = mprompt.data.data.get_eval_data(
+        factor_layer = args.factor_layer, factor_idx = args.factor_idx)
     r['explanation_init_strs'] = explanation_strs
-    r['explanation_init_rationales'] = explanation_rationales
-    logging.info('explanation_init_strs\n\t' + '\n\t'.join(explanation_strs))
 
     # generate synthetic data
     logging.info('\n\nGenerating synthetic data....')
@@ -214,20 +182,18 @@ if __name__ == '__main__':
             np.mean(mod_responses[:len(strs_added)]) -
             np.mean(mod_responses[len(strs_added):])
         )
+
     logging.info(f'{explanation_strs[0]}\n+++++++++\n\t' + '\n\t'.join(r['strs_added'][0][:3]) +
                  '\n--------\n\t' + '\n\t'.join(r['strs_removed'][0][:3]))
 
-    # sort everything by score
-    sort_inds = np.argsort(r['score_synthetic'])[::-1]
-    for k in ['explanation_init_strs', 'strs_added', 'strs_removed', 'score_synthetic']:
-        r[k] = [r[k][i] for i in sort_inds]
-        r['top_' + k] = r[k][0]
-
-    # evaluate how well explanation matches a "groundtruth"
-    if not (args.module_name == 'fmri' or args.module_name == 'dict_learn_factor'):
-        logging.info('Scoring explanation....')
-        r['score_contains_keywords'] = mprompt.methods.m4_evaluate.compute_score_contains_keywords(args, r['explanation_init_strs'])
+    # evaluate control data (higher score is better)
+    control_strs_added = control_data['strs_added']
+    control_strs_removed = control_data['strs_removed']
+    r['control_strs_added'] = control_strs_added
+    r['control_strs_removed'] = control_strs_removed
+    c_mod_responses = mod(control_strs_added + control_strs_removed)
+    r['control_score_synthetic'] = np.mean(c_mod_responses[:len(control_strs_added)]) - np.mean(c_mod_responses[len(control_strs_added):])
 
     # save results
-    pkl.dump(r, open(join(save_dir_unique, 'results.pkl'), 'wb'))
+    pkl.dump(r, open(join(save_dir_unique, f'eval.pkl'), 'wb'))
     logging.info('Succesfully completed :)\n\n')

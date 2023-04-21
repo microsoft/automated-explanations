@@ -1,9 +1,12 @@
 
 from typing import List
+import numpy as np
 from mprompt.data.d3 import TASKS_D3
 from mprompt.data.toy import TASKS_TOY
 from mprompt.modules.old_fmri_module import SAVE_DIR_FMRI
 from mprompt.modules.fmri_module import get_train_story_texts
+from mprompt.modules.dictionary_module import SAVE_DIR_DICT
+from mprompt.modules.dictionary_module import get_exp_data
 from os.path import join
 import re
 TASKS = {**TASKS_D3, **TASKS_TOY}
@@ -16,9 +19,17 @@ def get_relevant_data(module_name: str, module_num: int, subject: str='UTS03') -
         with open(join(SAVE_DIR_FMRI, 'narrative_stories.txt'), 'r') as f:
             narrative_stories = f.readlines()
         return narrative_stories
+    elif module_name == 'dict_learn_factor':
+        num_instances = 30000
+        sentences = np.load(join(SAVE_DIR_DICT, 'train_sentences.npy')).tolist()[:num_instances]
+        return sentences
     else:
         task_str = get_task_str(module_name, module_num)
         return TASKS[task_str]['gen_func']()
+
+def get_eval_data(factor_idx: int=2, factor_layer: int=4) -> List[str]:
+    # this function is now only used by the dict_learn module
+    return get_exp_data(factor_idx, factor_layer)
 
 def get_groundtruth_keyword(task_name):
     return TASKS[task_name]['target_token'].strip()
@@ -51,9 +62,10 @@ def get_groundtruth_keywords_check_func(task_str):
 
 
 if __name__ == '__main__':
-    task_str = get_task_str('emb_diff_d3', 0)
-    print(task_str)
-    print(get_groundtruth_explanation(task_str))
-    check_func = get_groundtruth_keywords_check_func(task_str)
-    print(check_func('irony'), check_func('apple'))
+    #task_str = get_task_str('emb_diff_d3', 0)
+    #print(task_str)
+    #print(get_groundtruth_explanation(task_str))
+    #check_func = get_groundtruth_keywords_check_func(task_str)
+    #print(check_func('irony'), check_func('apple'))
+    get_relevant_data('dict_learn_factor', 2)
 

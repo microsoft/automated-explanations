@@ -144,3 +144,8 @@ scripts/data/
 **.npz
 mprompt/modules/fmri
 mprompt/modules/old_fmri
+mprompt/modules/dictionary_learning/dictionaries
+mprompt/modules/dictionary_learning/*.json
+mprompt/modules/dictionary_learning/*.jbl
+mprompt/modules/dictionary_learning/*.npy
+imodelsX/
