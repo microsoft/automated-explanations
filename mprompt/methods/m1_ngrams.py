@@ -43,6 +43,9 @@ def explain_ngrams(
     elif args.module_name == 'old_fmri':
         cache_file = join(CACHE_DIR, 'cache_ngrams',
                             f'{args.module_name}.pkl')
+    elif args.module_name == 'dict_learn_factor':
+        cache_file = join(CACHE_DIR, 'cache_ngrams',
+                            f'{args.module_name}_l{args.factor_layer}_i{args.factor_idx}.pkl')
     else:
         cache_file = join(CACHE_DIR, 'cache_ngrams',
                             f'{args.module_name}_{args.module_num}.pkl')
@@ -51,10 +54,13 @@ def explain_ngrams(
     else:
         call_parameters = inspect.signature(mod.__call__).parameters.keys()
         print('predicting all ngrams...')
-        if 'return_all' in call_parameters:
-            ngram_scores = mod(ngrams_list, return_all=True)
+        if args.module_name == 'dict_learn_factor':
+            ngram_scores = mod(ngrams_list, calc_ngram=True)
         else:
-            ngram_scores = mod(ngrams_list)
+            if 'return_all' in call_parameters:
+                ngram_scores = mod(ngrams_list, return_all=True)
+            else:
+                ngram_scores = mod(ngrams_list)
             
         if use_cache:
             os.makedirs(dirname(cache_file), exist_ok=True)
