@@ -1,5 +1,5 @@
-CACHE_DIR = '/home/chansingh/mntv1/mprompt/cache'
+CACHE_DIR = '/accounts/campus/aliyahhsu/m_cache'
 # RESULTS_DIR = '/home/chansingh/mprompt/results/'
-RESULTS_DIR = '/home/chansingh/mntv1/mprompt/'
-REPO_DIR = '/home/chansingh/mprompt/'
+RESULTS_DIR = '/accounts/campus/aliyahhsu/module-prompt/results'
+REPO_DIR = '/accounts/campus/aliyahhsu/module-prompt'
 SAVE_DIR_FMRI = '/home/chansingh/mntv1/fmri/'
