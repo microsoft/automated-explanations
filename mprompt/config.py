@@ -1,4 +1,4 @@
-CACHE_DIR = '/accounts/campus/aliyahhsu/m_cache'
+CACHE_DIR = '/var/tmp/ah_cache'
 # RESULTS_DIR = '/home/chansingh/mprompt/results/'
 RESULTS_DIR = '/accounts/campus/aliyahhsu/module-prompt/results'
 REPO_DIR = '/accounts/campus/aliyahhsu/module-prompt'
