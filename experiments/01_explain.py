@@ -69,6 +69,8 @@ def add_main_args(parser):
                         default=4, help='for dictionary learning module, which layer of factor to use')
     parser.add_argument('--factor_idx', type=int,
                         default=2, help='for dictionary learning module, which index of factor in the layer to use')
+    parser.add_argument('--dl_task', type=str,
+                        default='wiki', help='for dictionary learning module, which task dataset to use')
 
     # algo args
     parser.add_argument('--method_name', type=str, choices=['ngrams', 'gradient'],
@@ -141,7 +143,7 @@ if __name__ == '__main__':
         r['fmri_test_corr'] = mod.corr
     elif args.module_name == 'dict_learn_factor':
         mod = mprompt.modules.dictionary_module.DictionaryModule(
-            layer_idx=args.factor_layer, factor_idx=args.factor_idx)
+            layer_idx=args.factor_layer, factor_idx=args.factor_idx, task=args.dl_task)
     else:
         task_str = mprompt.data.data.get_task_str(
             args.module_name, args.module_num)
@@ -159,7 +161,7 @@ if __name__ == '__main__':
 
     # load text data
     text_str_list = mprompt.data.data.get_relevant_data(
-        args.module_name, args.module_num, args.subject)
+        args.module_name, args.module_num, args.subject, args.dl_task)
 
     # subsample data
     if args.subsample_frac < 1:  # and not args.module_name == 'fmri':

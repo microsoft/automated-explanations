@@ -1,17 +1,16 @@
-
 from typing import List
 import numpy as np
+from datasets import load_dataset
 from mprompt.data.d3 import TASKS_D3
 from mprompt.data.toy import TASKS_TOY
 from mprompt.modules.old_fmri_module import SAVE_DIR_FMRI
 from mprompt.modules.fmri_module import get_train_story_texts
-from mprompt.modules.dictionary_module import SAVE_DIR_DICT
-from mprompt.modules.dictionary_module import get_exp_data
+from mprompt.modules.dictionary_learning.utils import get_exp_data, SAVE_DIR_DICT
 from os.path import join
 import re
 TASKS = {**TASKS_D3, **TASKS_TOY}
 
-def get_relevant_data(module_name: str, module_num: int, subject: str='UTS03') -> List[str]:
+def get_relevant_data(module_name: str, module_num: int, subject: str='UTS03', dl_task: str='wiki') -> List[str]:
     if module_name == 'fmri':
         return get_train_story_texts(subject)
     elif module_name == 'old_fmri':
@@ -21,7 +20,11 @@ def get_relevant_data(module_name: str, module_num: int, subject: str='UTS03') -
         return narrative_stories
     elif module_name == 'dict_learn_factor':
         num_instances = 30000
-        sentences = np.load(join(SAVE_DIR_DICT, 'train_sentences.npy')).tolist()[:num_instances]
+        if dl_task == 'wiki':
+            sentences = np.load(join(SAVE_DIR_DICT, 'train_sentences.npy')).tolist()[:num_instances]
+        else: # dl_task = 'sst2'
+            dataset = load_dataset('glue', 'sst2')
+            sentences = dataset['train']['sentence'][:num_instances]
         return sentences
     else:
         task_str = get_task_str(module_name, module_num)
@@ -67,5 +70,5 @@ if __name__ == '__main__':
     #print(get_groundtruth_explanation(task_str))
     #check_func = get_groundtruth_keywords_check_func(task_str)
     #print(check_func('irony'), check_func('apple'))
-    get_relevant_data('dict_learn_factor', 2)
+    get_relevant_data('dict_learn_factor', 2, dl_task='sst2')
 

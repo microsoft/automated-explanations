@@ -8,17 +8,17 @@ from imodelsx import submit_utils
 
 # List of values to sweep over (sweeps over all combinations of these)
 factor_idx = 15
-factor_layer = 10
+task = 'sst2'
+factor_layer = 3
 params_shared_dict = {
     'seed': [1],
-    'save_dir': [join(repo_dir, 'results', f'dl_l{factor_layer}',f'i{factor_idx}')],
-    # 'save_dir': [join('/home/chansingh/mntv1/mprompt', 'feb12_fmri_sweep_gen_template1')],
-    # 'save_dir': [join(repo_dir, 'results', 'feb12_fmri_sweep_gen_template1')],
+    'save_dir': [join(repo_dir, 'results', f'dl_{task}_l{factor_layer}',f'i{factor_idx}')],
     'use_cache': [1], # pass binary values with 0/1 instead of the ambiguous strings True/False
     'subsample_frac': [1],
     'module_name': ['dict_learn_factor'],
     'factor_layer': [factor_layer],
     'factor_idx': [factor_idx],
+    'dl_task': [task],
     'num_top_ngrams_to_use': [30],
     'num_top_ngrams_to_consider': [50],
     'num_summaries': [2],
@@ -43,5 +43,5 @@ submit_utils.run_args_list(
     # n_cpus=1,
     shuffle=False,
     # reverse=True,
-    repeat_failed_jobs=True,
+    repeat_failed_jobs=False,
 )

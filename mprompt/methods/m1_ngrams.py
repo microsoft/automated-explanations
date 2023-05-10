@@ -45,7 +45,7 @@ def explain_ngrams(
                             f'{args.module_name}.pkl')
     elif args.module_name == 'dict_learn_factor':
         cache_file = join(CACHE_DIR, 'cache_ngrams',
-                            f'{args.module_name}_l{args.factor_layer}_i{args.factor_idx}.pkl')
+                            f'{args.module_name}_{args.dl_task}_l{args.factor_layer}_i{args.factor_idx}.pkl')
     else:
         cache_file = join(CACHE_DIR, 'cache_ngrams',
                             f'{args.module_name}_{args.module_num}.pkl')
