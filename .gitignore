@@ -149,3 +149,5 @@ mprompt/modules/dictionary_learning/*.jbl
 mprompt/modules/dictionary_learning/*.npy
 imodelsX/
 mprompt/config.py
+
+**.julia
