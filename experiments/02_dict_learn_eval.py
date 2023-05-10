@@ -20,7 +20,6 @@ import mprompt.modules.dictionary_module
 import mprompt.methods.m1_ngrams
 import mprompt.methods.m2_summarize
 import mprompt.methods.m3_generate
-import mprompt.methods.m4_evaluate
 import mprompt.data.data
 from mprompt.data.data import TASKS_D3, TASKS_TOY
 from imodelsx import cache_save_utils
@@ -70,6 +69,8 @@ def add_main_args(parser):
                         default=4, help='for dictionary learning module, which layer of factor to use')
     parser.add_argument('--factor_idx', type=int,
                         default=2, help='for dictionary learning module, which index of factor in the layer to use')
+    parser.add_argument('--get_baseline_exp', type=int,
+                        default=0, help='whether to get full baseline exp results')
 
     # algo args
     parser.add_argument('--method_name', type=str, choices=['ngrams'],
@@ -161,8 +162,9 @@ if __name__ == '__main__':
 
     # load explanation result
     explanation_strs, control_data = mprompt.data.data.get_eval_data(
-        factor_layer = args.factor_layer, factor_idx = args.factor_idx)
+        factor_layer = args.factor_layer, factor_idx = args.factor_idx, get_baseline = args.get_baseline_exp)
     r['explanation_init_strs'] = explanation_strs
+    print(explanation_strs)
 
     # generate synthetic data
     logging.info('\n\nGenerating synthetic data....')
@@ -185,14 +187,15 @@ if __name__ == '__main__':
 
     logging.info(f'{explanation_strs[0]}\n+++++++++\n\t' + '\n\t'.join(r['strs_added'][0][:3]) +
                  '\n--------\n\t' + '\n\t'.join(r['strs_removed'][0][:3]))
-
-    # evaluate control data (higher score is better)
-    control_strs_added = control_data['strs_added']
-    control_strs_removed = control_data['strs_removed']
-    r['control_strs_added'] = control_strs_added
-    r['control_strs_removed'] = control_strs_removed
-    c_mod_responses = mod(control_strs_added + control_strs_removed)
-    r['control_score_synthetic'] = np.mean(c_mod_responses[:len(control_strs_added)]) - np.mean(c_mod_responses[len(control_strs_added):])
+    
+    if not args.get_baseline_exp:
+        # evaluate control data (higher score is better)
+        control_strs_added = control_data['strs_added']
+        control_strs_removed = control_data['strs_removed']
+        r['control_strs_added'] = control_strs_added
+        r['control_strs_removed'] = control_strs_removed
+        c_mod_responses = mod(control_strs_added + control_strs_removed)
+        r['control_score_synthetic'] = np.mean(c_mod_responses[:len(control_strs_added)]) - np.mean(c_mod_responses[len(control_strs_added):])
 
     # save results
     pkl.dump(r, open(join(save_dir_unique, f'eval.pkl'), 'wb'))

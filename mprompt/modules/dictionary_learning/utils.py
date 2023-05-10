@@ -2,13 +2,7 @@ import pickle as pkl
 from os.path import dirname, join
 import os.path
 from typing import List
-from spacy.lang.en import English
-import imodelsx
-from datasets import load_dataset
-
-low_level = [(4, 2), (4, 16), (4, 33), (0, 30), (2, 30), (4, 30)]
-mid_level = [(10, 42), (10, 50), (6, 86), (10, 102), (8, 125), (10, 184), (10, 195), (4, 13), (6, 13), (10, 13)]
-high_level = [(10, 297), (10, 322), (10, 386)]
+import json
 
 low_p = ['dl_l4_i2/268f564b66e8a186cd2f9c2876925b1b753c266429fadd81be54e86b997bfe18',
         'dl_l4_i16/3a4b18cdb341ebf9bf2e91228aef3a2f4b21e39032eac673e4929e1fd33d1a1c',
@@ -32,54 +26,50 @@ high_p = ['dl_l10_i297/089863daca700285fb97b75fb4f6380a8332a11a1aa5772804dc982df
         'dl_l10_i322/e02f845df54536abf3499bcc319f59bf693c8b6501136b79f8f742d81a3517e5',
         'dl_l10_i386/330771ba7e87a1bfd0278644d90e5aa27066fad1f90b2ecdaaa21a4cf36661a1']
 
+low_level = [(4, 2), (4, 16), (4, 33), (0, 30), (2, 30),
+             (4, 30), (4, 47)]
+mid_level = [(10, 42), (10, 50), (6, 86), (10, 102), (8, 125),
+             (10, 184), (10, 195), (4, 13), (6, 13), (10, 13),
+             (10, 24), (10, 25), (10, 51), (10, 86), (10, 99),
+             (10, 125), (10, 134), (10, 152), (4, 193), (6, 225)]
+high_level = [(10, 297), (10, 322), (10, 386), (10, 179)]
+
 low_exp = ['mind. Noun. the element of a person that enables them to be aware of the world and their experiences.',
-        'park. Noun. a common first and last name.',
-        'light. Noun. the natural agent that stimulates sight and makes things visible.',
-        'left. Adjective or Verb. Mixed senses.',
-        'left. Verb. leaving, exiting.',
-        'left. Verb. leaving, exiting.']
+           'park. Noun. a common first and last name.',
+           'light. Noun. the natural agent that stimulates sight and makes things visible.',
+           'left. Adjective or Verb. Mixed senses.',
+           'left. Verb. leaving, exiting.',
+           'left. Verb. leaving, exiting.',
+           'plants. Noun. vegetation.']
 
-mid_exp = ['something unfortunate happened.',
-        'Doing something again, or making something new again.',
-        'Consecutive years, used in foodball season naming.',
-        'African names.',
-        'Describing someone in a paraphrasing style. Name, Career.',
-        'Institution with abbreviation.',
-        'Consecutive of noun (Enumerating).',
-        'Numerical values.',
-        'Close Parentheses.',
-        'Unit exchange with parentheses.']
+mid_exp = ['Something unfortunate happened.',
+           'Doing something again, or making something new again.',
+           'Consecutive years, used in foodball season naming.',
+           'African names.',
+           'Describing someone in a paraphrasing style. Name, Career.',
+           'Institution with abbreviation.',
+           'Consecutive of noun (Enumerating).',
+           'Numerical values.',
+           'Close Parentheses.',
+           'Unit exchange with parentheses.',
+           'Male name.',
+           'Attributive Clauses.',
+           'Apostrophe s, possesive.',
+           'Consecutive years, this is convention to name foodball/rugby game season.',
+           'Past tense.',
+           'Describing someone in a para- phrasing style. Name, Career.',
+           'Transition sentence.',
+           'In some locations.',
+           'Time span in years.',
+           'Places in US, followings the convention "city, state".']
 
-high_exp = ['repetitive structure detector.',
-        'biography, someone born in some year...',
-        'war.']
-    
-levels = low_level + mid_level + high_level
+high_exp = ['Repetitive structure detector.',
+            'Biography, someone born in some year...',
+            'War.',
+            'Topic: music production.']
 
 cur_dir = dirname(os.path.abspath(__file__))
 SAVE_DIR_DICT = cur_dir
-
-def save_sst2_unique_ngram_list():
-    num_instances = 30000
-    dataset = load_dataset('glue', 'sst2')
-    X = dataset['train']['sentence'][:num_instances]
-        
-    # get all ngrams
-    tok = English(max_length=10e10)
-    X_str = ' '.join(X)
-    ngrams_list = imodelsx.util.generate_ngrams_list(
-        X_str,
-        ngrams=3,
-        tokenizer_ngrams=tok,
-        all_ngrams=True
-    )
-
-    # get unique ngrams
-    ngrams_list = sorted(list(set(ngrams_list)))
-
-    with open(join(cur_dir, 'sst2_unique_ngram_list.pkl'), 'wb') as fp:
-        pkl.dump(ngrams_list, fp)
-    
     
     
 def batch_up(iterable, batch_size=1):
@@ -128,11 +118,23 @@ def get_exp_data(factor_idx: int, factor_layer: int) -> List[str]:
     assert(exps != None)
 
     return exps, control_strs
-    
+
+def get_baseline_data(factor_idx, factor_layer) -> List[str]:
+    exps = []
+    # load baseline explanations
+    with open(join(cur_dir, 'baseline_exp.json'), 'r') as fp:
+        baseline_exp = json.load(fp)
+    for k, d in baseline_exp.items():
+        if d['factor_idx'] == factor_idx and d['layer'] == factor_layer:
+            exps.append(d['exp'])
+            break
+
+    return exps, {}
 
 def write_baseline_exp():
     r = {}
     exps = low_exp + mid_exp + high_exp
+    levels = low_level + mid_level + high_level
 
     for i, (l, pos) in enumerate(levels):
         r[i] = {}
@@ -148,10 +150,7 @@ def write_baseline_exp():
 if __name__ == '__main__':
     
     # save baseline explanation file to dir
-    #write_baseline_exp()
+    write_baseline_exp()
     #exp, data = get_exp_data(2, 4)
     #save_sst2_unique_ngram_list()
-    with open(join(cur_dir, 'sst2_unique_ngram_list.pkl'), 'rb') as fp:
-        data = pkl.load(fp)
-    print(len(data))
 
