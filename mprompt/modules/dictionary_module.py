@@ -60,7 +60,8 @@ class DictionaryModule():
         -------
         resp: List[float]
         """
-        cache_file = join(CACHE_DIR, 'dl_all_ngrams',f'cache_ngrams_{self.task}_l{self.layer_idx}.jbl')
+        #cache_file = join(CACHE_DIR, 'dl_all_ngrams',f'cache_ngrams_{self.task}_l{self.layer_idx}.jbl')
+        cache_file = join(SAVE_DIR_DICT,f'cache_ngrams_l{self.layer_idx}.jbl')
         
         if calc_ngram and os.path.exists(cache_file):
             ahat_at_layer = joblib.load(cache_file)
@@ -204,7 +205,7 @@ class DictionaryModule():
 
         return resp
         
-    def __call__(self, X: List[str], calc_ngram=False) -> np.ndarray:
+    def __call__(self, X: List[str], calc_ngram=True) -> np.ndarray:
         """
         Returns a scalar continuous response for each element of X
         """

@@ -5,7 +5,7 @@ from mprompt.data.d3 import TASKS_D3
 from mprompt.data.toy import TASKS_TOY
 from mprompt.modules.old_fmri_module import SAVE_DIR_FMRI
 from mprompt.modules.fmri_module import get_train_story_texts
-from mprompt.modules.dictionary_learning.utils import get_exp_data, SAVE_DIR_DICT
+from mprompt.modules.dictionary_learning.utils import get_exp_data, get_baseline_data, SAVE_DIR_DICT
 from os.path import join
 import re
 TASKS = {**TASKS_D3, **TASKS_TOY}
@@ -30,9 +30,12 @@ def get_relevant_data(module_name: str, module_num: int, subject: str='UTS03', d
         task_str = get_task_str(module_name, module_num)
         return TASKS[task_str]['gen_func']()
 
-def get_eval_data(factor_idx: int=2, factor_layer: int=4) -> List[str]:
+def get_eval_data(factor_idx: int=2, factor_layer: int=4, get_baseline=False) -> List[str]:
     # this function is now only used by the dict_learn module
-    return get_exp_data(factor_idx, factor_layer)
+    if get_baseline:
+        return get_baseline_data(factor_idx, factor_layer)
+    else:
+        return get_exp_data(factor_idx, factor_layer)
 
 def get_groundtruth_keyword(task_name):
     return TASKS[task_name]['target_token'].strip()

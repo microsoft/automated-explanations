@@ -16,48 +16,15 @@ from mprompt.config import CACHE_DIR
 
 cur_dir = dirname(os.path.abspath(__file__))
 
-def get_unique_ngram(X_str, tok):
-    # get all ngrams
-    ngrams_list = imodelsx.util.generate_ngrams_list(
-        X_str,
-        ngrams=3,
-        tokenizer_ngrams=tok,
-        all_ngrams=True
-    )
-
-    # get unique ngrams
-    ngrams_list = sorted(list(set(ngrams_list)))
-    
-    return ngrams_list
-
-def load_ngram_coefs():
+def load_sample_coefs():
     coefs = []
+    # the wiki here is indeed sst2
     for i in tqdm(range(13)):
-        p = join(CACHE_DIR, 'dl_all_ngrams', f'cache_ngrams_sst2_l{i}.jbl')
+        p = join(CACHE_DIR, 'dl_all_ngrams', f'cache_ngrams_wiki_l{i}.jbl')
         m = joblib.load(p)
         coefs.append(m)
         print(m.shape)
     return np.array(coefs)
-
-
-def featurize(X, ngram_coefs, ngram_idx_map):
-    feat = []
-    tok = English(max_length=10e10)
-    ngram_size, factor_size = ngram_coefs[0].shape
-    ngram_coefs = np.transpose(ngram_coefs, (1, 0, 2)) #[ngram_size, 13, factor_size]
-    print(ngram_coefs.shape)
-    
-    for sent in X:
-        sent_f = np.zeros((ngram_size, 13, factor_size))
-        sent_ngrams = get_unique_ngram(sent, tok)
-        print(sent)
-        for w in sent_ngrams:
-            print(w, ngram_idx_map[w])
-            sent_f[ngram_idx_map[w], :, :] = ngram_coefs[ngram_idx_map[w], :, :]
-        feat.append(sent_f)
-        break
-    
-    return np.array(feat)
         
         
         
@@ -66,17 +33,10 @@ if __name__ == '__main__':
     
     num_instances = 30000
     dataset = load_dataset('glue', 'sst2')
-    X = dataset['train']['sentence'][:num_instances]
     y = dataset['train']['label'][:num_instances]
     
-    with open(join(cur_dir, 'sst2_unique_ngram_list.pkl'), 'rb') as fp:
-        unique_ngram_list = pkl.load(fp)
-    ngram_idx_map = { w:i for i, w in enumerate(unique_ngram_list)}
-    
-    ngram_coefs = load_ngram_coefs()
+    sample_coefs = load_sample_coefs() #[13, sent_size, 1500]
     print(ngram_coefs.shape)
-    f = featurize(X, ngram_coefs, ngram_idx_map)
-    print(f.shape)
     
     
     params = {
