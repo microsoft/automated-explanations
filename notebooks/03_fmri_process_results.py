@@ -28,7 +28,8 @@ import torch.cuda
 from mprompt.config import CACHE_DIR
 
 def add_expl_preds_and_save(r, fname='results_fmri_full.pkl'):
-    # Calculate match between expl and test resp
+    """Calculate match between expl and test resp
+    """
     dsets = joblib.load(join(SAVE_DIR_FMRI, 'stories', 'running_words.jbl'))
     r['neg_dists_expl_test'] = [[] for _ in range(r.shape[0])]
     r['rankcorr_expl_test'] = np.nan
