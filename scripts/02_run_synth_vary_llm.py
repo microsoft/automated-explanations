@@ -7,7 +7,7 @@ from imodelsx import submit_utils
 params_shared_dict = {
     'checkpoint': ['text-ada-001', 'text-babbage-001', 'text-curie-001', 'text-davinci-003'],
     'seed': [1],
-    'save_dir': [join('/home/chansingh/mntv1/mprompt', 'may10')],
+    'save_dir': [join('/home/chansingh/mprompt/results/', 'may10')],
     'use_cache': [1],
     'subsample_frac': [1],
     'module_name': ['emb_diff_d3'],
@@ -16,7 +16,7 @@ params_shared_dict = {
     'generate_template_num': [1],
     'num_summaries': [5],
     'num_synthetic_strs': [10],
-    'module_num': list(range(54)),
+    'module_num': list(range(54)), # should go all the way to 54
 }
 
 # List of tuples to sweep over (these values are coupled, and swept over together)
@@ -34,7 +34,7 @@ submit_utils.run_args_list(
     script_name=join(repo_dir, 'experiments', '01_explain.py'),
     actually_run=True,
     # gpu_ids=[0],
-    n_cpus=2, # 20
+    n_cpus=5, # 20
     repeat_failed_jobs=True,
-    shuffle=False,
+    shuffle=True,
 )

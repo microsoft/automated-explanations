@@ -21,13 +21,13 @@ import joblib
 
 modules_dir = dirname(os.path.abspath(__file__))
 from mprompt.config import SAVE_DIR_FMRI
+
 # SAVE_DIR_FMRI = join(modules_dir, 'fmri')
 NUM_TOP_VOXELS = 500
 
 
-class fMRIModule():
-
-    def __init__(self, voxel_num_best: int = 0, subject: str = 'UTS01'):
+class fMRIModule:
+    def __init__(self, voxel_num_best: int = 0, subject: str = "UTS01"):
         """
         Params
         ------
@@ -36,14 +36,14 @@ class fMRIModule():
         """
 
         # load opt model & tokenizer
-        self.checkpoint = 'facebook/opt-30b'
+        self.checkpoint = "facebook/opt-30b"
         self.tokenizer = AutoTokenizer.from_pretrained(self.checkpoint)
         self.model = AutoModelForCausalLM.from_pretrained(
-            self.checkpoint, device_map='auto', torch_dtype=torch.float16)
-        
+            self.checkpoint, device_map="auto", torch_dtype=torch.float16
+        )
+
         # load fmri-specific stuff
         self._init_fmri(voxel_num_best, subject)
-
 
     def _init_fmri(self, voxel_num_best: Union[int, List[int]], subject: str):
         self.voxel_num_best = voxel_num_best
@@ -52,26 +52,36 @@ class fMRIModule():
 
         # select voxel index
         voxel_idxs = joblib.load(
-            join(SAVE_DIR_FMRI, 'voxel_lists', f'{subject}_voxel_selectivity.jbl'))
+            join(SAVE_DIR_FMRI, "voxel_lists", f"{subject}_voxel_selectivity.jbl")
+        )
         numpy.random.default_rng(seed=42).shuffle(voxel_idxs)
         voxel_idxs = voxel_idxs[:NUM_TOP_VOXELS]
-        joblib.dump(voxel_idxs, join(SAVE_DIR_FMRI, 'voxel_lists',
-                    f'{subject}_voxel_selectivity_shuffled.jbl'))
+        joblib.dump(
+            voxel_idxs,
+            join(
+                SAVE_DIR_FMRI,
+                "voxel_lists",
+                f"{subject}_voxel_selectivity_shuffled.jbl",
+            ),
+        )
 
         # load weights
-        weights_file = join(SAVE_DIR_FMRI, 'model_weights',
-                            f'wt_{subject}.jbl')
+        weights_file = join(SAVE_DIR_FMRI, "model_weights", f"wt_{subject}.jbl")
         self.weights = joblib.load(weights_file)
-        self.preproc = pkl.load(open(join(SAVE_DIR_FMRI, 'preproc.pkl'), 'rb'))
+        self.preproc = pkl.load(open(join(SAVE_DIR_FMRI, "preproc.pkl"), "rb"))
         self.weights = self.weights[:, voxel_idxs]
 
         # load corr performance
         if isinstance(voxel_num_best, int):
             voxel_idx = voxel_idxs[voxel_num_best]
             corrs = joblib.load(
-                join(SAVE_DIR_FMRI, 'voxel_performances', f'{subject}_voxel_performance.jbl'))
+                join(
+                    SAVE_DIR_FMRI,
+                    "voxel_performances",
+                    f"{subject}_voxel_performance.jbl",
+                )
+            )
             self.corr = corrs[voxel_idx]
-        
 
     def _get_embs(self, X: List[str]):
         """
@@ -84,12 +94,16 @@ class fMRIModule():
         for i in tqdm(range(len(X))):
             text = self.tokenizer.encode(X[i])
             inputs = {}
-            inputs['input_ids'] = torch.tensor([text]).int()
-            inputs['attention_mask'] = torch.ones(inputs['input_ids'].shape)
+            inputs["input_ids"] = torch.tensor([text]).int()
+            inputs["attention_mask"] = torch.ones(inputs["input_ids"].shape)
 
             # Ideally, you would use downsampled features instead of copying features across time delays
-            emb = list(self.model(**inputs, output_hidden_states=True)
-                       [2])[33][0][-1].cpu().detach().numpy()
+            emb = (
+                list(self.model(**inputs, output_hidden_states=True)[2])[33][0][-1]
+                .cpu()
+                .detach()
+                .numpy()
+            )
             embs.append(emb)
         return np.array(embs)
 
@@ -111,56 +125,259 @@ class fMRIModule():
         if return_all:
             return preds_fMRI  # self.weights was already restricted to top voxels
         else:
-            pred_voxel = preds_fMRI[:, np.array(self.voxel_num_best)]  # select voxel (or potentially many voxels)
+            pred_voxel = preds_fMRI[
+                :, np.array(self.voxel_num_best)
+            ]  # select voxel (or potentially many voxels)
             return pred_voxel
 
 
-def get_roi(voxel_num_best: int = 0, roi_type: str = 'anat', subject: str = 'UTS01'):
-    if roi_type == 'anat':
-        rois = joblib.load(join(SAVE_DIR_FMRI, 'voxel_rois',
-                           'voxel_anat_rois', f'{subject}_voxel_anat_rois.jbl'))
-    elif roi_type == 'func':
-        rois = joblib.load(join(SAVE_DIR_FMRI, 'voxel_rois',
-                           'voxel_func_rois', f'{subject}_voxel_func_rois.jbl'))
+def get_roi(voxel_num_best: int = 0, roi_type: str = "anat", subject: str = "UTS01"):
+    if roi_type == "anat":
+        rois = joblib.load(
+            join(
+                SAVE_DIR_FMRI,
+                "voxel_rois",
+                "voxel_anat_rois",
+                f"{subject}_voxel_anat_rois.jbl",
+            )
+        )
+    elif roi_type == "func":
+        rois = joblib.load(
+            join(
+                SAVE_DIR_FMRI,
+                "voxel_rois",
+                "voxel_func_rois",
+                f"{subject}_voxel_func_rois.jbl",
+            )
+        )
     voxel_idxs = joblib.load(
-        join(SAVE_DIR_FMRI, 'voxel_lists', f'{subject}_voxel_selectivity_shuffled.jbl'))
+        join(SAVE_DIR_FMRI, "voxel_lists", f"{subject}_voxel_selectivity_shuffled.jbl")
+    )
     voxel_idx = voxel_idxs[voxel_num_best]
-    return rois.get(str(voxel_idx), '--')
+    return rois.get(str(voxel_idx), "--")
 
 
-def get_train_story_texts(subject: str = 'UTS01'):
+def get_train_story_texts(subject: str = "UTS01"):
     TRAIN_STORIES_01 = [
-        'itsabox', 'odetostepfather', 'inamoment',  'hangtime', 'ifthishaircouldtalk', 'goingthelibertyway', 'golfclubbing', 'thetriangleshirtwaistconnection', 'igrewupinthewestborobaptistchurch', 'tetris', 'becomingindian', 'canplanetearthfeedtenbillionpeoplepart1', 'thetiniestbouquet', 'swimmingwithastronauts', 'lifereimagined', 'forgettingfear', 'stumblinginthedark', 'backsideofthestorm', 'food', 'theclosetthatateeverything', 'notontheusualtour', 'exorcism', 'adventuresinsayingyes', 'thefreedomridersandme', 'cocoonoflove', 'waitingtogo', 'thepostmanalwayscalls', 'googlingstrangersandkentuckybluegrass', 'mayorofthefreaks', 'learninghumanityfromdogs', 'shoppinginchina', 'souls', 'cautioneating', 'comingofageondeathrow', 'breakingupintheageofgoogle', 'gpsformylostidentity', 'eyespy', 'treasureisland', 'thesurprisingthingilearnedsailingsoloaroundtheworld', 'theadvancedbeginner', 'goldiethegoldfish', 'life', 'thumbsup', 'seedpotatoesofleningrad',
-        'theshower', 'adollshouse', 'canplanetearthfeedtenbillionpeoplepart2', 'sloth', 'howtodraw', 'quietfire', 'metsmagic', 'penpal', 'thecurse', 'canadageeseandddp', 'thatthingonmyarm', 'buck', 'wildwomenanddancingqueens', 'againstthewind', 'indianapolis', 'alternateithicatom', 'bluehope', 'kiksuya', 'afatherscover', 'haveyoumethimyet', 'firetestforlove', 'catfishingstrangerstofindmyself', 'christmas1940', 'tildeath', 'lifeanddeathontheoregontrail', 'vixenandtheussr', 'undertheinfluence', 'beneaththemushroomcloud', 'jugglingandjesus', 'superheroesjustforeachother', 'sweetaspie', 'naked', 'singlewomanseekingmanwich', 'avatar', 'whenmothersbullyback', 'myfathershands', 'reachingoutbetweenthebars', 'theinterview', 'stagefright', 'legacy', 'canplanetearthfeedtenbillionpeoplepart3', 'listo', 'gangstersandcookies', 'birthofanation', 'mybackseatviewofagreatromance', 'lawsthatchokecreativity', 'threemonths', 'whyimustspeakoutaboutclimatechange', 'leavingbaghdad']
+        "itsabox",
+        "odetostepfather",
+        "inamoment",
+        "hangtime",
+        "ifthishaircouldtalk",
+        "goingthelibertyway",
+        "golfclubbing",
+        "thetriangleshirtwaistconnection",
+        "igrewupinthewestborobaptistchurch",
+        "tetris",
+        "becomingindian",
+        "canplanetearthfeedtenbillionpeoplepart1",
+        "thetiniestbouquet",
+        "swimmingwithastronauts",
+        "lifereimagined",
+        "forgettingfear",
+        "stumblinginthedark",
+        "backsideofthestorm",
+        "food",
+        "theclosetthatateeverything",
+        "notontheusualtour",
+        "exorcism",
+        "adventuresinsayingyes",
+        "thefreedomridersandme",
+        "cocoonoflove",
+        "waitingtogo",
+        "thepostmanalwayscalls",
+        "googlingstrangersandkentuckybluegrass",
+        "mayorofthefreaks",
+        "learninghumanityfromdogs",
+        "shoppinginchina",
+        "souls",
+        "cautioneating",
+        "comingofageondeathrow",
+        "breakingupintheageofgoogle",
+        "gpsformylostidentity",
+        "eyespy",
+        "treasureisland",
+        "thesurprisingthingilearnedsailingsoloaroundtheworld",
+        "theadvancedbeginner",
+        "goldiethegoldfish",
+        "life",
+        "thumbsup",
+        "seedpotatoesofleningrad",
+        "theshower",
+        "adollshouse",
+        "canplanetearthfeedtenbillionpeoplepart2",
+        "sloth",
+        "howtodraw",
+        "quietfire",
+        "metsmagic",
+        "penpal",
+        "thecurse",
+        "canadageeseandddp",
+        "thatthingonmyarm",
+        "buck",
+        "wildwomenanddancingqueens",
+        "againstthewind",
+        "indianapolis",
+        "alternateithicatom",
+        "bluehope",
+        "kiksuya",
+        "afatherscover",
+        "haveyoumethimyet",
+        "firetestforlove",
+        "catfishingstrangerstofindmyself",
+        "christmas1940",
+        "tildeath",
+        "lifeanddeathontheoregontrail",
+        "vixenandtheussr",
+        "undertheinfluence",
+        "beneaththemushroomcloud",
+        "jugglingandjesus",
+        "superheroesjustforeachother",
+        "sweetaspie",
+        "naked",
+        "singlewomanseekingmanwich",
+        "avatar",
+        "whenmothersbullyback",
+        "myfathershands",
+        "reachingoutbetweenthebars",
+        "theinterview",
+        "stagefright",
+        "legacy",
+        "canplanetearthfeedtenbillionpeoplepart3",
+        "listo",
+        "gangstersandcookies",
+        "birthofanation",
+        "mybackseatviewofagreatromance",
+        "lawsthatchokecreativity",
+        "threemonths",
+        "whyimustspeakoutaboutclimatechange",
+        "leavingbaghdad",
+    ]
     TRAIN_STORIES_02_03 = [
-        'itsabox', 'odetostepfather', 'inamoment', 'afearstrippedbare', 'findingmyownrescuer', 'hangtime', 'ifthishaircouldtalk', 'goingthelibertyway', 'golfclubbing', 'thetriangleshirtwaistconnection', 'igrewupinthewestborobaptistchurch', 'tetris', 'becomingindian', 'canplanetearthfeedtenbillionpeoplepart1', 'thetiniestbouquet', 'swimmingwithastronauts', 'lifereimagined', 'forgettingfear', 'stumblinginthedark', 'backsideofthestorm', 'food', 'theclosetthatateeverything', 'escapingfromadirediagnosis', 'notontheusualtour', 'exorcism', 'adventuresinsayingyes', 'thefreedomridersandme', 'cocoonoflove', 'waitingtogo', 'thepostmanalwayscalls', 'googlingstrangersandkentuckybluegrass', 'mayorofthefreaks', 'learninghumanityfromdogs', 'shoppinginchina', 'souls', 'cautioneating', 'comingofageondeathrow', 'breakingupintheageofgoogle', 'gpsformylostidentity', 'marryamanwholoveshismother', 'eyespy', 'treasureisland', 'thesurprisingthingilearnedsailingsoloaroundtheworld', 'theadvancedbeginner', 'goldiethegoldfish',
-        'life', 'thumbsup', 'seedpotatoesofleningrad', 'theshower', 'adollshouse', 'canplanetearthfeedtenbillionpeoplepart2', 'sloth', 'howtodraw', 'quietfire', 'metsmagic', 'penpal', 'thecurse', 'canadageeseandddp', 'thatthingonmyarm', 'buck', 'thesecrettomarriage', 'wildwomenanddancingqueens', 'againstthewind', 'indianapolis', 'alternateithicatom', 'bluehope', 'kiksuya', 'afatherscover', 'haveyoumethimyet', 'firetestforlove', 'catfishingstrangerstofindmyself', 'christmas1940', 'tildeath', 'lifeanddeathontheoregontrail', 'vixenandtheussr', 'undertheinfluence', 'beneaththemushroomcloud', 'jugglingandjesus', 'superheroesjustforeachother', 'sweetaspie', 'naked', 'singlewomanseekingmanwich', 'avatar', 'whenmothersbullyback', 'myfathershands', 'reachingoutbetweenthebars', 'theinterview', 'stagefright', 'legacy', 'canplanetearthfeedtenbillionpeoplepart3', 'listo', 'gangstersandcookies', 'birthofanation', 'mybackseatviewofagreatromance', 'lawsthatchokecreativity', 'threemonths', 'whyimustspeakoutaboutclimatechange', 'leavingbaghdad']
+        "itsabox",
+        "odetostepfather",
+        "inamoment",
+        "afearstrippedbare",
+        "findingmyownrescuer",
+        "hangtime",
+        "ifthishaircouldtalk",
+        "goingthelibertyway",
+        "golfclubbing",
+        "thetriangleshirtwaistconnection",
+        "igrewupinthewestborobaptistchurch",
+        "tetris",
+        "becomingindian",
+        "canplanetearthfeedtenbillionpeoplepart1",
+        "thetiniestbouquet",
+        "swimmingwithastronauts",
+        "lifereimagined",
+        "forgettingfear",
+        "stumblinginthedark",
+        "backsideofthestorm",
+        "food",
+        "theclosetthatateeverything",
+        "escapingfromadirediagnosis",
+        "notontheusualtour",
+        "exorcism",
+        "adventuresinsayingyes",
+        "thefreedomridersandme",
+        "cocoonoflove",
+        "waitingtogo",
+        "thepostmanalwayscalls",
+        "googlingstrangersandkentuckybluegrass",
+        "mayorofthefreaks",
+        "learninghumanityfromdogs",
+        "shoppinginchina",
+        "souls",
+        "cautioneating",
+        "comingofageondeathrow",
+        "breakingupintheageofgoogle",
+        "gpsformylostidentity",
+        "marryamanwholoveshismother",
+        "eyespy",
+        "treasureisland",
+        "thesurprisingthingilearnedsailingsoloaroundtheworld",
+        "theadvancedbeginner",
+        "goldiethegoldfish",
+        "life",
+        "thumbsup",
+        "seedpotatoesofleningrad",
+        "theshower",
+        "adollshouse",
+        "canplanetearthfeedtenbillionpeoplepart2",
+        "sloth",
+        "howtodraw",
+        "quietfire",
+        "metsmagic",
+        "penpal",
+        "thecurse",
+        "canadageeseandddp",
+        "thatthingonmyarm",
+        "buck",
+        "thesecrettomarriage",
+        "wildwomenanddancingqueens",
+        "againstthewind",
+        "indianapolis",
+        "alternateithicatom",
+        "bluehope",
+        "kiksuya",
+        "afatherscover",
+        "haveyoumethimyet",
+        "firetestforlove",
+        "catfishingstrangerstofindmyself",
+        "christmas1940",
+        "tildeath",
+        "lifeanddeathontheoregontrail",
+        "vixenandtheussr",
+        "undertheinfluence",
+        "beneaththemushroomcloud",
+        "jugglingandjesus",
+        "superheroesjustforeachother",
+        "sweetaspie",
+        "naked",
+        "singlewomanseekingmanwich",
+        "avatar",
+        "whenmothersbullyback",
+        "myfathershands",
+        "reachingoutbetweenthebars",
+        "theinterview",
+        "stagefright",
+        "legacy",
+        "canplanetearthfeedtenbillionpeoplepart3",
+        "listo",
+        "gangstersandcookies",
+        "birthofanation",
+        "mybackseatviewofagreatromance",
+        "lawsthatchokecreativity",
+        "threemonths",
+        "whyimustspeakoutaboutclimatechange",
+        "leavingbaghdad",
+    ]
     story_names_train = {
-        'UTS01': TRAIN_STORIES_01,
-        'UTS02': TRAIN_STORIES_02_03,
-        'UTS03': TRAIN_STORIES_02_03,
+        "UTS01": TRAIN_STORIES_01,
+        "UTS02": TRAIN_STORIES_02_03,
+        "UTS03": TRAIN_STORIES_02_03,
     }[subject]
 
-    grids = joblib.load(join(SAVE_DIR_FMRI, 'stories', 'grids_all.jbl'))
-    trfiles = joblib.load(join(SAVE_DIR_FMRI, 'stories', 'trfiles_all.jbl'))
+    grids = joblib.load(join(SAVE_DIR_FMRI, "stories", "grids_all.jbl"))
+    trfiles = joblib.load(join(SAVE_DIR_FMRI, "stories", "trfiles_all.jbl"))
     from huth.utils_ds import make_word_ds
+
     wordseqs = make_word_ds(grids, trfiles)
-    texts = [' '.join(wordseqs[story].data) for story in story_names_train]
+    texts = [" ".join(wordseqs[story].data) for story in story_names_train]
     return texts
 
 
 def cache_test_data():
-    '''Format the test data as a supervised task (text, resp) using 4 delays
-    '''
-    TEST_STORIES = ['wheretheressmoke',
-                    'onapproachtopluto', 'fromboyhoodtofatherhood']
+    """Format the test data as a supervised task (text, resp) using 4 delays"""
+    TEST_STORIES = ["wheretheressmoke", "onapproachtopluto", "fromboyhoodtofatherhood"]
     out = defaultdict(dict)
-    for subject in tqdm(['UTS01', 'UTS02', 'UTS03']):
-        voxel_idxs = joblib.load(join(
-            SAVE_DIR_FMRI, 'voxel_lists', f'{subject}_voxel_selectivity.jbl'))[:NUM_TOP_VOXELS]
-        grids = joblib.load(join(SAVE_DIR_FMRI, 'stories', 'grids_all.jbl'))
-        trfiles = joblib.load(
-            join(SAVE_DIR_FMRI, 'stories', 'trfiles_all.jbl'))
+    for subject in tqdm(["UTS01", "UTS02", "UTS03"]):
+        voxel_idxs = joblib.load(
+            join(SAVE_DIR_FMRI, "voxel_lists", f"{subject}_voxel_selectivity.jbl")
+        )[:NUM_TOP_VOXELS]
+        grids = joblib.load(join(SAVE_DIR_FMRI, "stories", "grids_all.jbl"))
+        trfiles = joblib.load(join(SAVE_DIR_FMRI, "stories", "trfiles_all.jbl"))
         wordseqs = make_word_ds(grids, trfiles)
 
         # loop over stories
@@ -177,38 +394,40 @@ def cache_test_data():
                 tr_time_max = tr_times[max(0, i - 1)]
                 tr_time_min = tr_times[max(0, i - num_delays)]
                 valid_times = (tr_time_min <= wordseq.data_times) & (
-                    wordseq.data_times <= tr_time_max)
-                running_words[k].append(' '.join(words[valid_times]))
+                    wordseq.data_times <= tr_time_max
+                )
+                running_words[k].append(" ".join(words[valid_times]))
 
         # get resp
         # these are already normalized
-        resp = joblib.load(join(SAVE_DIR_FMRI, 'responses',
-                           f'{subject}_responses.jbl'))
-        resp = {k: resp[k][:, voxel_idxs]
-                for k in TEST_STORIES}  # narrow down the stories/voxels
+        resp = joblib.load(join(SAVE_DIR_FMRI, "responses", f"{subject}_responses.jbl"))
+        resp = {
+            k: resp[k][:, voxel_idxs] for k in TEST_STORIES
+        }  # narrow down the stories/voxels
 
-        out[subject]['words'] = sum(list(running_words.values()), [])
-        out[subject]['resp'] = np.concatenate(list(resp.values()))
-        assert len(out[subject]['words']) == out[subject]['resp'].shape[0]
-    joblib.dump(out, join(SAVE_DIR_FMRI, 'stories', 'running_words.jbl'))
+        out[subject]["words"] = sum(list(running_words.values()), [])
+        out[subject]["resp"] = np.concatenate(list(resp.values()))
+        assert len(out[subject]["words"]) == out[subject]["resp"].shape[0]
+    joblib.dump(out, join(SAVE_DIR_FMRI, "stories", "running_words.jbl"))
 
 
 def cache_preprocessor():
     embs_dict = joblib.load(
-        join(SAVE_DIR_FMRI, 'stimulus_features', 'OPT_features.jbl'))
+        join(SAVE_DIR_FMRI, "stimulus_features", "OPT_features.jbl")
+    )
     embs = np.concatenate([embs_dict[k] for k in embs_dict])
     preproc = sklearn.preprocessing.StandardScaler()
     preproc.fit(embs)
-    pkl.dump(preproc, open(join(SAVE_DIR_FMRI, 'preproc.pkl'), 'wb'))
+    pkl.dump(preproc, open(join(SAVE_DIR_FMRI, "preproc.pkl"), "wb"))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # cache_preprocessor()
     # cache_test_data()
     # story_text = get_train_story_texts()
 
     mod = fMRIModule(voxel_num_best=[1, 2, 3])
-    X = ['I am happy', 'I am sad', 'I am angry']
+    X = ["I am happy", "I am sad", "I am angry"]
     # print(X[0][:50])
     resp = mod(X[:3])
     print(resp.shape)
