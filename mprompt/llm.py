@@ -18,12 +18,11 @@ import hashlib
 import torch
 from mprompt.config import CACHE_DIR
 # repo_dir = join(dirname(dirname(__file__)))
-
-langchain.llm_cache = InMemoryCache()
+# langchain.llm_cache = InMemoryCache()
 
 
 def get_llm(checkpoint):
-    if checkpoint.startswith('text-da'):
+    if checkpoint.startswith('text-da') or '-00' in checkpoint:
         return llm_openai(checkpoint)
     elif checkpoint.startswith('gpt-3') or checkpoint.startswith('gpt-4'):
         return llm_openai_chat(checkpoint)
@@ -35,7 +34,7 @@ def get_llm(checkpoint):
 def llm_openai(checkpoint='text-davinci-003') -> LLM:
     class LLM_OpenAI():
         def __init__(self, checkpoint,
-                     cache_dir=join(CACHE_DIR, 'cache_openai')):
+                     cache_dir=join(CACHE_DIR, checkpoint)):
             self.checkpoint = checkpoint
             self.cache_dir = cache_dir
 
@@ -75,7 +74,7 @@ def llm_openai_chat(checkpoint='gpt-3.5-turbo') -> LLM:
         '''Chat models take a different format: https://platform.openai.com/docs/guides/chat/introduction
         '''
         def __init__(self, checkpoint,
-                     cache_dir=join(CACHE_DIR, 'cache_openai')):
+                     cache_dir=join(CACHE_DIR, checkpoint)):
             self.checkpoint = checkpoint
             self.cache_dir = cache_dir
 
@@ -267,6 +266,8 @@ def get_paragraphs(
     return paragraphs
 
 if __name__ == '__main__':
-    llm = get_llm('text-davinci-003')
-    text = llm('What do these have in common? Horse, ')
+    # llm = get_llm('text-davinci-003')
+    # llm = get_llm('text-curie-001')
+    llm = get_llm('text-ada-001')
+    text = llm('Question: What do these have in common? Horse, cat, dog. Answer:')
     print('text', text)
