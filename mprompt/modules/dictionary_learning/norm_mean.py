@@ -29,27 +29,6 @@ def get_mean(store_dir):
         
     return data
 
-def get_std(store_dir):
-    std_file = join(SAVE_DIR_DICT, 'wiki_ngram_std.pkl')
-    
-    if not os.path.exists(std_file):
-        ngram_dir = join(CACHE_DIR, store_dir)
-        std_lst = [] #[layer_size, 1500]
-        for layer in tqdm(range(13)):
-            p = join(ngram_dir, f'cache_ngrams_l{layer}.jbl')
-            m = joblib.load(p) #[ngram_size, 1500]
-            std_m = np.std(m, axis=0) #[1500]
-            print(std_m.shape)
-            std_lst.append(std_m)
-            
-        with open(std_file, 'wb') as fp:
-            pickle.dump(std_lst, fp)
-    
-    with open(std_file, 'rb') as fp:
-        data = pickle.load(fp)
-        
-    return data
-
 def get_syn_score(result_dir):
     unique_p = [['null' for _ in range(1500)] for _ in range(13)]
     scores = [[0 for _ in range(1500)] for _ in range(13)]
