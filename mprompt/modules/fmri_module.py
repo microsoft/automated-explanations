@@ -378,6 +378,7 @@ def cache_test_data():
         )[:NUM_TOP_VOXELS]
         grids = joblib.load(join(SAVE_DIR_FMRI, "stories", "grids_all.jbl"))
         trfiles = joblib.load(join(SAVE_DIR_FMRI, "stories", "trfiles_all.jbl"))
+        from huth.utils_ds import make_word_ds
         wordseqs = make_word_ds(grids, trfiles)
 
         # loop over stories
@@ -423,13 +424,13 @@ def cache_preprocessor():
 
 if __name__ == "__main__":
     # cache_preprocessor()
-    # cache_test_data()
+    cache_test_data()
     # story_text = get_train_story_texts()
 
-    mod = fMRIModule(voxel_num_best=[1, 2, 3])
-    X = ["I am happy", "I am sad", "I am angry"]
-    # print(X[0][:50])
-    resp = mod(X[:3])
-    print(resp.shape)
-    print(resp)
-    # print(mod.corrs[:20])
+    # mod = fMRIModule(voxel_num_best=[1, 2, 3])
+    # X = ["I am happy", "I am sad", "I am angry"]
+    # # print(X[0][:50])
+    # resp = mod(X[:3])
+    # print(resp.shape)
+    # print(resp)
+    # # print(mod.corrs[:20])

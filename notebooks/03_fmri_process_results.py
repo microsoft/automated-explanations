@@ -102,6 +102,7 @@ if __name__ == "__main__":
     # results_dir = '/home/chansingh/mntv1/mprompt/mar9/'
     results_dir = "/home/chansingh/mntv1/mprompt/mar13/"
 
+    '''
     r = imodelsx.process_results.get_results_df(results_dir, use_cached=False)
     print(f"Loaded {r.shape[0]} results")
     for num in [25, 50, 75, 100]:
@@ -138,15 +139,6 @@ if __name__ == "__main__":
         lambda x: len(x) / num_top_ngrams_expl
     )
 
-    # Save results
-    r.to_pickle(join(RESULTS_DIR, "results_fmri.pkl"))
-
-    # Add explanation<>test response match
-    torch.cuda.empty_cache()
-    print("Saved original results, now computing expl<>resp match...")
-    r = add_expl_preds(r)
-    r.to_pickle(join(RESULTS_DIR, "results_fmri_full.pkl"))
-
     # Add score normalized by std over ngrams
     scores_std = {}
     for subject in ["UTS01", "UTS02", "UTS03"]:
@@ -159,6 +151,17 @@ if __name__ == "__main__":
         lambda x: scores_std[x["subject"]][x["module_num"]], axis=1
     )
     r["top_score_normalized"] = r["top_score_synthetic"] / r["top_score_std"]
+
+    # Save results
+    r.to_pickle(join(RESULTS_DIR, "results_fmri.pkl"))
+    '''
+
+
+    # Add explanation<>test response match
+    r = pd.read_pickle(join(RESULTS_DIR, "results_fmri.pkl"))
+    torch.cuda.empty_cache()
+    print("Saved original results, now computing expl<>resp match...")
+    r = add_expl_preds(r)
     r.to_pickle(join(RESULTS_DIR, "results_fmri_full.pkl"))
 
     # Unnecessary metrics
