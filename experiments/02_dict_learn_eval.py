@@ -22,6 +22,7 @@ import mprompt.methods.m2_summarize
 import mprompt.methods.m3_generate
 import mprompt.data.data
 from mprompt.data.data import TASKS_D3, TASKS_TOY
+from mprompt.modules.dictionary_learning.norm_std import get_std
 from imodelsx import cache_save_utils
 
 
@@ -164,7 +165,9 @@ if __name__ == '__main__':
     explanation_strs, control_data = mprompt.data.data.get_eval_data(
         factor_layer = args.factor_layer, factor_idx = args.factor_idx, get_baseline = args.get_baseline_exp)
     r['explanation_init_strs'] = explanation_strs
-    print(explanation_strs)
+
+    std_lst = np.array(get_std(''))
+    std = std_lst[args.factor_layer][args.factor_idx]
 
     # generate synthetic data
     logging.info('\n\nGenerating synthetic data....')
@@ -183,6 +186,10 @@ if __name__ == '__main__':
         r['score_synthetic'].append(
             np.mean(mod_responses[:len(strs_added)]) -
             np.mean(mod_responses[len(strs_added):])
+        )
+        
+        r['score_synthetic_std'].append(
+            r['score_synthetic'] / std
         )
 
     logging.info(f'{explanation_strs[0]}\n+++++++++\n\t' + '\n\t'.join(r['strs_added'][0][:3]) +

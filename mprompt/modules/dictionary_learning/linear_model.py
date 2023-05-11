@@ -20,10 +20,10 @@ def load_sample_coefs():
     coefs = []
     # the wiki here is indeed sst2
     for i in tqdm(range(13)):
-        p = join(CACHE_DIR, 'dl_all_ngrams', f'cache_ngrams_wiki_l{i}.jbl')
+        p = join(CACHE_DIR, 'dl_sst2', f'cache_sst2_l{i}.jbl')
         m = joblib.load(p)
         coefs.append(m)
-        print(m.shape)
+        print(m)
     return np.array(coefs)
         
         
@@ -35,10 +35,10 @@ if __name__ == '__main__':
     dataset = load_dataset('glue', 'sst2')
     y = dataset['train']['label'][:num_instances]
     
-    sample_coefs = load_sample_coefs() #[13, sent_size, 1500]
-    print(ngram_coefs.shape)
+    sample_coefs = load_sample_coefs() #[13, 67349(sst2_train_set_size), 1500]
+    print(sample_coefs.shape)
     
-    
+    '''
     params = {
     "alpha" : [0.0001, 0.001, 0.01, 0.1],
     }
@@ -54,6 +54,7 @@ if __name__ == '__main__':
     clf.fit(f, y)
     print(clf.best_score_)
     print(clf.best_estimator_)
+    '''
     
     
     

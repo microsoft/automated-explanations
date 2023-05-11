@@ -9,26 +9,6 @@ from tqdm import tqdm
 cur_dir = dirname(os.path.abspath(__file__))
 SAVE_DIR_DICT = cur_dir
 
-def get_mean(store_dir):
-    mean_file = join(SAVE_DIR_DICT, 'wiki_ngram_mean.pkl')
-    
-    if not os.path.exists(mean_file):
-        ngram_dir = join(CACHE_DIR, store_dir)
-        mean_lst = [] #[layer_size, 1500]
-        for layer in tqdm(range(13)):
-            p = join(ngram_dir, f'cache_ngrams_l{layer}.jbl')
-            m = joblib.load(p) #[ngram_size, 1500]
-            mean_m = np.mean(m, axis=0) #[1500]
-            mean_lst.append(mean_m)
-            
-        with open(mean_file, 'wb') as fp:
-            pickle.dump(mean_lst, fp)
-    
-    with open(mean_file, 'rb') as fp:
-        data = pickle.load(fp)
-        
-    return data
-
 def get_std(store_dir):
     std_file = join(SAVE_DIR_DICT, 'wiki_ngram_std.pkl')
     

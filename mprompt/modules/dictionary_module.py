@@ -205,7 +205,7 @@ class DictionaryModule():
 
         return resp
         
-    def __call__(self, X: List[str], calc_ngram=True) -> np.ndarray:
+    def __call__(self, X: List[str], calc_ngram=False) -> np.ndarray:
         """
         Returns a scalar continuous response for each element of X
         """
