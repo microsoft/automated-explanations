@@ -2,6 +2,7 @@ from os.path import dirname, join
 import os.path
 repo_dir = dirname(dirname(os.path.abspath(__file__)))
 from imodelsx import submit_utils
+from copy import deepcopy
 
 # Showcasing different ways to sweep over arguments
 # Can pass any empty dict for any of these to avoid sweeping
@@ -14,12 +15,12 @@ mid_level = [(10, 42), (10, 50), (6, 86), (10, 102), (8, 125),
              (10, 125), (10, 134), (10, 152), (4, 193), (6, 225)]
 high_level = [(10, 297), (10, 322), (10, 386), (10, 179)]
 levels = low_level + mid_level + high_level
-
+args_list_list = []
 for factor_layer, factor_idx in levels:
     # List of values to sweep over (sweeps over all combinations of these)
     params_shared_dict = {
         'seed': [1],
-        'save_dir': [join(repo_dir, 'results', f'b_l{factor_layer}_i{factor_idx}')],
+        'save_dir': [join(repo_dir, 'results', 'bert', 'human_eval', f'b_l{factor_layer}_i{factor_idx}')],
         'use_cache': [1], # pass binary values with 0/1 instead of the ambiguous strings True/False
         'get_baseline_exp': [1],
         'subsample_frac': [1],
@@ -41,14 +42,15 @@ for factor_layer, factor_idx in levels:
         params_shared_dict=params_shared_dict,
         params_coupled_dict=params_coupled_dict,
     )
-    # print('args_list', args_list)
-    submit_utils.run_args_list(
-        args_list,
-        script_name=join(repo_dir, 'experiments', '02_dict_learn_eval.py'),
-        actually_run=True,
-        # gpu_ids=[0, 1],
-        # n_cpus=1,
-        shuffle=False,
-        # reverse=True,
-        repeat_failed_jobs=False,
-    )
+    args_list_list.append(deepcopy(args_list))
+# print('args_list', args_list)
+submit_utils.run_args_list(
+    sum(args_list_list, []),
+    script_name=join(repo_dir, 'experiments', '02_dict_learn_eval.py'),
+    actually_run=True,
+    # gpu_ids=[0, 1],
+    # n_cpus=1,
+    shuffle=False,
+    # reverse=True,
+    repeat_failed_jobs=False,
+)
