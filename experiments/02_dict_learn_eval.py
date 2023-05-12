@@ -11,7 +11,7 @@ from sklearn.model_selection import train_test_split
 import pickle as pkl
 import imodelsx
 import torch
-import mprompt.llm
+import mprompt.methods.llm
 import mprompt.modules.old_fmri_module
 import mprompt.modules.fmri_module
 import mprompt.modules.prompted_module
@@ -159,7 +159,7 @@ if __name__ == '__main__':
                 # checkpoint=args.checkpoint_module,
             )
     
-    llm = mprompt.llm.get_llm(args.checkpoint)
+    llm = mprompt.methods.llm.get_llm(args.checkpoint)
 
     # load explanation result
     explanation_strs, control_data = mprompt.data.data.get_eval_data(

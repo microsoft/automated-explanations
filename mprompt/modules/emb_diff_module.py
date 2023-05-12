@@ -15,7 +15,6 @@ from tqdm import trange
 import os.path
 import torch
 import re
-import mprompt.llm
 import scipy.spatial.distance
 import mprompt.data.data
 from typing import Union

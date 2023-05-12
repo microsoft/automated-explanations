@@ -12,7 +12,7 @@ import pickle as pkl
 from os.path import dirname, join
 import os.path
 import re
-import mprompt.llm
+import imodelsx.mprompt.llm
 from langchain import PromptTemplate
 from mprompt.data.data import TASKS
 modules_dir = dirname(os.path.abspath(__file__))

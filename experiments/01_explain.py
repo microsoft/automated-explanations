@@ -11,15 +11,15 @@ from sklearn.model_selection import train_test_split
 import pickle as pkl
 import imodelsx
 import torch
-import mprompt.llm
 import mprompt.modules.old_fmri_module
 import mprompt.modules.fmri_module
 import mprompt.modules.prompted_module
 import mprompt.modules.emb_diff_module
 import mprompt.modules.dictionary_module
-import mprompt.methods.m1_ngrams
-import mprompt.methods.m2_summarize
-import mprompt.methods.m3_generate
+import imodelsx.mprompt.llm
+import imodelsx.mprompt.m1_ngrams
+import imodelsx.mprompt.m2_summarize
+import imodelsx.mprompt.m3_generate
 import mprompt.evaluate
 import mprompt.data.data
 from mprompt.config import CACHE_DIR
@@ -190,7 +190,7 @@ if __name__ == '__main__':
     # explain with method
     if args.method_name == 'ngrams':
         cache_filename = _get_cache_filename(args, CACHE_DIR)
-        explanation_init_ngrams, explanation_init_scores = mprompt.methods.m1_ngrams.explain_ngrams(
+        explanation_init_ngrams, explanation_init_scores = imodelsx.mprompt.m1_ngrams.explain_ngrams(
             X=text_str_list,
             mod=mod,
             num_top_ngrams=75,
@@ -207,8 +207,8 @@ if __name__ == '__main__':
             f'{explanation_init_ngrams[:3]=} {len(explanation_init_ngrams)}')
     
         # summarize the ngrams into some candidate strings
-        llm = mprompt.llm.get_llm(args.checkpoint)
-        explanation_strs, explanation_rationales = mprompt.methods.m2_summarize.summarize_ngrams(
+        llm = imodelsx.mprompt.llm.get_llm(args.checkpoint)
+        explanation_strs, explanation_rationales = imodelsx.mprompt.m2_summarize.summarize_ngrams(
             llm,
             explanation_init_ngrams,
             num_summaries=args.num_summaries,
@@ -223,7 +223,7 @@ if __name__ == '__main__':
         # generate synthetic data
         logging.info('\n\nGenerating synthetic data....')
         for explanation_str in explanation_strs:
-            strs_added, strs_removed = mprompt.methods.m3_generate.generate_synthetic_strs(
+            strs_added, strs_removed = imodelsx.mprompt.m3_generate.generate_synthetic_strs(
                 llm,
                 explanation_str=explanation_str,
                 num_synthetic_strs=args.num_synthetic_strs,

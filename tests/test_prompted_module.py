@@ -1,7 +1,7 @@
 import pickle as pkl
 from mprompt.modules.prompted_module import PromptedModule
 from mprompt.modules.emb_diff_module import EmbDiffModule
-from mprompt.llm import llm_hf
+from imodelsx.mprompt.llm import llm_hf
 import random
 import torch
 import numpy as np

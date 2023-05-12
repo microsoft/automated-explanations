@@ -15,7 +15,7 @@ import joblib
 from collections import defaultdict
 from mprompt.config import RESULTS_DIR, REPO_DIR
 from typing import Tuple
-import mprompt.llm
+import mprompt.methods.llm
 import json
 # openai.api_key_path = os.path.expanduser('~/.OPENAI_KEY')
 
@@ -175,7 +175,7 @@ if __name__ == '__main__':
 
             if generate_paragraphs:
                 # generate paragraphs
-                paragraphs = mprompt.llm.get_paragraphs(
+                paragraphs = mprompt.methods.llm.get_paragraphs(
                     prompts,
                     checkpoint='gpt-4-0314',
                     prefix_first=PV['prefix_first'], prefix_next=PV['prefix_next'],
