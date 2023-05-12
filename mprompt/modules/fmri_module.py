@@ -389,11 +389,11 @@ def cache_test_data():
             wordseq = wordseqs[k]
             words = np.array(wordseq.data)
             tr_times = wordseq.tr_times[10:-5]
-            num_delays = 4
+            num_trs = 4
             running_words[k] = []
             for i in range(len(tr_times)):
                 tr_time_max = tr_times[max(0, i - 1)]
-                tr_time_min = tr_times[max(0, i - num_delays)]
+                tr_time_min = tr_times[max(0, i - num_trs)]
                 valid_times = (tr_time_min <= wordseq.data_times) & (
                     wordseq.data_times <= tr_time_max
                 )
