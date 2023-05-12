@@ -89,8 +89,6 @@ def add_main_args(parser):
                         default='wiki', help='for dictionary learning module, which task dataset to use')
 
     # algo args
-    parser.add_argument('--method_name', type=str, choices=['ngrams', 'gradient'],
-                        default='ngrams', help='name of algo for explanation')
     parser.add_argument('--num_top_ngrams_to_use', type=int,
                         default=3, help='number of ngrams to use to start the explanation')
     parser.add_argument('--num_top_ngrams_to_consider', type=int,
@@ -101,6 +99,8 @@ def add_main_args(parser):
                         default=3, help='number of synthetic strings to generate')
     parser.add_argument('--generate_template_num', type=int,
                         default=1, help='which template to use for generation')
+    parser.add_argument('--method_name', type=str, choices=['ngrams', 'gradient'],
+                        default='ngrams', help='(Deprecated) name of algo for explanation')    
     return parser
 
 
@@ -188,66 +188,67 @@ if __name__ == '__main__':
         # text_str_list, size=n_subsample, replace=False).tolist()
 
     # explain with method
-    if args.method_name == 'ngrams':
-        cache_filename = _get_cache_filename(args, CACHE_DIR)
-        explanation_init_ngrams, explanation_init_scores = imodelsx.mprompt.m1_ngrams.explain_ngrams(
-            X=text_str_list,
-            mod=mod,
-            num_top_ngrams=75,
-            cache_filename=cache_filename,
-            module_name=args.module_name,
-            module_num=args.module_num,
-            noise_ngram_scores=args.noise_ngram_scores,
-            noise_seed=args.seed,
-            module_num_restrict=args.module_num_restrict,
+    cache_filename = _get_cache_filename(args, CACHE_DIR)
+    if args.module_num_restrict >= 0:
+        text_str_list_restrict = mprompt.data.data.get_relevant_data(
+            args.module_name, args.module_num_restrict
         )
-        r['explanation_init_ngrams'] = explanation_init_ngrams
-        r['explanation_init_outputs'] = explanation_init_scores
-        logging.info(
-            f'{explanation_init_ngrams[:3]=} {len(explanation_init_ngrams)}')
-    
-        # summarize the ngrams into some candidate strings
-        llm = imodelsx.mprompt.llm.get_llm(args.checkpoint)
-        explanation_strs, explanation_rationales = imodelsx.mprompt.m2_summarize.summarize_ngrams(
+    else:
+        text_str_list_restrict = None
+    explanation_init_ngrams, explanation_init_scores = imodelsx.mprompt.m1_ngrams.explain_ngrams(
+        X=text_str_list,
+        mod=mod,
+        num_top_ngrams=75,
+        cache_filename=cache_filename,
+        module_name=args.module_name,
+        module_num=args.module_num,
+        noise_ngram_scores=args.noise_ngram_scores,
+        noise_seed=args.seed,
+        text_str_list_restrict=text_str_list_restrict,
+    )
+    r['explanation_init_ngrams'] = explanation_init_ngrams
+    r['explanation_init_outputs'] = explanation_init_scores
+    logging.info(
+        f'{explanation_init_ngrams[:3]=} {len(explanation_init_ngrams)}')
+
+    # summarize the ngrams into some candidate strings
+    llm = imodelsx.mprompt.llm.get_llm(args.checkpoint, join(CACHE_DIR, args.checkpoint))
+    explanation_strs, explanation_rationales = imodelsx.mprompt.m2_summarize.summarize_ngrams(
+        llm,
+        explanation_init_ngrams,
+        num_summaries=args.num_summaries,
+        num_top_ngrams_to_use=args.num_top_ngrams_to_use,
+        num_top_ngrams_to_consider=args.num_top_ngrams_to_consider,
+        seed=args.seed,
+    )
+    r['explanation_init_strs'] = explanation_strs
+    r['explanation_init_rationales'] = explanation_rationales
+    logging.info('explanation_init_strs\n\t' + '\n\t'.join(explanation_strs))
+
+    # generate synthetic data
+    logging.info('\n\nGenerating synthetic data....')
+    for explanation_str in explanation_strs:
+        strs_added, strs_removed = imodelsx.mprompt.m3_generate.generate_synthetic_strs(
             llm,
-            explanation_init_ngrams,
-            num_summaries=args.num_summaries,
-            num_top_ngrams_to_use=args.num_top_ngrams_to_use,
-            num_top_ngrams_to_consider=args.num_top_ngrams_to_consider,
-            seed=args.seed,
+            explanation_str=explanation_str,
+            num_synthetic_strs=args.num_synthetic_strs,
+            template_num=args.generate_template_num,
         )
-        r['explanation_init_strs'] = explanation_strs
-        r['explanation_init_rationales'] = explanation_rationales
-        logging.info('explanation_init_strs\n\t' + '\n\t'.join(explanation_strs))
+        r['strs_added'].append(strs_added)
+        r['strs_removed'].append(strs_removed)
 
-        # generate synthetic data
-        logging.info('\n\nGenerating synthetic data....')
-        for explanation_str in explanation_strs:
-            strs_added, strs_removed = imodelsx.mprompt.m3_generate.generate_synthetic_strs(
-                llm,
-                explanation_str=explanation_str,
-                num_synthetic_strs=args.num_synthetic_strs,
-                template_num=args.generate_template_num,
-            )
-            r['strs_added'].append(strs_added)
-            r['strs_removed'].append(strs_removed)
+        # evaluate synthetic data (higher score is better)
+        r['score_synthetic'].append(
+            np.mean(mod(strs_added)) - np.mean(mod(strs_removed)))
 
-            # evaluate synthetic data (higher score is better)
-            r['score_synthetic'].append(
-                np.mean(mod(strs_added)) - np.mean(mod(strs_removed)))
+    logging.info(f'{explanation_strs[0]}\n+++++++++\n\t' + '\n\t'.join(r['strs_added'][0][:3]) +
+                '\n--------\n\t' + '\n\t'.join(r['strs_removed'][0][:3]))
 
-        logging.info(f'{explanation_strs[0]}\n+++++++++\n\t' + '\n\t'.join(r['strs_added'][0][:3]) +
-                    '\n--------\n\t' + '\n\t'.join(r['strs_removed'][0][:3]))
-
-        # sort everything by score
-        sort_inds = np.argsort(r['score_synthetic'])[::-1]
-        for k in ['explanation_init_strs', 'strs_added', 'strs_removed', 'score_synthetic']:
-            r[k] = [r[k][i] for i in sort_inds]
-            r['top_' + k] = r[k][0]
-    elif args.method_name == 'gradient':
-        # run gradient-based baseline here
-        print('reached!')
-        pass
+    # sort everything by score
+    sort_inds = np.argsort(r['score_synthetic'])[::-1]
+    for k in ['explanation_init_strs', 'strs_added', 'strs_removed', 'score_synthetic']:
+        r[k] = [r[k][i] for i in sort_inds]
+        r['top_' + k] = r[k][0]
 
     
     # evaluate how well explanation matches a "groundtruth"
