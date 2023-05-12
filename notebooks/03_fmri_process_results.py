@@ -18,14 +18,14 @@ from typing import List
 tqdm.pandas()
 from copy import deepcopy
 from mprompt.modules.fmri_module import get_roi
-import mprompt.methods.evaluate as evaluate
+import mprompt.evaluate as evaluate
 from mprompt.config import RESULTS_DIR
 import joblib
 from mprompt.modules.fmri_module import SAVE_DIR_FMRI
 import imodelsx.util
 from mprompt.modules.emb_diff_module import EmbDiffModule
 import scipy.stats
-from mprompt.methods.evaluate import D5_Validator
+from mprompt.evaluate import D5_Validator
 import torch.cuda
 from mprompt.config import CACHE_DIR
 

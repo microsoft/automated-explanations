@@ -9,7 +9,7 @@ from mprompt.modules.fmri_module import fMRIModule
 repo_dir = dirname(dirname(os.path.abspath(__file__)))
 import pandas as pd
 import mprompt.data.data
-import mprompt.methods.evaluate as evaluate
+import mprompt.evaluate as evaluate
 import numpy as np
 import imodelsx.util
 from tqdm import tqdm

@@ -11,7 +11,6 @@ from langchain import PromptTemplate
 
 
 def summarize_ngrams(
-    args,
     llm: LLM,
     ngrams_list: List[str],
     num_summaries: int = 2,
@@ -106,10 +105,7 @@ if __name__ == '__main__':
     # print('Rationale:', repr(summary_rationale))
     llm = get_llm(checkpoint='text-davinci-003')
 
-    class args:
-        seed = 1
     summaries, summary_rationales = summarize_ngrams(
-        args,
         llm,
         ['cat', 'dog', 'bird', 'elephant', 'cheetah'])
     print('Summaries:', summaries)

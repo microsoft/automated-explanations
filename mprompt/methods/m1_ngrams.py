@@ -6,35 +6,22 @@ from os.path import dirname, join
 import os.path
 import pickle as pkl
 import inspect
-from mprompt.config import CACHE_DIR
 import mprompt.data.data
 
 
-def _get_cache_filename(args, CACHE_DIR) -> str:
-    if args.module_name == "fmri":
-        return join(CACHE_DIR, "cache_ngrams", f"{args.module_name}_{args.subject}.pkl")
-    elif args.module_name == "old_fmri":
-        return join(CACHE_DIR, "cache_ngrams", f"{args.module_name}.pkl")
-    elif args.module_name == "dict_learn_factor":
-        return join(
-            CACHE_DIR,
-            "cache_ngrams",
-            f"{args.module_name}_{args.dl_task}_l{args.factor_layer}_i{args.factor_idx}.pkl",
-        )
-    else:
-        return join(
-            CACHE_DIR, "cache_ngrams", f"{args.module_name}_{args.module_num}.pkl"
-        )
-
-
 def explain_ngrams(
-    args,
     X: List[str],
     mod,
     ngrams: int = 3,
     all_ngrams: bool = True,
     num_top_ngrams: int = 75,
     use_cache: bool = True,
+    cache_filename: str = None,
+    module_name: str = None,
+    module_num: int = None,
+    noise_ngram_scores: float = 0,
+    noise_seed: int = None,
+    module_num_restrict: int = -1,
 ) -> List[str]:
     """Note: this caches the call that gets the scores"""
     # get all ngrams
@@ -50,14 +37,13 @@ def explain_ngrams(
 
     # compute scores and cache...
     # fmri should cache all preds together, since they are efficiently computed together
-    cache_filename = _get_cache_filename(args, CACHE_DIR)
 
     if use_cache and os.path.exists(cache_filename):
         ngram_scores = pkl.load(open(cache_filename, "rb"))
     else:
         call_parameters = inspect.signature(mod.__call__).parameters.keys()
         print("predicting all ngrams...")
-        if args.module_name == "dict_learn_factor":
+        if module_name == "dict_learn_factor":
             ngram_scores = mod(ngrams_list, calc_ngram=True)
         else:
             if "return_all" in call_parameters:
@@ -71,23 +57,23 @@ def explain_ngrams(
 
     # multidimensional predictions
     if len(ngram_scores.shape) > 1 and ngram_scores.shape[1] > 1:
-        ngram_scores = ngram_scores[:, args.module_num]
+        ngram_scores = ngram_scores[:, module_num]
 
     # add noise to ngram scores
-    if args.noise_ngram_scores > 0:
+    if noise_ngram_scores > 0:
         scores_top_100 = np.sort(ngram_scores)[::-1][:100]
         std_top_100 = np.std(scores_top_100)
-        rng = np.random.default_rng(args.seed)
+        rng = np.random.default_rng(noise_seed)
         ngram_scores += rng.normal(
-            scale=std_top_100 * args.noise_ngram_scores,
+            scale=std_top_100 * noise_ngram_scores,
             size=ngram_scores.shape,
         )
 
     # restrict top ngrams to alternative corpus
-    if args.module_num_restrict >= 0:
+    if module_num_restrict >= 0:
         print("before", ngrams_list)
         text_str_list_alt = mprompt.data.data.get_relevant_data(
-            args.module_name, args.module_num_restrict
+            module_name, module_num_restrict
         )
         ngrams_set_alt = set(
             imodelsx.util.generate_ngrams_list(

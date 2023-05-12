@@ -20,11 +20,27 @@ import mprompt.modules.dictionary_module
 import mprompt.methods.m1_ngrams
 import mprompt.methods.m2_summarize
 import mprompt.methods.m3_generate
-import mprompt.methods.evaluate
+import mprompt.evaluate
 import mprompt.data.data
+from mprompt.config import CACHE_DIR
 from mprompt.data.data import TASKS_D3, TASKS_TOY
 from imodelsx import cache_save_utils
 
+def _get_cache_filename(args, CACHE_DIR) -> str:
+    if args.module_name == "fmri":
+        return join(CACHE_DIR, "cache_ngrams", f"{args.module_name}_{args.subject}.pkl")
+    elif args.module_name == "old_fmri":
+        return join(CACHE_DIR, "cache_ngrams", f"{args.module_name}.pkl")
+    elif args.module_name == "dict_learn_factor":
+        return join(
+            CACHE_DIR,
+            "cache_ngrams",
+            f"{args.module_name}_{args.dl_task}_l{args.factor_layer}_i{args.factor_idx}.pkl",
+        )
+    else:
+        return join(
+            CACHE_DIR, "cache_ngrams", f"{args.module_name}_{args.module_num}.pkl"
+        )
 
 def add_main_args(parser):
     """Caching uses the non-default values from argparse to name the saving directory.
@@ -173,11 +189,17 @@ if __name__ == '__main__':
 
     # explain with method
     if args.method_name == 'ngrams':
+        cache_filename = _get_cache_filename(args, CACHE_DIR)
         explanation_init_ngrams, explanation_init_scores = mprompt.methods.m1_ngrams.explain_ngrams(
-            args=args,
             X=text_str_list,
             mod=mod,
             num_top_ngrams=75,
+            cache_filename=cache_filename,
+            module_name=args.module_name,
+            module_num=args.module_num,
+            noise_ngram_scores=args.noise_ngram_scores,
+            noise_seed=args.seed,
+            module_num_restrict=args.module_num_restrict,
         )
         r['explanation_init_ngrams'] = explanation_init_ngrams
         r['explanation_init_outputs'] = explanation_init_scores
@@ -187,7 +209,6 @@ if __name__ == '__main__':
         # summarize the ngrams into some candidate strings
         llm = mprompt.llm.get_llm(args.checkpoint)
         explanation_strs, explanation_rationales = mprompt.methods.m2_summarize.summarize_ngrams(
-            args,
             llm,
             explanation_init_ngrams,
             num_summaries=args.num_summaries,
@@ -228,12 +249,11 @@ if __name__ == '__main__':
         print('reached!')
         pass
 
-
     
     # evaluate how well explanation matches a "groundtruth"
     if not (args.module_name == 'fmri' or args.module_name == 'dict_learn_factor'):
         logging.info('Scoring explanation....')
-        r['score_contains_keywords'] = mprompt.methods.evaluate.compute_score_contains_keywords(
+        r['score_contains_keywords'] = mprompt.evaluate.compute_score_contains_keywords(
             args, r['explanation_init_strs'])
 
     # save results
