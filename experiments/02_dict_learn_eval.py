@@ -11,18 +11,18 @@ from sklearn.model_selection import train_test_split
 import pickle as pkl
 import imodelsx
 import torch
-import mprompt.methods.llm
-import mprompt.modules.old_fmri_module
-import mprompt.modules.fmri_module
-import mprompt.modules.prompted_module
-import mprompt.modules.emb_diff_module
-import mprompt.modules.dictionary_module
-import mprompt.methods.m1_ngrams
-import mprompt.methods.m2_summarize
-import mprompt.methods.m3_generate
-import mprompt.data.data
-from mprompt.data.data import TASKS_D3, TASKS_TOY
-from mprompt.modules.dictionary_learning.norm_std import get_std
+import sasc.methods.llm
+import sasc.modules.old_fmri_module
+import sasc.modules.fmri_module
+import sasc.modules.prompted_module
+import sasc.modules.emb_diff_module
+import sasc.modules.dictionary_module
+import sasc.methods.m1_ngrams
+import sasc.methods.m2_summarize
+import sasc.methods.m3_generate
+import sasc.data.data
+from sasc.data.data import TASKS_D3, TASKS_TOY
+from sasc.modules.dictionary_learning.norm_std import get_std
 from imodelsx import cache_save_utils
 
 
@@ -135,34 +135,34 @@ if __name__ == '__main__':
 
     # load module to interpret
     if args.module_name == 'fmri':
-        mod = mprompt.modules.fmri_module.fMRIModule(
+        mod = sasc.modules.fmri_module.fMRIModule(
             voxel_num_best=args.module_num, subject=args.subject)
         r['fmri_test_corr'] = mod.corr
     elif args.module_name == 'old_fmri':
-        mod = mprompt.modules.old_fmri_module.OldFMRIModule(
+        mod = sasc.modules.old_fmri_module.OldFMRIModule(
             voxel_num_best=args.module_num)
         r['fmri_test_corr'] = mod.corr
     elif args.module_name == 'dict_learn_factor':
-        mod = mprompt.modules.dictionary_module.DictionaryModule(
+        mod = sasc.modules.dictionary_module.DictionaryModule(
             layer_idx=args.factor_layer, factor_idx=args.factor_idx)
     else:
-        task_str = mprompt.data.data.get_task_str(args.module_name, args.module_num)
+        task_str = sasc.data.data.get_task_str(args.module_name, args.module_num)
         logging.info('running ' + task_str)
         if args.module_name.startswith('prompted'):
-            mod = mprompt.modules.prompted_module.PromptedModule(
+            mod = sasc.modules.prompted_module.PromptedModule(
                 task_str=task_str,
                 checkpoint=args.checkpoint_module,
             )
         elif args.module_name.startswith('emb_diff'):
-            mod = mprompt.modules.emb_diff_module.EmbDiffModule(
+            mod = sasc.modules.emb_diff_module.EmbDiffModule(
                 task_str=task_str,
                 # checkpoint=args.checkpoint_module,
             )
     
-    llm = mprompt.methods.llm.get_llm(args.checkpoint)
+    llm = sasc.methods.llm.get_llm(args.checkpoint)
 
     # load explanation result
-    explanation_strs, control_data = mprompt.data.data.get_eval_data(
+    explanation_strs, control_data = sasc.data.data.get_eval_data(
         factor_layer = args.factor_layer, factor_idx = args.factor_idx, get_baseline = args.get_baseline_exp)
     r['explanation_init_strs'] = explanation_strs
 
@@ -172,7 +172,7 @@ if __name__ == '__main__':
     # generate synthetic data
     logging.info('\n\nGenerating synthetic data....')
     for explanation_str in explanation_strs:
-        strs_added, strs_removed = mprompt.methods.m3_generate.generate_synthetic_strs(
+        strs_added, strs_removed = sasc.methods.m3_generate.generate_synthetic_strs(
             llm,
             explanation_str=explanation_str,
             num_synthetic_strs=args.num_synthetic_strs,
