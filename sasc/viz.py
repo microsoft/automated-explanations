@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from typing import List
 import imodelsx.util
 
-from mprompt.evaluate import D5_Validator
+from sasc.evaluate import D5_Validator
 
 
 def colorize(
@@ -77,7 +77,7 @@ def get_story_scores(val, expls, paragraphs):
         # neg_dists = moving_average(neg_dists, n=3)
         # neg_dists = (neg_dists - neg_dists.min()) / (neg_dists.max() - neg_dists.min())
         # neg_dists = neg_dists / 2 + 0.5 # shift to 0.5-1 range
-        # s = mprompt.viz.colorize(words, neg_dists, title=expl, subtitle=prompt)
+        # s = sasc.viz.colorize(words, neg_dists, title=expl, subtitle=prompt)
 
         # validator-based viz
         probs = np.array(val.validate_w_scores(expl, ngrams))

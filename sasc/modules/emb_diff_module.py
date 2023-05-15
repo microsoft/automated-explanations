@@ -16,10 +16,10 @@ import os.path
 import torch
 import re
 import scipy.spatial.distance
-import mprompt.data.data
+import sasc.data.data
 from typing import Union
 from langchain import PromptTemplate
-from mprompt.data.data import TASKS
+from sasc.data.data import TASKS
 from InstructorEmbedding import INSTRUCTOR
 modules_dir = dirname(os.path.abspath(__file__))
 
@@ -57,7 +57,7 @@ class EmbDiffModule():
             if 'target_str' in task:
                 self.target_str = task['target_str']
             else:
-                self.target_str = mprompt.data.data.get_groundtruth_keyword(task_str)
+                self.target_str = sasc.data.data.get_groundtruth_keyword(task_str)
         else:
             warnings.warn(f'no task found for {task_str}, using {task_str} as target_str')
             self.target_str = task_str

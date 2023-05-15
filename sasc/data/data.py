@@ -1,11 +1,11 @@
 from typing import List
 import numpy as np
 from datasets import load_dataset
-from mprompt.data.d3 import TASKS_D3
-from mprompt.data.toy import TASKS_TOY
-from mprompt.modules.old_fmri_module import SAVE_DIR_FMRI
-from mprompt.modules.fmri_module import get_train_story_texts
-from mprompt.modules.dictionary_learning.utils import get_exp_data, get_baseline_data, SAVE_DIR_DICT
+from sasc.data.d3 import TASKS_D3
+from sasc.data.toy import TASKS_TOY
+from sasc.modules.old_fmri_module import SAVE_DIR_FMRI
+from sasc.modules.fmri_module import get_train_story_texts
+from sasc.modules.dictionary_learning.utils import get_exp_data, get_baseline_data, SAVE_DIR_DICT
 from os.path import join
 import re
 TASKS = {**TASKS_D3, **TASKS_TOY}

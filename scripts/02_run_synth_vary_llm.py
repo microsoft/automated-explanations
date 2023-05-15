@@ -7,7 +7,7 @@ from imodelsx import submit_utils
 params_shared_dict = {
     'checkpoint': ['text-ada-001', 'text-babbage-001', 'text-curie-001', 'text-davinci-003'],
     'seed': [1],
-    'save_dir': [join('/home/chansingh/mprompt/results/', 'may10')],
+    'save_dir': [join('/home/chansingh/sasc/results/', 'may10')],
     'use_cache': [1],
     'subsample_frac': [1],
     'module_name': ['emb_diff_d3'],

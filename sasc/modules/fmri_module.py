@@ -20,7 +20,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 import joblib
 
 modules_dir = dirname(os.path.abspath(__file__))
-from mprompt.config import SAVE_DIR_FMRI
+from sasc.config import SAVE_DIR_FMRI
 
 # SAVE_DIR_FMRI = join(modules_dir, 'fmri')
 NUM_TOP_VOXELS = 500

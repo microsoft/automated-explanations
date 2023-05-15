@@ -5,15 +5,15 @@ from transformers import T5ForConditionalGeneration, T5Tokenizer
 from tqdm import tqdm, trange
 import torch.nn
 from typing import List
-import mprompt.data.data
+import sasc.data.data
 import bert_score
 
 
 def compute_score_contains_keywords(args, explanation_strs):
     score_contains_keywords = []
-    task_str = mprompt.data.data.get_task_str(
+    task_str = sasc.data.data.get_task_str(
         args.module_name, args.module_num)
-    check_func = mprompt.data.data.get_groundtruth_keywords_check_func(
+    check_func = sasc.data.data.get_groundtruth_keywords_check_func(
         task_str)
 
     # compute whether each explanation contains any of the synthetic keywords
@@ -24,9 +24,9 @@ def compute_score_contains_keywords(args, explanation_strs):
 
 def compute_score_bert(args, explanation_strs):
     # get groundtruth explanation
-    task_str = mprompt.data.data.get_task_str(
+    task_str = sasc.data.data.get_task_str(
         args.module_name, args.module_num)
-    keyword_groundtruth = mprompt.data.data.get_groundtruth_keyword(task_str)
+    keyword_groundtruth = sasc.data.data.get_groundtruth_keyword(task_str)
 
     # compute bert score with groundtruth explanation
     scores_tup_PRF = bert_score.score(

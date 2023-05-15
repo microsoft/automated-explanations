@@ -1,11 +1,11 @@
 import pickle as pkl
-from mprompt.modules.prompted_module import PromptedModule
-from mprompt.modules.emb_diff_module import EmbDiffModule
-from imodelsx.mprompt.llm import llm_hf
+from sasc.modules.prompted_module import PromptedModule
+from sasc.modules.emb_diff_module import EmbDiffModule
+from imodelsx.sasc.llm import llm_hf
 import random
 import torch
 import numpy as np
-from mprompt.data.data import TASKS, TASKS_TOY, TASKS_D3
+from sasc.data.data import TASKS, TASKS_TOY, TASKS_D3
 from os.path import join, dirname
 from tqdm import tqdm
 import sys

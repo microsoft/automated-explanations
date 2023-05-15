@@ -9,15 +9,12 @@ from os.path import dirname, join
 import os.path
 import torch.cuda
 from transformers import BertTokenizerFast, BertModel, BertForMaskedLM, AutoTokenizer
-from datasets import load_dataset, load_from_disk, concatenate_datasets, DatasetDict
+from datasets import load_dataset
 
-from mprompt.modules.dictionary_learning import sparsify_PyTorch
-from mprompt.modules.dictionary_learning.utils import batch_up
+from sasc.modules.dictionary_learning import sparsify_PyTorch
+from sasc.modules.dictionary_learning.utils import batch_up
 import joblib
-import scipy as sp
-import sklearn
-import json
-from mprompt.config import CACHE_DIR
+from sasc.config import CACHE_DIR
 
 modules_dir = dirname(os.path.abspath(__file__))
 SAVE_DIR_DICT = join(modules_dir, 'dictionary_learning')

@@ -26,7 +26,7 @@ required_pypi = [
 ]
 
 setuptools.setup(
-    name="mprompt",
+    name="sasc",
     version="0.01",
     author="Microsoft Research",
     author_email="",
