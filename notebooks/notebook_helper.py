@@ -5,19 +5,19 @@ import os.path
 from os.path import dirname, join
 from typing import List
 
-from mprompt.modules.fmri_module import fMRIModule
+from sasc.modules.fmri_module import fMRIModule
 repo_dir = dirname(dirname(os.path.abspath(__file__)))
 import pandas as pd
-import mprompt.data.data
-import mprompt.evaluate as evaluate
+import sasc.data.data
+import sasc.evaluate as evaluate
 import numpy as np
 import imodelsx.util
 from tqdm import tqdm
 
 def process_and_add_scores(r: pd.DataFrame, add_bert_scores=False):
     # metadata
-    r['task_str'] = r.apply(lambda row: mprompt.data.data.get_task_str(row['module_name'], row['module_num']), axis=1)
-    r['task_keyword'] = r['task_str'].apply(lambda task_str: mprompt.data.data.get_groundtruth_keyword(task_str))
+    r['task_str'] = r.apply(lambda row: sasc.data.data.get_task_str(row['module_name'], row['module_num']), axis=1)
+    r['task_keyword'] = r['task_str'].apply(lambda task_str: sasc.data.data.get_groundtruth_keyword(task_str))
     r['task_name (groundtruth)'] = r['task_str'].apply(lambda s: s.split('_')[-1])
     r['ngrams_restricted'] = ~(r['module_num_restrict'] == -1)
     r['num_generated_explanations'] = r['explanation_init_strs'].apply(lambda x: len(x))
@@ -257,10 +257,10 @@ def viz_paragraphs(paragraphs, scores_data_story, expls, prompts, normalize_to_r
             scores_i = (scores_i - scores_i.min()) / (scores_i.max() - scores_i.min())
         # scores_mod_i = scipy.special.softmax(scores_mod_i)
         if moving_average:
-            scores_i = mprompt.viz.moving_average(scores_i, n=3)
+            scores_i = sasc.viz.moving_average(scores_i, n=3)
         if shift_to_range:
             scores_i = scores_i / 2 + 0.5 # shift to 0.5-1 range
-        s_data += ' ' + mprompt.viz.colorize(
+        s_data += ' ' + sasc.viz.colorize(
             paragraphs[i].split(), scores_i,
             title=expls[i], subtitle=prompts[i],
             char_width_max=60,

@@ -8,14 +8,14 @@ import pandas as pd
 from typing import List
 import numpy as np
 import notebook_helper
-import mprompt.viz
+import sasc.viz
 import openai
 from pprint import pprint
 import joblib
 from collections import defaultdict
-from mprompt.config import RESULTS_DIR, REPO_DIR
+from sasc.config import RESULTS_DIR, REPO_DIR
 from typing import Tuple
-import mprompt.methods.llm
+import sasc.methods.llm
 import json
 # openai.api_key_path = os.path.expanduser('~/.OPENAI_KEY')
 

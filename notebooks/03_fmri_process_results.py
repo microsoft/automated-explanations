@@ -17,17 +17,17 @@ from typing import List
 
 tqdm.pandas()
 from copy import deepcopy
-from mprompt.modules.fmri_module import get_roi
-import mprompt.evaluate as evaluate
-from mprompt.config import RESULTS_DIR
+from sasc.modules.fmri_module import get_roi
+import sasc.evaluate as evaluate
+from sasc.config import RESULTS_DIR
 import joblib
-from mprompt.modules.fmri_module import SAVE_DIR_FMRI
+from sasc.modules.fmri_module import SAVE_DIR_FMRI
 import imodelsx.util
-from mprompt.modules.emb_diff_module import EmbDiffModule
+from sasc.modules.emb_diff_module import EmbDiffModule
 import scipy.stats
-from mprompt.evaluate import D5_Validator
+from sasc.evaluate import D5_Validator
 import torch.cuda
-from mprompt.config import CACHE_DIR
+from sasc.config import CACHE_DIR
 
 
 def add_expl_preds(r):
@@ -102,7 +102,7 @@ if __name__ == "__main__":
     # results_dir = '/home/chansingh/mntv1/mprompt/mar9/'
     results_dir = "/home/chansingh/mntv1/mprompt/mar13/"
 
-    '''
+    
     r = imodelsx.process_results.get_results_df(results_dir, use_cached=False)
     print(f"Loaded {r.shape[0]} results")
     for num in [25, 50, 75, 100]:
@@ -153,16 +153,15 @@ if __name__ == "__main__":
     r["top_score_normalized"] = r["top_score_synthetic"] / r["top_score_std"]
 
     # Save results
-    r.to_pickle(join(RESULTS_DIR, "results_fmri.pkl"))
-    '''
+    r.to_pickle(join(RESULTS_DIR, "results_fmri_1500.pkl"))
 
 
     # Add explanation<>test response match
-    r = pd.read_pickle(join(RESULTS_DIR, "results_fmri.pkl"))
+    r = pd.read_pickle(join(RESULTS_DIR, "results_fmri_1500.pkl"))
     torch.cuda.empty_cache()
     print("Saved original results, now computing expl<>resp match...")
     r = add_expl_preds(r)
-    r.to_pickle(join(RESULTS_DIR, "results_fmri_full.pkl"))
+    r.to_pickle(join(RESULTS_DIR, "results_fmri_full_1500.pkl"))
 
     # Unnecessary metrics
     # r['top_ngrams_test_correct_score'] = correct_ngrams_module_scores # these scores are basically just 0/1 for each ngram
