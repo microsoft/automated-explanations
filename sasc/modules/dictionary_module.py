@@ -14,7 +14,6 @@ from datasets import load_dataset
 from sasc.modules.dictionary_learning import sparsify_PyTorch
 from sasc.modules.dictionary_learning.utils import batch_up
 import joblib
-from sasc.config import CACHE_DIR
 
 modules_dir = dirname(os.path.abspath(__file__))
 SAVE_DIR_DICT = join(modules_dir, 'dictionary_learning')
@@ -57,7 +56,6 @@ class DictionaryModule():
         -------
         resp: List[float]
         """
-        #cache_file = join(CACHE_DIR, 'dl_all_ngrams',f'cache_ngrams_{self.task}_l{self.layer_idx}.jbl')
         cache_file = join(SAVE_DIR_DICT,f'cache_ngrams_l{self.layer_idx}.jbl')
         
         if calc_ngram and os.path.exists(cache_file):

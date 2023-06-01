@@ -18,7 +18,6 @@ import re
 import scipy.spatial.distance
 import sasc.data.data
 from typing import Union
-from langchain import PromptTemplate
 from sasc.data.data import TASKS
 from InstructorEmbedding import INSTRUCTOR
 modules_dir = dirname(os.path.abspath(__file__))
