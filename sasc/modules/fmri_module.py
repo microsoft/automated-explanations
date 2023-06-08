@@ -25,6 +25,11 @@ from sasc.config import SAVE_DIR_FMRI
 # SAVE_DIR_FMRI = join(modules_dir, 'fmri')
 NUM_TOP_VOXELS = 500
 
+def convert_module_num_to_voxel_num(module_num: int, subject: str):
+    voxel_idxs = joblib.load(join(SAVE_DIR_FMRI, 'voxel_lists', f'{subject}_voxel_selectivity.jbl'))
+    numpy.random.default_rng(seed=42).shuffle(voxel_idxs)
+    return voxel_idxs[module_num]
+
 
 class fMRIModule:
     def __init__(self, voxel_num_best: int = 0, subject: str = "UTS01"):

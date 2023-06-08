@@ -7,7 +7,7 @@ from tqdm import tqdm
 import pandas as pd
 from typing import List
 import numpy as np
-import notebook_helper
+import sasc.notebook_helper as notebook_helper
 import sasc.viz
 import openai
 from pprint import pprint
@@ -15,7 +15,7 @@ import joblib
 from collections import defaultdict
 from sasc.config import RESULTS_DIR, REPO_DIR
 from typing import Tuple
-import sasc.methods.llm
+import imodelsx.sasc.llm
 import json
 # openai.api_key_path = os.path.expanduser('~/.OPENAI_KEY')
 
@@ -82,7 +82,7 @@ def get_rows_voxels(seed, n_voxels_per_category=4):
     # return rows
 
     # mar 22 - UTS02 voxels in different categories
-    voxels_dict = json.load(open(join(REPO_DIR, f'notebooks/voxel_select/uts02_concepts_pilot_mar22.json'), 'r'))
+    voxels_dict = json.load(open(join(REPO_DIR, f'notebooks_stories/voxel_select/uts02_concepts_pilot_mar22.json'), 'r'))
     d = defaultdict(list)
 
     # randomly shuffle the categories order + voxels within each category
@@ -152,7 +152,7 @@ if __name__ == '__main__':
     # rows, idxs_list, voxels = get_rows_voxels(seed=seed, n_voxels_per_category=4)
 
 
-    generate_paragraphs = True
+    generate_paragraphs = False
 
     # iterate over seeds
     seeds = list(range(1, 8))
@@ -161,10 +161,17 @@ if __name__ == '__main__':
         # for version in ['v4_noun', 'v5_noun']:
         for version in ['v4_noun', 'v5_noun']:
 
+            STORIES_DIR = join(RESULTS_DIR, 'pilot_v1')
             EXPT_NAME = f'uts02_pilot_gpt4_mar28___ver={version}___seed={seed}'
+            EXPT_DIR = join(STORIES_DIR, EXPT_NAME)
+            os.makedirs(EXPT_DIR, exist_ok=True)
+
+
             rows = get_rows_voxels(seed=seed)
+            rows.to_csv(join(EXPT_DIR, f'rows.csv'), index=False)
             # print(rows.shape)
             # display(rows.head())
+            # print(rows)
 
             expls = rows.expl.values
             examples_list = rows.top_ngrams_module_correct
@@ -175,7 +182,7 @@ if __name__ == '__main__':
 
             if generate_paragraphs:
                 # generate paragraphs
-                paragraphs = mprompt.methods.llm.get_paragraphs(
+                paragraphs = imodelsx.sasc.llm.get_paragraphs(
                     prompts,
                     checkpoint='gpt-4-0314',
                     prefix_first=PV['prefix_first'], prefix_next=PV['prefix_next'],
@@ -188,9 +195,6 @@ if __name__ == '__main__':
                     # pprint(para)
 
                 # save
-                STORIES_DIR = join(RESULTS_DIR, 'stories')
-                EXPT_DIR = join(STORIES_DIR, EXPT_NAME)
-                os.makedirs(EXPT_DIR, exist_ok=True)
                 joblib.dump(rows, join(STORIES_DIR, EXPT_NAME, 'rows.pkl'))
                 with open(join(EXPT_DIR, 'story.txt'), 'w') as f:
                     f.write('\n\n'.join(rows.paragraph.values))
