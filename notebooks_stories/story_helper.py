@@ -1,6 +1,6 @@
 import numpy as np
 
-def get_resp_chunks(timing, paragraphs, resp_story, OFFSET=8):
+def get_resp_chunks(timing, paragraphs, resp_story, offset=8, apply_offset=True):
     # return responses for each paragraph (after applying offset)
 
     resp_chunks = []
@@ -21,12 +21,15 @@ def get_resp_chunks(timing, paragraphs, resp_story, OFFSET=8):
 
     for i in range(len(start_times)):
         resp_paragraph = resp_story[:, start_times[i] : end_times[i]]
-        while resp_paragraph.shape[1] <= 2 * OFFSET:
-            OFFSET -= 1
+        if apply_offset:
+            while resp_paragraph.shape[1] <= 2 * offset:
+                offset -= 1
+            resp_paragraph = resp_paragraph[:, offset:-offset]
+        resp_chunks.append(resp_paragraph)
 
         # find the middle 3 values of resp_paragraph
         # # # mid = resp_paragraph.shape[1] // 2
         # # resp_middle = resp_paragraph[:, mid - 1 : mid + 2]
         # mat[:, i] = resp_middle.mean(axis=1)
-        resp_chunks.append(resp_paragraph[:, OFFSET:-OFFSET])
+        
     return resp_chunks
