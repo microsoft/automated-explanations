@@ -70,7 +70,7 @@ if __name__ == '__main__':
     resp_chunks_arr = np.array(resp_chunks_list).mean(axis=0)
     expls = rw.sort_values(by="expl")["expl"].values
     for i in range(resp_chunks_arr.shape[0]):
-        quickshow(resp_chunks_arr[i], subject="UTS02", fname_save=f"_resps_flatmap_{i}_{expls[i]}.pdf")
+        quickshow(resp_chunks_arr[i], subject="UTS02", fname_save=join(path_to_repo, 'results', 'pilot_plots', f"_resps_flatmap_{i}_{expls[i]}.pdf"))
         plt.cla()
         plt.close()
         
