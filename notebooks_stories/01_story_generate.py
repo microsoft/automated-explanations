@@ -9,7 +9,6 @@ from typing import List
 import numpy as np
 import sasc.notebook_helper as notebook_helper
 import sasc.viz
-import openai
 from pprint import pprint
 import joblib
 from collections import defaultdict
@@ -18,9 +17,52 @@ from typing import Tuple
 import imodelsx.sasc.llm
 import json
 
-# openai.api_key_path = os.path.expanduser('~/.OPENAI_KEY')
-
 VOXEL_DICT = {
+    "UTS01": [
+        41,  # time period (numeric),
+        378,  # college days
+        186,  # location
+        322,  # embarrassment
+        434,  # laughter or amusement
+        244,  # emotional response
+        34,  # fear and anticipation
+        258,  # lonelineness
+        365,  # family and friends
+        # 204,  # family and friends
+        106,  # communication
+        187,  # relationships
+        # 399,  # relationships
+        # 122,  # relationships
+        # 162,  # communication
+        # 261,  # relationships
+        # 332,  # family and friends
+        # 432,  # relationships
+        # 142,  # family and friends
+        # 340,  # family and friends
+        # 71,  # family and friends
+        # 291,  # family and relationships
+        # 264,  # family and relationships
+        # 374,  # family and friends
+        # 400,  # relationships
+        # 145,  # relationships
+        # 479,  # family and relationships
+        197,  # flirting and relationships
+        # 144,  # family relationships
+        489,  # physical movement
+        # 469,  # physical contact
+        # 171,  # physical movement
+        # 46,  # physical contact
+        # 394,  # physical movement
+        # 456,  # physical contact
+        # 121,  # movement
+        # 456,  # physical contact
+        # 376,  # physical contact
+        311,  # vulgarities
+        232,  # violence and injury
+        203,  # food and drink
+        # 321,  # body positioning
+        484,  # repetition
+    ],
     "UTS02": [
         # 8 voxels with 3 reps is ~15 mins
         337,
@@ -49,9 +91,9 @@ VOXEL_DICT = {
         377,  # distance or proximity
         # 404, # travel and movement
         56,  # location or place
-        # 161, # surprise, confusion
+        161,  # surprise, confusion
         47,  # emotional expressions
-        305,  # self-reflection
+        # 305,  # self-reflection
         # 110, # laughter
         439,  # profanity
         337,  # love and joy
@@ -117,6 +159,7 @@ def get_rows_voxels(subject: str):
             print("missing", voxel_num)
     assert vals["module_num"].nunique() == vals.shape[0], "no duplicates"
     assert len(vals) == len(voxel_nums), "all voxels found"
+    assert len(voxel_nums) == 17
 
     # add extra data (like ngrams) to voxels
     rows = _voxels_to_rows(vals.values)
@@ -127,10 +170,9 @@ if __name__ == "__main__":
     generate_paragraphs = False
 
     # iterate over seeds
-    # seeds = list(range(1, 8))
-    seeds = [1, 8]
+    seeds = list(range(1, 8))
     # random.shuffle(seeds)
-    for subject in ["UTS03"]:
+    for subject in ['UTS01', 'UTS03']:
         for seed in seeds:
             for version in ["v5_noun"]:
                 STORIES_DIR = join(RESULTS_DIR, "pilot_v1")
