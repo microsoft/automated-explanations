@@ -172,7 +172,9 @@ if __name__ == "__main__":
     # iterate over seeds
     seeds = list(range(1, 8))
     # random.shuffle(seeds)
-    for subject in ['UTS01', 'UTS03']:
+    n_examples_per_prompt = 3
+    n_examples_per_prompt_to_consider = 5
+    for subject in ["UTS01", "UTS03"]:
         for seed in seeds:
             for version in ["v5_noun"]:
                 STORIES_DIR = join(RESULTS_DIR, "pilot_v1")
@@ -191,9 +193,24 @@ if __name__ == "__main__":
                 # get prompts
                 expls = rows.expl.values
                 examples_list = rows.top_ngrams_module_correct
-                prompts = notebook_helper.get_prompts(
-                    expls, examples_list, version, n_examples=4
-                )
+
+                # n_examples from each list of examples
+                # for pilot v0, just selected the first
+                rng = np.random.RandomState(seed)
+                examples_list = [
+                    ", ".join(
+                        [
+                            f'"{x}"'
+                            for x in rng.choice(
+                                examples[:n_examples_per_prompt_to_consider],
+                                n_examples_per_prompt,
+                                replace=False,
+                            ).tolist()
+                        ]
+                    )
+                    for examples in examples_list
+                ]
+                prompts = notebook_helper.get_prompts(expls, examples_list, version)
                 for p in prompts:
                     print(p)
                 PV = notebook_helper.get_prompt_templates(version)
