@@ -1,5 +1,7 @@
 import numpy as np
-
+import re
+from matplotlib.backends.backend_pdf import PdfPages
+import matplotlib.pyplot as plt
 
 def get_start_end_times(timing, paragraphs):
     idx = 0
@@ -39,3 +41,30 @@ def get_resp_chunks(timing, paragraphs, resp_story, offset=8, apply_offset=True)
         # mat[:, i] = resp_middle.mean(axis=1)
 
     return resp_chunks
+
+
+def find_all_examples_within_quotes(x: str):
+    # return a list of strings that are within quotes
+    # e.g. This is a "hello" world string about "cars" -> ["hello", "cars"]
+
+    # find all indices of quotes
+    idxs = []
+
+    idxs = [m.start() for m in re.finditer('"', x)]
+    if len(idxs) % 2 != 0:
+        raise ValueError("Uneven number of quotes")
+
+    # find all strings within quotes
+    examples = []
+    for i in range(0, len(idxs), 2):
+        examples.append(x[idxs[i] + 1 : idxs[i + 1]])
+
+    return examples
+
+def save_figs_to_single_pdf(filename):
+    p = PdfPages(filename)
+    fig_nums = plt.get_fignums()  
+    figs = [plt.figure(n) for n in fig_nums]
+    for fig in figs: 
+        fig.savefig(p, format='pdf', bbox_inches='tight') 
+    p.close()  
