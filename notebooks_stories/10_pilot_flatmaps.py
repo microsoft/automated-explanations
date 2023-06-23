@@ -10,7 +10,7 @@ path_to_current_file = dirname(os.path.abspath(__file__))
 path_to_repo = dirname(path_to_current_file)
 
 
-def quickshow(X: np.ndarray, subject="UTS03", fname_save=None):
+def quickshow(X: np.ndarray, subject="UTS03", fname_save=None, title=None):
     """
     Actual visualizations
     Note: for this to work, need to point the cortex config filestore to the `ds003020/derivative/pycortex-db` directory.
@@ -18,7 +18,14 @@ def quickshow(X: np.ndarray, subject="UTS03", fname_save=None):
     """
     vol = cortex.Volume(X, subject, xfmname=f"{subject}_auto")
     # , with_curvature=True, with_sulci=True)
-    cortex.quickshow(vol, with_rois=True, cmap="PuBu")
+    vabs = max(abs(vol.data.min()), abs(vol.data.max()))
+    vol.vmin = -vabs
+    vol.vmax = vabs
+    # fig = plt.figure()
+    cortex.quickshow(vol, with_rois=True, cmap="PuBu") #, vmin=-vabs, vmax=vabs)
+    # fig = plt.gcf()
+    # add title
+    # fig.axes[0].set_title(title, fontsize='xx-small')
     if fname_save is not None:
         plt.savefig(fname_save)
         plt.savefig(fname_save.replace(".pdf", ".png"))
@@ -70,7 +77,7 @@ if __name__ == '__main__':
     resp_chunks_arr = np.array(resp_chunks_list).mean(axis=0)
     expls = rw.sort_values(by="expl")["expl"].values
     for i in range(resp_chunks_arr.shape[0]):
-        quickshow(resp_chunks_arr[i], subject="UTS02", fname_save=join(path_to_repo, 'results', 'pilot_plots', f"_resps_flatmap_{i}_{expls[i]}.pdf"))
+        quickshow(resp_chunks_arr[i], subject="UTS02", fname_save=join(path_to_repo, 'results', 'pilot_plots', f"_resps_flatmap_{i}_{expls[i]}.pdf"), title=expls[i])
         plt.cla()
         plt.close()
         
