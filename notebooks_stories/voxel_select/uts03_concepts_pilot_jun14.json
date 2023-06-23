@@ -1,90 +1,90 @@
 {
 "temporal": [
 [
-"Time passing",
+"time passing",
 "UTS03",
 171
 ]
 ],
 "numeric": [
 [
-"Birthdays, birth years",
+"birthdays, birth years",
 "UTS03",
 39
 ],
 [
-"Measurements (distance and time)",
+"measurements (distance and time)",
 "UTS03",
 253
 ]
 ],
 "locational": [
 [
-"Distance or proximity",
+"distance or proximity",
 "UTS03",
 377
 ],
 [
-"Travel and movement",
+"travel and movement",
 "UTS03",
 404
 ],
 [
-"Location or place",
+"location or place",
 "UTS03",
 56
 ]
 ],
 "emotional": [
 [
-"Surprise, confusion",
+"surprise, confusion",
 "UTS03",
 161
 ],
 [
-"Emotional expressions",
+"emotional expressions",
 "UTS03",
 47
 ],
 [
-"Self-reflection",
+"self-reflection",
 "UTS03",
 305
 ],
 [
-"Laughter",
+"laughter",
 "UTS03",
 110
 ],
 [
-"Profanity",
+"profanity",
 "UTS03",
 439
 ],
 [
-"Love and joy",
+"love and joy",
 "UTS03",
 337
 ]
 ],
 "social": [
 [
-"Relationships and emotions",
+"relationships and emotions",
 "UTS03",
 494
 ],
 [
-"Family and friends",
+"family and friends",
 "UTS03",
 339
 ],
 [
-"Relationships",
+"relationships",
 "UTS03",
 354
 ],
 [
-"Speaking / responding",
+"speaking / responding",
 "UTS03",
 343
 ]
@@ -92,29 +92,29 @@
 "professional": [],
 "food": [
 [
-"Food and drinks",
+"food and drinks",
 "UTS03",
 481
 ]
 ],
 "movement": [
 [
-"Physical movement",
+"physical movement",
 "UTS03",
 215
 ],
 [
-"Physical injury",
+"physical injury",
 "UTS03",
 148
 ],
 [
-"Physical actions",
+"physical actions",
 "UTS03",
 121
 ],
 [
-"Physical movement",
+"physical movement",
 "UTS03",
 393
 ],
@@ -129,29 +129,29 @@
 288
 ],
 [
-"Body language",
+"body language",
 "UTS03",
 99
 ]
 ],
 "manual": [
 [
-"Lying, deception",
+"lying, deception",
 "UTS03",
 246
 ],
 [
-"Unhealthy",
+"unhealthy",
 "UTS03",
 400
 ],
 [
-"Vomiting, sickness",
+"vomiting, sickness",
 "UTS03",
 395
 ],
 [
-"Hair and clothing",
+"hair and clothing",
 "UTS03",
 24
 ]

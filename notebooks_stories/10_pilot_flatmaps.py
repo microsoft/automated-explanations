@@ -4,35 +4,14 @@ from os.path import join, dirname
 from tqdm import tqdm
 import joblib
 import numpy as np
-import cortex
 import story_helper
+import sasc.viz
+
 path_to_current_file = dirname(os.path.abspath(__file__))
 path_to_repo = dirname(path_to_current_file)
 
 
-def quickshow(X: np.ndarray, subject="UTS03", fname_save=None, title=None):
-    """
-    Actual visualizations
-    Note: for this to work, need to point the cortex config filestore to the `ds003020/derivative/pycortex-db` directory.
-    This might look something like `/home/chansingh/mntv1/deep-fMRI/data/ds003020/derivative/pycortex-db/UTS03/anatomicals/`
-    """
-    vol = cortex.Volume(X, subject, xfmname=f"{subject}_auto")
-    # , with_curvature=True, with_sulci=True)
-    vabs = max(abs(vol.data.min()), abs(vol.data.max()))
-    vol.vmin = -vabs
-    vol.vmax = vabs
-    # fig = plt.figure()
-    cortex.quickshow(vol, with_rois=True, cmap="PuBu") #, vmin=-vabs, vmax=vabs)
-    # fig = plt.gcf()
-    # add title
-    # fig.axes[0].set_title(title, fontsize='xx-small')
-    if fname_save is not None:
-        plt.savefig(fname_save)
-        plt.savefig(fname_save.replace(".pdf", ".png"))
-        plt.close()
-
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     # load data and corresponding resps
     pilot_data_dir = "/home/chansingh/mntv1/deep-fMRI/story_data/20230504"
     resp_np_files = os.listdir(pilot_data_dir)
@@ -48,9 +27,9 @@ if __name__ == '__main__':
     """
 
     # viz mean driving resp for each of the 16 voxels
-    story_data = joblib.load(join(path_to_repo, 'results/pilot_story_data.pkl'))
+    story_data = joblib.load(join(path_to_repo, "results/pilot_story_data.pkl"))
     resp_chunks_list = []
-    for story_num in range(6): # range(1, 7)
+    for story_num in range(6):  # range(1, 7)
         rows = story_data["rows"][story_num]
         rw = rows[
             [
@@ -68,7 +47,9 @@ if __name__ == '__main__':
         assert len(paragraphs) == len(rw), (len(paragraphs), len(rw))
         timing = story_data["timing"][story_num]
 
-        resp_story = resps_dict[story_data["story_name_new"][story_num]].T  # (voxels, time)
+        resp_story = resps_dict[
+            story_data["story_name_new"][story_num]
+        ].T  # (voxels, time)
         resp_chunks = story_helper.get_resp_chunks(timing, paragraphs, resp_story)
 
         args = np.argsort(rw["expl"].values)
@@ -77,8 +58,16 @@ if __name__ == '__main__':
     resp_chunks_arr = np.array(resp_chunks_list).mean(axis=0)
     expls = rw.sort_values(by="expl")["expl"].values
     for i in range(resp_chunks_arr.shape[0]):
-        quickshow(resp_chunks_arr[i], subject="UTS02", fname_save=join(path_to_repo, 'results', 'pilot_plots', f"_resps_flatmap_{i}_{expls[i]}.pdf"), title=expls[i])
+        sasc.viz.quickshow(
+            resp_chunks_arr[i],
+            subject="UTS02",
+            fname_save=join(
+                path_to_repo,
+                "results",
+                "pilot_plots",
+                f"_resps_flatmap_{i}_{expls[i]}.pdf",
+            ),
+            title=expls[i],
+        )
         plt.cla()
         plt.close()
-        
-    

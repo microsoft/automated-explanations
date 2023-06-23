@@ -14,7 +14,7 @@
 "numeric": [],
 "locational": [
 [
-"a_location_or_view_f",
+"location",
 "UTS01",
 186
 ]
@@ -26,129 +26,129 @@
 322
 ],
 [
-"laughter_or_amusemen",
+"laughter or amusement",
 "UTS01",
 434
 ],
 [
-"emotional_response",
+"emotional response",
 "UTS01",
 244
 ],
 [
-"fear_and_anticipatio",
+"fear and anticipation",
 "UTS01",
 34
 ],
 [
-"loneliness_and_isola",
+"lonelineness",
 "UTS01",
 258
 ]
 ],
 "social": [
 [
-"family_and_friends",
+"family and friends",
 "UTS01",
 365
 ],
 [
-"family_and_friends",
+"family and friends",
 "UTS01",
 204
 ],
 [
-"communication_or_lac",
+"communication",
 "UTS01",
 106
 ],
 [
-"relationships_and_th",
+"relationships",
 "UTS01",
 187
 ],
 [
-"relationships_and_em",
+"relationships",
 "UTS01",
 399
 ],
 [
-"relationships_with_f",
+"relationships",
 "UTS01",
 122
 ],
 [
-"communication_with_f",
+"communication",
 "UTS01",
 162
 ],
 [
-"family_and_relations",
+"relationships",
 "UTS01",
 261
 ],
 [
-"family_and_friends",
+"family and friends",
 "UTS01",
 332
 ],
 [
-"relationships_and_em",
+"relationships",
 "UTS01",
 432
 ],
 [
-"family_and_friends",
+"family and friends",
 "UTS01",
 142
 ],
 [
-"family_and_friends",
+"family and friends",
 "UTS01",
 340
 ],
 [
-"family_and_friends",
+"family and friends",
 "UTS01",
 71
 ],
 [
-"relationships_and_fa",
+"family and relationships",
 "UTS01",
 291
 ],
 [
-"relationships_with_f",
+"family and relationships",
 "UTS01",
 264
 ],
 [
-"family_and_friends",
+"family and friends",
 "UTS01",
 374
 ],
 [
-"relationships_and_in",
+"relationships",
 "UTS01",
 400
 ],
 [
-"relationships_and_co",
+"relationships",
 "UTS01",
 145
 ],
 [
-"family_and_relations",
+"family and relationships",
 "UTS01",
 479
 ],
 [
-"flirting_and_relatio",
+"flirting and relationships",
 "UTS01",
 197
 ],
 [
-"family_relationships",
+"family relationships",
 "UTS01",
 144
 ]
@@ -156,47 +156,47 @@
 "professional": [],
 "movement": [
 [
-"physical_movement,_s",
+"physical movement",
 "UTS01",
 489
 ],
 [
-"physical_contact_or_",
+"physical contact",
 "UTS01",
 469
 ],
 [
-"physical_movement_or",
+"physical movement",
 "UTS01",
 171
 ],
 [
-"physical_contact_or_",
+"physical contact",
 "UTS01",
 46
 ],
 [
-"movement_and_physica",
+"physical movement",
 "UTS01",
 394
 ],
 [
-"physical_contact,_su",
+"physical contact",
 "UTS01",
 456
 ],
 [
-"movement_or_position",
+"movement",
 "UTS01",
 121
 ],
 [
-"physical_contact,_su",
+"physical contact",
 "UTS01",
 456
 ],
 [
-"physical_contact_or_",
+"physical contact",
 "UTS01",
 376
 ]
@@ -208,22 +208,22 @@
 311
 ],
 [
-"violence_and_injury",
+"violence and injury",
 "UTS01",
 232
 ],
 [
-"food_and_drink",
+"food and drink",
 "UTS01",
 203
 ],
 [
-"body_positioning",
+"body positioning",
 "UTS01",
 321
 ],
 [
-"repetition_of_words_",
+"repetition",
 "UTS01",
 484
 ]

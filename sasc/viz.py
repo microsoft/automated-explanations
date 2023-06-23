@@ -2,9 +2,6 @@ import matplotlib
 import numpy as np
 import matplotlib.pyplot as plt
 from typing import List
-import imodelsx.util
-
-from sasc.evaluate import D5_Validator
 
 import numpy as np
 from matplotlib.backends.backend_pdf import PdfPages
@@ -40,7 +37,7 @@ def save_figs_to_single_pdf(filename):
 
 def colorize(
     words: List[str],
-    color_array: np.ndarray[float],
+    color_array, #: np.ndarray[float],
     char_width_max=60,
     title: str = None,
     subtitle: str = None,
@@ -87,6 +84,8 @@ def moving_average(a, n=3):
 
 
 def get_story_scores(val, expls, paragraphs):
+    import imodelsx.util
+
     # mod = EmbDiffModule()
     scores_list = []
     for i in range(len(expls)):
@@ -133,3 +132,27 @@ def heatmap(
     plt.colorbar(label=clab)
     plt.tight_layout()
     # plt.show()
+
+
+def quickshow(X: np.ndarray, subject="UTS03", fname_save=None, title=None):
+    import cortex
+
+    """
+    Actual visualizations
+    Note: for this to work, need to point the cortex config filestore to the `ds003020/derivative/pycortex-db` directory.
+    This might look something like `/home/chansingh/mntv1/deep-fMRI/data/ds003020/derivative/pycortex-db/UTS03/anatomicals/`
+    """
+    vol = cortex.Volume(X, subject, xfmname=f"{subject}_auto")
+    # , with_curvature=True, with_sulci=True)
+    vabs = max(abs(vol.data.min()), abs(vol.data.max()))
+    vol.vmin = -vabs
+    vol.vmax = vabs
+    # fig = plt.figure()
+    cortex.quickshow(vol, with_rois=True, cmap="PuBu")  # , vmin=-vabs, vmax=vabs)
+    # fig = plt.gcf()
+    # add title
+    # fig.axes[0].set_title(title, fontsize='xx-small')
+    if fname_save is not None:
+        plt.savefig(fname_save)
+        plt.savefig(fname_save.replace(".pdf", ".png"))
+        plt.close()
