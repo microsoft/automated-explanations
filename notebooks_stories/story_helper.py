@@ -2,6 +2,9 @@ import numpy as np
 import re
 from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib.pyplot as plt
+from sklearn.decomposition import PCA
+import imodelsx.linear_finetune
+from typing import List
 
 def get_start_end_times(timing, paragraphs):
     idx = 0
@@ -68,3 +71,19 @@ def save_figs_to_single_pdf(filename):
     for fig in figs: 
         fig.savefig(p, format='pdf', bbox_inches='tight') 
     p.close()  
+
+def sort_expls_semantically(expls: List[str]):
+    # from sasc.config import RESULTS_DIR, REPO_DIR
+    # r = pd.read_pickle(join(RESULTS_DIR, "results_fmri_full_1500.pkl"))
+    # expls_full = r['top_explanation_init_strs']
+    expls_full = expls
+    pca = PCA(n_components=1)
+    lf = imodelsx.linear_finetune.LinearFinetune()
+    embs_full = lf._get_embs(expls_full)
+    pca.fit(embs_full)
+
+
+    embs = lf._get_embs(expls)
+    coefs = pca.transform(embs).flatten()
+    ordering = np.argsort(coefs).flatten()
+    return ordering
