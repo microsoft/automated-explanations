@@ -45,7 +45,7 @@ def explanation_story_match(EXPT_DIR, expls, paragraphs, prompts):
         shift_to_range=True,
     )
     with open(join(EXPT_DIR, "story.html"), "w") as f:
-        f.write(s_data.encode('ascii', 'ignore'))
+        f.write(s_data.encode('ascii', errors='ignore').decode())
 
     # compute scores heatmap
     scores_mean, scores_all = sasc.generate_helper.compute_expl_data_match_heatmap(
@@ -98,7 +98,7 @@ def module_story_match(EXPT_DIR, expls, paragraphs, voxel_nums, subjects):
 
 def sweep_pilot():
     # iterate over seeds
-    seeds = [1, 2, 3, 4, 5, 6, 7]
+    seeds = range(1, 8)
     for seed in seeds:
         for version in ["v4_noun", "v5_noun"]:
             EXPT_NAME = f"uts02_pilot_gpt4_mar28___ver={version}___seed={seed}"

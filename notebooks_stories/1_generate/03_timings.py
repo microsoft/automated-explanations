@@ -159,6 +159,8 @@ if __name__ == "__main__":
     # setting = 'default'
     setting = "interactions"
     EXPT_NAMES = os.listdir(join(RESULTS_DIR, "pilot_v1", setting))
+    # shuffle EXPT_NAMES
+    random.shuffle(EXPT_NAMES)
 
     for EXPT_NAME in tqdm(EXPT_NAMES):
         EXPT_DIR = join(RESULTS_DIR, "pilot_v1", setting, EXPT_NAME)

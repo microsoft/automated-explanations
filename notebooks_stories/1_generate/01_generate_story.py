@@ -143,16 +143,13 @@ if __name__ == "__main__":
                         n_examples_per_prompt,
                         version,
                     )
-
+                    
+                    # repeat
+                    reps = [pd.concat([rows1.iloc[[0]]] * 4, ignore_index=True)]
+                    for i in range(1, len(rows1)):
+                        reps.append(pd.concat([rows1.iloc[[i]]] * 3, ignore_index=True))
                     rows1_rep = pd.concat(
-                        [
-                            pd.concat(
-                                [rows1.iloc[[0]]] * 4, ignore_index=True
-                            ),  # repeat first row 4 times
-                            pd.concat(
-                                [rows1.iloc[1:].copy()] * 3, ignore_index=True
-                            ),  # repeat remaining rows 3 times
-                        ],
+                        reps,
                         ignore_index=True,
                     )
                     rows1.to_csv(join(EXPT_DIR, f"rows1.csv"), index=False)
