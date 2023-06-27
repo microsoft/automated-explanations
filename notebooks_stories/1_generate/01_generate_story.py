@@ -79,8 +79,12 @@ def get_rows_and_prompts_interactions(
         n_examples_per_prompt=n_examples_per_prompt,
         seed=seed,
     )
-    examples_list1 = sasc.generate_helper.select_top_examples_randomly(rows1['top_ngrams_module_correct'], **kwargs)
-    examples_list2 = sasc.generate_helper.select_top_examples_randomly(rows2['top_ngrams_module_correct'], **kwargs)
+    examples_list1 = sasc.generate_helper.select_top_examples_randomly(
+        rows1["top_ngrams_module_correct"], **kwargs
+    )
+    examples_list2 = sasc.generate_helper.select_top_examples_randomly(
+        rows2["top_ngrams_module_correct"], **kwargs
+    )
     prompts = sasc.generate_helper.get_prompts_interaction(
         expls1,
         expls2,
@@ -115,7 +119,7 @@ if __name__ == "__main__":
                 STORIES_DIR = join(RESULTS_DIR, "pilot_v1")
 
                 EXPT_NAME = f"{subject.lower()}___jun14___seed={seed}"
-                EXPT_DIR = join(STORIES_DIR, EXPT_NAME, setting)
+                EXPT_DIR = join(STORIES_DIR, setting, EXPT_NAME)
                 os.makedirs(EXPT_DIR, exist_ok=True)
 
                 if setting == "default":
@@ -139,8 +143,28 @@ if __name__ == "__main__":
                         n_examples_per_prompt,
                         version,
                     )
+
+                    rows1_rep = pd.concat(
+                        [
+                            pd.concat(
+                                [rows1.iloc[[0]]] * 4, ignore_index=True
+                            ),  # repeat first row 4 times
+                            pd.concat(
+                                [rows1.iloc[1:].copy()] * 3, ignore_index=True
+                            ),  # repeat remaining rows 3 times
+                        ],
+                        ignore_index=True,
+                    )
                     rows1.to_csv(join(EXPT_DIR, f"rows1.csv"), index=False)
+                    rows1.to_pickle(join(EXPT_DIR, f"rows1.pkl"))
                     rows2.to_csv(join(EXPT_DIR, f"rows2.csv"), index=False)
+                    rows2.to_pickle(join(EXPT_DIR, f"rows2.pkl"))
+                    rows1_rep.to_pickle(join(EXPT_DIR, f"rows1_rep.pkl"))
+
+                    # just repeat first voxel appropriate amount of times
+
+                    rows = rows1.loc[rows1.index.repeat(3)]
+
                     with open(join(EXPT_DIR, "prompts.txt"), "w") as f:
                         f.write("\n\n".join(prompts))
 
@@ -148,8 +172,8 @@ if __name__ == "__main__":
                 paragraphs = sasc.generate_helper.get_paragraphs(
                     prompts,
                     checkpoint="gpt-4-0314",
-                    prefix_first=PV["prefix_first"] if 'prefix_first' in PV else None,
-                    prefix_next=PV["prefix_next"] if 'prefix_next' in PV else None,
+                    prefix_first=PV["prefix_first"] if "prefix_first" in PV else None,
+                    prefix_next=PV["prefix_next"] if "prefix_next" in PV else None,
                     cache_dir="/home/chansingh/cache/llm_stories",
                 )
 

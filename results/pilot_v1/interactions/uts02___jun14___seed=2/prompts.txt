@@ -1,0 +1,31 @@
+Write the beginning paragraph of a long, coherent story. The story will cover diverse themes such as "birthdays", "communication", "emotional expression", "locations", "measurements", "physical injury or trauma".
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "emotional expression". Make sure it contains several words related to "emotional expression", such as "blocks while screaming", "joking and smiling", "she started laughing". Do not mention words related to "communication".
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "emotional expression" and "communication". Make sure it contains several words related to "emotional expression", such as "blocks while screaming", "joking and smiling", "she started laughing", and several words related to "communication", such as "read my letter", "i get interviewed", "explain the joke".
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "communication". Make sure it contains several words related to "communication", such as "read my letter", "i get interviewed", "explain the joke". Do not mention related to "emotional expression".
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "physical injury or trauma". Make sure it contains several words related to "physical injury or trauma", such as "throat was slit", "snapped his neck", "'s neck snapped". Do not mention words related to "birthdays".
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "physical injury or trauma" and "birthdays". Make sure it contains several words related to "physical injury or trauma", such as "throat was slit", "snapped his neck", "'s neck snapped", and several words related to "birthdays", such as "even my birthday", "on my birthday", "seven my birthday".
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "birthdays". Make sure it contains several words related to "birthdays", such as "even my birthday", "on my birthday", "seven my birthday". Do not mention related to "physical injury or trauma".
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "locations". Make sure it contains several words related to "locations", such as "them fly overhead", "facing the beach", "onto the sidewalk". Do not mention words related to "measurements".
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "locations" and "measurements". Make sure it contains several words related to "locations", such as "them fly overhead", "facing the beach", "onto the sidewalk", and several words related to "measurements", such as "fifty feet underwater", "feet above the", "seventy five foot".
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "measurements". Make sure it contains several words related to "measurements", such as "fifty feet underwater", "feet above the", "seventy five foot". Do not mention related to "locations".
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "laughter". Make sure it contains several words related to "laughter", such as "she laughed cause", "of laughed because", "funny everybody laughs". Do not mention words related to "food preparation".
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "laughter" and "food preparation". Make sure it contains several words related to "laughter", such as "she laughed cause", "of laughed because", "funny everybody laughs", and several words related to "food preparation", such as "some sliced cucumber", "sliced red onion", "thinly sliced".
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "food preparation". Make sure it contains several words related to "food preparation", such as "some sliced cucumber", "sliced red onion", "thinly sliced". Do not mention related to "laughter".
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "time". Make sure it contains several words related to "time", such as "three a second", "forty five second", "count down and". Do not mention words related to "moments".
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "time" and "moments". Make sure it contains several words related to "time", such as "three a second", "forty five second", "count down and", and several words related to "moments", such as "leaves the room", "suddenly he stops", "the doorbell rang".
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "moments". Make sure it contains several words related to "moments", such as "leaves the room", "suddenly he stops", "the doorbell rang". Do not mention related to "time".
