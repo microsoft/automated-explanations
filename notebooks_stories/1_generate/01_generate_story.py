@@ -14,7 +14,6 @@ import joblib
 from collections import defaultdict
 from sasc.config import RESULTS_DIR, REPO_DIR
 from typing import Tuple
-import imodelsx.sasc.llm
 import sys
 import json
 
@@ -146,7 +145,7 @@ if __name__ == "__main__":
                         f.write("\n\n".join(prompts))
 
                 # generate paragraphs
-                paragraphs = imodelsx.sasc.llm.get_paragraphs(
+                paragraphs = sasc.generate_helper.get_paragraphs(
                     prompts,
                     checkpoint="gpt-4-0314",
                     prefix_first=PV["prefix_first"] if 'prefix_first' in PV else None,
