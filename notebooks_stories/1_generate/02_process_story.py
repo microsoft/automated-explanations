@@ -45,7 +45,7 @@ def explanation_story_match(EXPT_DIR, expls, paragraphs, prompts):
         shift_to_range=True,
     )
     with open(join(EXPT_DIR, "story.html"), "w") as f:
-        f.write(s_data)
+        f.write(s_data.encode('ascii', 'ignore'))
 
     # compute scores heatmap
     scores_mean, scores_all = sasc.generate_helper.compute_expl_data_match_heatmap(
