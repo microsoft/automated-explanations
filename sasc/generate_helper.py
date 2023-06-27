@@ -12,8 +12,32 @@ import pandas as pd
 import sasc.data.data
 import sasc.evaluate as evaluate
 import numpy as np
+import numpy.random
 import imodelsx.util
 from tqdm import tqdm
+
+
+def select_top_examples_randomly(
+    examples_list,
+    n_examples_per_prompt_to_consider: int,
+    n_examples_per_prompt: int,
+    seed: int,
+) -> List[str]:
+    rng = np.random.RandomState(seed)
+    return [
+        # ", ".join(
+        [
+            # f'"{x}"'
+            x
+            for x in rng.choice(
+                examples[:n_examples_per_prompt_to_consider],
+                n_examples_per_prompt,
+                replace=False,
+            ).tolist()
+        ]
+        # )
+        for examples in examples_list
+    ]
 
 
 def process_and_add_scores(r: pd.DataFrame, add_bert_scores=False):
@@ -116,6 +140,68 @@ def get_prompts(expls: List[str], examples_list: List[List[str]], version):
         ]
     else:
         raise ValueError(version, "not supported in get_prompts")
+    return prompts
+
+
+def get_prompt_templates_interaction(version):
+    PROMPTS = {
+        # make story "coherent"
+        "v0": {
+            "prefix_first": "Write the beginning paragraph of a long, coherent story. The story will cover diverse themes such as {expls}.",
+            "prefix_one_not_two": 'Write the next paragraph of the story, staying consistent with the story so far, but now make it about "{expl_one}". Make sure it contains several words related to "{expl_one}", such as {examples_one}. Do not mention words related to "{expl_two}".',
+            "prefix_one_and_two": 'Write the next paragraph of the story, staying consistent with the story so far, but now make it about "{expl_one}" and "{expl_two}". Make sure it contains several words related to "{expl_one}", such as {examples_one}, and several words related to "{expl_two}", such as {examples_two}.',
+            "prefix_two_not_one": 'Write the next paragraph of the story, staying consistent with the story so far, but now make it about "{expl_two}". Make sure it contains several words related to "{expl_two}", such as {examples_two}. Do not mention related to "{expl_one}".',
+        },
+    }
+    return PROMPTS[version]
+
+
+def get_prompts_interaction(
+    expls_one: List[str],
+    expls_two: List[str],
+    examples_list_one: List[List[str]],
+    examples_list_two: List[List[str]],
+    version: str = "v0",
+):
+    """Get prompts for an entire story, alternative 3 paragraphs for each explanation"""
+    # get templates
+    assert len(expls_one) == len(expls_two)
+    assert len(expls_one) == len(examples_list_one)
+    assert len(expls_two) == len(examples_list_two)
+    PV = get_prompt_templates_interaction(version)
+    all_examples = [
+        f'"{x}"'
+        for x in np.unique(
+            np.concatenate((np.unique(expls_one[:3]), np.unique(expls_two[:3])))
+        )
+    ]
+    prompts = [PV["prefix_first"].format(expls=", ".join(all_examples))]
+
+    for i in range(len(expls_one)):
+        ex1 = [f'"{x}"' for x in examples_list_one[i]]
+        ex2 = [f'"{x}"' for x in examples_list_two[i]]
+        prompts.append(
+            PV["prefix_one_not_two"].format(
+                expl_one=expls_one[i],
+                examples_one=", ".join(ex1),
+                expl_two=expls_two[i],
+            )
+        )
+        prompts.append(
+            PV["prefix_one_and_two"].format(
+                expl_one=expls_one[i],
+                examples_one=", ".join(ex1),
+                expl_two=expls_two[i],
+                examples_two=", ".join(ex2),
+            )
+        )
+        prompts.append(
+            PV["prefix_two_not_one"].format(
+                expl_one=expls_one[i],
+                examples_two=", ".join(ex2),
+                expl_two=expls_two[i],
+            )
+        )
     return prompts
 
 
