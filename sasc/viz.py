@@ -126,7 +126,7 @@ def heatmap(
     plt.figure(figsize=(7, 6))
     plt.imshow(data)
     plt.xticks(range(data.shape[0]), labels, rotation=90, fontsize="small")
-    plt.yticks(range(data.shape[0]), labels, fontsize="small")
+    plt.yticks(range(data.shape[1]), labels, fontsize="small")
     plt.ylabel(ylab)
     plt.xlabel(xlab)
     plt.colorbar(label=clab)

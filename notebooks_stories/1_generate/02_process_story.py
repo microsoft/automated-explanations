@@ -45,9 +45,10 @@ def explanation_story_match(EXPT_DIR, expls, paragraphs, prompts):
         shift_to_range=True,
     )
     with open(join(EXPT_DIR, "story.html"), "w") as f:
-        f.write(s_data.encode('ascii', errors='ignore').decode())
+        f.write(s_data.encode("ascii", errors="ignore").decode())
 
     # compute scores heatmap
+    # print('expls', expls, 'paragraphs', paragraphs)
     scores_mean, scores_all = sasc.generate_helper.compute_expl_data_match_heatmap(
         val, expls, paragraphs
     )
@@ -56,7 +57,7 @@ def explanation_story_match(EXPT_DIR, expls, paragraphs, prompts):
         join(EXPT_DIR, "scores_data.pkl"),
     )
     sasc.viz.heatmap(scores_mean.T, expls, ylab="Story", xlab="Explanation")
-    plt.savefig(join(EXPT_DIR, "story_data_match.png"), dpi=300)
+    # plt.savefig(join(EXPT_DIR, "story_data_match.png"), dpi=300)
     plt.savefig(join(EXPT_DIR, "story_data_match.pdf"), bbox_inches="tight")
 
 
@@ -80,6 +81,11 @@ def module_story_match(EXPT_DIR, expls, paragraphs, voxel_nums, subjects):
         },
         join(EXPT_DIR, f"scores_mod_ngram_length={0}.pkl"),
     )
+
+    # make plot
+    sasc.viz.heatmap(scores_mod.T, expls, ylab='Story', xlab='Module')
+    plt.savefig(join(EXPT_DIR, f'story_module_match.pdf'), bbox_inches='tight')
+
 
     # with overlaps
     # ngram_lengths = [10, 50, 100, 384]
@@ -120,30 +126,6 @@ def sweep_pilot():
             torch.cuda.empty_cache()
 
 
-def sweep_default():
-    # iterate over seeds
-    seeds = range(1, 8)
-    for seed in seeds:
-        for version in ["v4_noun", "v5_noun"]:
-            EXPT_NAME = f"uts02_pilot_gpt4_mar28___ver={version}___seed={seed}"
-            EXPT_DIR = join(RESULTS_DIR, "stories", "default", EXPT_NAME)
-            rows = joblib.load(join(EXPT_DIR, "rows.pkl"))
-            expls = rows.expl.values
-            paragraphs = rows.paragraph.values
-            prompts = rows.prompt.values
-            voxel_nums = rows.module_num.values
-            subjects = rows.subject.values
-
-            # run things
-            print("Computing module<>story match", EXPT_NAME)
-            module_story_match(EXPT_DIR, expls, paragraphs, voxel_nums, subjects)
-            torch.cuda.empty_cache()
-
-            print("Computing expl<>story match", EXPT_NAME)
-            explanation_story_match(EXPT_DIR, expls, paragraphs, prompts)
-            torch.cuda.empty_cache()
-
-
 def sweep_interactions():
     # iterate over seeds
     seeds = range(1, 8)
@@ -158,22 +140,23 @@ def sweep_interactions():
             prompts_paragraphs = joblib.load(
                 join(EXPT_DIR, "prompts_paragraphs.pkl"),
             )
-            rows1_rep = joblib.load(join(EXPT_DIR, "rows1_rep.pkl"))
+            rows1_rep = joblib.load(join(EXPT_DIR, "rows.pkl"))
             prompts = prompts_paragraphs["prompts"]
             paragraphs = prompts_paragraphs["paragraphs"]
             voxel_nums = rows1_rep.module_num.values
             subjects = rows1_rep.subject.values
             expls = rows1_rep.expl.values
-            print(f"Loaded {len(prompts)} prompts, {len(paragraphs)} paragraphs, {len(rows1_rep)} (repeated1) rows")
+            print(
+                f"Loaded {len(prompts)} prompts, {len(paragraphs)} paragraphs, {len(rows1_rep)} (repeated1) rows"
+            )
 
             # run things
-            print("Computing module<>story match", EXPT_NAME)
-            module_story_match(EXPT_DIR, expls, paragraphs, voxel_nums, subjects)
-
+            print("Computing data<>story match", EXPT_NAME)
+            explanation_story_match(EXPT_DIR, expls, paragraphs, prompts)
             torch.cuda.empty_cache()
 
-            print("Computing expl<>story match", EXPT_NAME)
-            explanation_story_match(EXPT_DIR, expls, paragraphs, prompts)
+            print("Computing module<>story match", EXPT_NAME)
+            module_story_match(EXPT_DIR, expls, paragraphs, voxel_nums, subjects)
             torch.cuda.empty_cache()
 
 

@@ -164,10 +164,10 @@ if __name__ == "__main__":
 
     for EXPT_NAME in tqdm(EXPT_NAMES):
         EXPT_DIR = join(RESULTS_DIR, "pilot_v1", setting, EXPT_NAME)
-        if os.path.exists(join(EXPT_DIR, "rows.pkl")):
+        if setting == 'default':
             rows = joblib.load(join(EXPT_DIR, "rows.pkl"))
             text = "\n".join(rows.paragraph.values)
-        elif os.path.exists(join(EXPT_DIR, "prompts.txt")):
+        elif setting == 'interactions':
             prompts_paragraphs = joblib.load(
                 join(EXPT_DIR, "prompts_paragraphs.pkl"),
             )

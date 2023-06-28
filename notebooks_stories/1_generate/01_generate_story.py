@@ -156,11 +156,7 @@ if __name__ == "__main__":
                     rows1.to_pickle(join(EXPT_DIR, f"rows1.pkl"))
                     rows2.to_csv(join(EXPT_DIR, f"rows2.csv"), index=False)
                     rows2.to_pickle(join(EXPT_DIR, f"rows2.pkl"))
-                    rows1_rep.to_pickle(join(EXPT_DIR, f"rows1_rep.pkl"))
-
-                    # just repeat first voxel appropriate amount of times
-
-                    rows = rows1.loc[rows1.index.repeat(3)]
+                    rows1_rep.to_pickle(join(EXPT_DIR, f"rows.pkl"))
 
                     with open(join(EXPT_DIR, "prompts.txt"), "w") as f:
                         f.write("\n\n".join(prompts))
