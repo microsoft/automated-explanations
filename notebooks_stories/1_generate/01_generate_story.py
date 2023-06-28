@@ -133,8 +133,8 @@ if __name__ == "__main__":
                         version,
                     )
                     rows.to_csv(join(EXPT_DIR, f"rows.csv"), index=False)
-                    with open(join(EXPT_DIR, "prompts.txt"), "w") as f:
-                        f.write("\n\n".join(prompts))
+                    rows.to_pickle(join(EXPT_DIR, f"rows.pkl"))
+                    
                 elif setting == "interactions":
                     rows1, rows2, prompts, PV = get_rows_and_prompts_interactions(
                         subject,
@@ -159,8 +159,7 @@ if __name__ == "__main__":
                     rows2.to_pickle(join(EXPT_DIR, f"rows2.pkl"))
                     rows1_rep.to_pickle(join(EXPT_DIR, f"rows.pkl"))
 
-                    with open(join(EXPT_DIR, "prompts.txt"), "w") as f:
-                        f.write("\n\n".join(prompts))
+                
 
                 # generate paragraphs
                 paragraphs = sasc.generate_helper.get_paragraphs(
@@ -180,6 +179,8 @@ if __name__ == "__main__":
                 # rows["prompt"] = prompts
                 # rows["paragraph"] = paragraphs
                 # joblib.dump(rows, join(EXPT_DIR, "rows.pkl"))
+                with open(join(EXPT_DIR, "prompts.txt"), "w") as f:
+                    f.write("\n\n".join(prompts))
                 with open(join(EXPT_DIR, "story.txt"), "w") as f:
                     f.write("\n\n".join(paragraphs))
                 joblib.dump(

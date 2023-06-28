@@ -83,9 +83,8 @@ def module_story_match(EXPT_DIR, expls, paragraphs, voxel_nums, subjects):
     )
 
     # make plot
-    sasc.viz.heatmap(scores_mod.T, expls, ylab='Story', xlab='Module')
-    plt.savefig(join(EXPT_DIR, f'story_module_match.pdf'), bbox_inches='tight')
-
+    sasc.viz.heatmap(scores_mod.T, expls, ylab="Story", xlab="Module")
+    plt.savefig(join(EXPT_DIR, f"story_module_match.pdf"), bbox_inches="tight")
 
     # with overlaps
     # ngram_lengths = [10, 50, 100, 384]
@@ -102,28 +101,42 @@ def module_story_match(EXPT_DIR, expls, paragraphs, voxel_nums, subjects):
     #     }, join(EXPT_DIR, f'scores_mod_ngram_length={ngram_length}.pkl'))
 
 
-def sweep_pilot():
-    # iterate over seeds
-    seeds = range(1, 8)
-    for seed in seeds:
-        for version in ["v4_noun", "v5_noun"]:
-            EXPT_NAME = f"uts02_pilot_gpt4_mar28___ver={version}___seed={seed}"
-            EXPT_DIR = join(RESULTS_DIR, "stories", EXPT_NAME)
-            rows = joblib.load(join(EXPT_DIR, "rows.pkl"))
-            expls = rows.expl.values
+def sweep_default_and_polysemantic(setting="default"):    
+    EXPT_PARENT_DIR = join(RESULTS_DIR, "pilot_v1", setting)
+    # if setting == 'default':
+        # seeds = range(1, 8)
+        # versions  = ["v4_noun", "v5_noun"]
+        # EXPT_NAMES = [f"uts02_pilot_gpt4_mar28___ver={version}___seed={seed}" for seed in seeds for version in versions]
+    # elif setting == 'interactions':
+    EXPT_NAMES = os.listdir(EXPT_PARENT_DIR)
+    for EXPT_NAME in EXPT_NAMES:
+        EXPT_DIR = join(EXPT_PARENT_DIR, EXPT_NAME)
+        rows = joblib.load(join(EXPT_DIR, "rows.pkl"))
+        expls = rows.expl.values
+
+        # original version
+        if "paragraph" in rows.columns:
             paragraphs = rows.paragraph.values
             prompts = rows.prompt.values
-            voxel_nums = rows.module_num.values
-            subjects = rows.subject.values
+        # new version
+        else:
+            prompts_paragraphs = joblib.load(
+                join(EXPT_DIR, "prompts_paragraphs.pkl"),
+            )
+            prompts = prompts_paragraphs["prompts"]
+            paragraphs = prompts_paragraphs["paragraphs"]
 
-            # run things
-            print("Computing module<>story match", EXPT_NAME)
-            module_story_match(EXPT_DIR, expls, paragraphs, voxel_nums, subjects)
-            torch.cuda.empty_cache()
+        voxel_nums = rows.module_num.values
+        subjects = rows.subject.values
 
-            print("Computing expl<>story match", EXPT_NAME)
-            explanation_story_match(EXPT_DIR, expls, paragraphs, prompts)
-            torch.cuda.empty_cache()
+        # run things
+        print("Computing module<>story match", EXPT_NAME)
+        module_story_match(EXPT_DIR, expls, paragraphs, voxel_nums, subjects)
+        torch.cuda.empty_cache()
+
+        print("Computing expl<>story match", EXPT_NAME)
+        explanation_story_match(EXPT_DIR, expls, paragraphs, prompts)
+        torch.cuda.empty_cache()
 
 
 def sweep_interactions():
@@ -161,8 +174,6 @@ def sweep_interactions():
 
 
 if __name__ == "__main__":
-    # EXPT_NAME = 'huth2016clusters_mar21_i_time_traveled'
-    # EXPT_NAME = 'voxels_mar21_hands_arms_emergency'
-    # sweep_pilot()
-
-    sweep_interactions()
+    sweep_default_and_polysemantic(setting="polysemantic")
+    sweep_default_and_polysemantic(setting="default`")
+    # sweep_interactions()
