@@ -18,7 +18,7 @@ import sys
 import json
 
 sys.path.append(join(REPO_DIR, "notebooks_stories", "0_voxel_select"))
-import pilot
+import get_voxels
 
 
 def get_rows_and_prompts_default(
@@ -30,7 +30,7 @@ def get_rows_and_prompts_default(
     version,
 ):
     # get voxels
-    rows = pilot.get_rows_voxels(subject=subject, setting=setting)
+    rows = get_voxels.get_rows_voxels(subject=subject, setting=setting)
 
     # shuffle order (this is the 1st place randomness is applied)
     rows = rows.sample(frac=1, random_state=seed, replace=False)
@@ -65,7 +65,7 @@ def get_rows_and_prompts_interactions(
     version,
 ):
     # get voxels
-    rows1, rows2 = pilot.get_rows_voxels(subject=subject, setting=setting)
+    rows1, rows2 = get_voxels.get_rows_voxels(subject=subject, setting=setting)
 
     # shuffle order (this is the 1st place randomness is applied)
     rows1 = rows1.sample(frac=1, random_state=seed, replace=False)
@@ -105,13 +105,14 @@ if __name__ == "__main__":
     VERSIONS = {
         "default": "v5_noun",
         "interactions": "v0",
+        "polysemantic": "v5_noun",
     }
     # iterate over seeds
     seeds = list(range(1, 8))
     # random.shuffle(seeds)
     n_examples_per_prompt = 3
     n_examples_per_prompt_to_consider = 5
-    for setting in ["interactions"]:  # default
+    for setting in ["polysemantic"]:  # default, interactions, polysemantic
         for subject in ["UTS02"]:  # ["UTS01", "UTS03"]:
             for seed in seeds:
                 # for version in ["v5_noun"]:
@@ -122,7 +123,7 @@ if __name__ == "__main__":
                 EXPT_DIR = join(STORIES_DIR, setting, EXPT_NAME)
                 os.makedirs(EXPT_DIR, exist_ok=True)
 
-                if setting == "default":
+                if setting in ["default", 'polysemantic']:
                     rows, prompts, PV = get_rows_and_prompts_default(
                         subject,
                         setting,

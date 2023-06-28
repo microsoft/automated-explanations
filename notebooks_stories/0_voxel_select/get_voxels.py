@@ -5,7 +5,7 @@ import seaborn as sns
 from os.path import join
 from tqdm import tqdm
 import pandas as pd
-from typing import List
+from typing import Dict, List
 import numpy as np
 import sasc.viz
 from pprint import pprint
@@ -129,9 +129,10 @@ INTERACTIONS_DICT = {
     ],
 }
 
-
-def _voxels_to_rows(voxels: List[Tuple]) -> pd.DataFrame:
-    """add extra data (like ngrams) to each row"""
+def _voxels_to_rows(
+    voxels: List[Tuple], polysemantic_ngrams: Dict = None
+) -> pd.DataFrame:
+    """Add extra data (like ngrams) to each row"""
     r = pd.read_pickle(join(RESULTS_DIR, "results_fmri_full_1500.pkl")).sort_values(
         by=["top_score_synthetic"], ascending=False
     )
@@ -141,11 +142,15 @@ def _voxels_to_rows(voxels: List[Tuple]) -> pd.DataFrame:
     for vox in voxels:
         expl, subj, vox_num = vox
         vox_num = int(vox_num)
-        try:
-            rows.append(r[(r.subject == subj) & (r.module_num == vox_num)].iloc[0])
-            expls.append(expl)
-        except:
-            print("skipping", vox)
+        # try:
+        row = r[(r.subject == subj) & (r.module_num == vox_num)].iloc[0]
+        if polysemantic_ngrams is not None:
+            row['top_ngrams_module_correct'] = polysemantic_ngrams[tuple(vox)]
+        rows.append(row)
+        expls.append(expl)
+
+        # except:
+        # print("skipping", vox)
     rows = pd.DataFrame(rows)
     rows["expl"] = expls
     # with pd.option_context('display.max_rows', None, 'display.max_columns', None, 'display.max_colwidth', 200):
@@ -165,28 +170,48 @@ def get_rows_voxels(subject: str, setting="default"):
     """
 
     # UTS02 - Pilot voxels
-    PILOT_FNAMES = {
-        "UTS02": "notebooks_stories/0_voxel_select/pilot/uts02_concepts_pilot_mar22.json",
-        "UTS01": "notebooks_stories/0_voxel_select/pilot/uts01_concepts_pilot_jun14.json",
-        "UTS03": "notebooks_stories/0_voxel_select/pilot/uts03_concepts_pilot_jun14.json",
-    }
-    voxels_dict = json.load(open(join(REPO_DIR, PILOT_FNAMES[subject]), "r"))
+    if setting in ["default", "interactions"]:
+        VOXEL_DICT_FNAMES = {
+            "UTS02": "notebooks_stories/0_voxel_select/pilot/uts02_concepts_pilot_mar22.json",
+            "UTS01": "notebooks_stories/0_voxel_select/pilot/uts01_concepts_pilot_jun14.json",
+            "UTS03": "notebooks_stories/0_voxel_select/pilot/uts03_concepts_pilot_jun14.json",
+        }
+
+    elif setting == "polysemantic":
+        VOXEL_DICT_FNAMES = {
+            "UTS02": "notebooks_stories/0_voxel_select/polysemantic_UTS02.json",
+        }
+    voxels_dict = json.load(open(join(REPO_DIR, VOXEL_DICT_FNAMES[subject]), "r"))
     vals = pd.DataFrame([tuple(x) for x in sum(list(voxels_dict.values()), [])])
     vals.columns = ["expl", "subject", "module_num"]
 
-    if setting == "default":
-        voxel_nums = VOXEL_DICT[subject]
-        print("len(voxel_nums)", len(voxel_nums), "nunique", len(np.unique(voxel_nums)))
-        vals = vals[vals["module_num"].isin(voxel_nums)]
-        for voxel_num in voxel_nums:
-            if not voxel_num in vals["module_num"].values:
-                print("missing", voxel_num)
-        assert vals["module_num"].nunique() == vals.shape[0], "no duplicates"
-        assert len(vals) == len(voxel_nums), "all voxels found"
-        assert len(voxel_nums) == 17
+    if setting in ["default", "polysemantic"]:
+
+        # filter vals
+        if setting == 'default':
+            voxel_nums = VOXEL_DICT[subject]
+            print("len(voxel_nums)", len(voxel_nums), "nunique", len(np.unique(voxel_nums)))
+            vals = vals[vals["module_num"].isin(voxel_nums)]
+            for voxel_num in voxel_nums:
+                if not voxel_num in vals["module_num"].values:
+                    print("missing", voxel_num)
+            assert vals["module_num"].nunique() == vals.shape[0], "no duplicates"
+            assert len(vals) == len(voxel_nums), "all voxels found"
+            assert len(voxel_nums) == 17
+        else:
+            print('len(vals)', len(vals), 'nunique voxels', vals['module_num'].nunique())
 
         # add extra data (like ngrams) to each row
-        rows = _voxels_to_rows(vals.values)
+        if setting == "polysemantic":
+            polysemantic_ngrams = joblib.load(
+                join(
+                    REPO_DIR,
+                    f"notebooks_stories/0_voxel_select/polysemantic_ngrams_{subject}.pkl",
+                )
+            )
+        else:
+            polysemantic_ngrams = None
+        rows = _voxels_to_rows(vals.values, polysemantic_ngrams=polysemantic_ngrams)
         return rows
 
     elif setting == "interactions":
