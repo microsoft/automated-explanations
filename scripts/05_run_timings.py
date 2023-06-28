@@ -24,7 +24,7 @@ args_list = submit_utils.get_args_list(
 submit_utils.run_args_list(
     args_list,
     script_name=join(repo_dir, 'notebooks_stories', '1_generate', '03_timings.py'),
-    repeat_failed_jobs=False,
+    repeat_failed_jobs=True,
     # reverse=True,
     # n_cpus=15,
     gpu_ids=[2, 3],

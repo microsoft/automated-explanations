@@ -207,9 +207,9 @@ def get_prompt_templates_interaction(version):
         # make story "coherent"
         "v0": {
             "prefix_first": "Write the beginning paragraph of a long, coherent story. The story will cover diverse themes such as {expls}.",
-            "prefix_one_not_two": 'Write the next paragraph of the story, staying consistent with the story so far, but now make it about "{expl_one}". Make sure it contains several words related to "{expl_one}", such as {examples_one}. Do not mention words related to "{expl_two}".',
+            "prefix_one_not_two": 'Write the next paragraph of the story, staying consistent with the story so far, but now make it about "{expl_one}". Make sure it contains several words related to "{expl_one}", such as {examples_one}. Important: do not mention words related to "{expl_two}".',
             "prefix_one_and_two": 'Write the next paragraph of the story, staying consistent with the story so far, but now make it about "{expl_one}" and "{expl_two}". Make sure it contains several words related to "{expl_one}", such as {examples_one}, and several words related to "{expl_two}", such as {examples_two}.',
-            "prefix_two_not_one": 'Write the next paragraph of the story, staying consistent with the story so far, but now make it about "{expl_two}". Make sure it contains several words related to "{expl_two}", such as {examples_two}. Do not mention related to "{expl_one}".',
+            "prefix_two_not_one": 'Write the next paragraph of the story, staying consistent with the story so far, but now make it about "{expl_two}". Make sure it contains several words related to "{expl_two}", such as {examples_two}. Important: do not mention words related to "{expl_one}".',
         },
     }
     return PROMPTS[version]
