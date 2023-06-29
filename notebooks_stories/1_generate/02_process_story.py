@@ -175,5 +175,5 @@ def sweep_interactions():
 
 if __name__ == "__main__":
     sweep_default_and_polysemantic(setting="polysemantic")
-    sweep_default_and_polysemantic(setting="default`")
+    sweep_default_and_polysemantic(setting="default")
     # sweep_interactions()

@@ -146,9 +146,7 @@ def process_story(EXPT_DIR, EXPT_NAME, text, timings_fname_prefix):
     pd.DataFrame.from_dict(
         {
             "word": text.split()[:n],
-            "timing": timing[
-                :n
-            ],  # difference between word2 middle and word1 middle
+            "timing": timing[:n],  # difference between word2 middle and word1 middle
             # 'timing2': timing2[:n], # difference between word3 middle and word2 middle (no offsetting needed)
             "time_running": np.nancumsum(timing),
         }
@@ -156,22 +154,29 @@ def process_story(EXPT_DIR, EXPT_NAME, text, timings_fname_prefix):
 
 
 if __name__ == "__main__":
-    # setting = 'default'
-    setting = "interactions"
+    # setting = "default"
+    setting = "polysemantic"
+    # setting = "interactions"
     EXPT_NAMES = os.listdir(join(RESULTS_DIR, "pilot_v1", setting))
     # shuffle EXPT_NAMES
     random.shuffle(EXPT_NAMES)
 
     for EXPT_NAME in tqdm(EXPT_NAMES):
         EXPT_DIR = join(RESULTS_DIR, "pilot_v1", setting, EXPT_NAME)
-        if setting == 'default':
+        if setting in ["polysemantic", "default"]:
             rows = joblib.load(join(EXPT_DIR, "rows.pkl"))
-            text = "\n".join(rows.paragraph.values)
-        elif setting == 'interactions':
+            try:
+                prompts_paragraphs = joblib.load(
+                    join(EXPT_DIR, "prompts_paragraphs.pkl"),
+                )
+                text = "\n".join(prompts_paragraphs["paragraphs"])
+            except:
+                text = "\n".join(rows.paragraph.values)
+        elif setting == "interactions":
             prompts_paragraphs = joblib.load(
                 join(EXPT_DIR, "prompts_paragraphs.pkl"),
             )
-            text = "\n".join(prompts_paragraphs['paragraphs'])
+            text = "\n".join(prompts_paragraphs["paragraphs"])
 
         if os.path.exists(join(EXPT_DIR, "timings.csv")):
             print("already cached", EXPT_NAME)
