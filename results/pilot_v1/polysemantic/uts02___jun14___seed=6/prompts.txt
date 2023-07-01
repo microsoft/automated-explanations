@@ -1,0 +1,31 @@
+Write the beginning paragraph of a long, coherent story. The story should be about "moment in time". Make sure it contains several words related to "moment in time", such as ['a minute later', 'hour later he', 'later the doorbell'].
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "action". Make sure it contains several words related to "action", such as ['clean an office', 'shopped the registries', 'writing his obituary'].
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "food". Make sure it contains several words related to "food", such as ['some sliced cucumber', 'lemon slices', 'steamed mussels'].
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "clothing". Make sure it contains several words related to "clothing", such as ['rolled up sleeves', 'shirt the suspenders', 'boots clanking'].
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "something negative or undesirable". Make sure it contains several words related to "something negative or undesirable", such as ['very conception unnatural', 'said very rudely', 'became painfully intimate'].
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "fear". Make sure it contains several words related to "fear", such as ['runs out crying', 'darted to safety', 'instinct to hide'].
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "communication". Make sure it contains several words related to "communication", such as ['skype the unboyfriend', 'tell her sisters', 'already called ahead'].
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "movement". Make sure it contains several words related to "movement", such as ['neighbor came over', 'son comes running', 'enters the room'].
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "food preparation". Make sure it contains several words related to "food preparation", such as ['cucumber and mayonnaise', 'sliced red onion', 'cut the apples'].
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "physical appearance". Make sure it contains several words related to "physical appearance", such as ['that many wrinkles', 'rolled up sleeves', 'back my unibrow'].
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "illness". Make sure it contains several words related to "illness", such as ['suicidal depressed', 'as paranoid schizophrenic', 'bipolar obsessive compulsive'].
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "location". Make sure it contains several words related to "location", such as ['our small rural', 'ship to hoboken', 'middlebury vermont'].
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "movement". Make sure it contains several words related to "movement", such as ['job running interference', 'stalls i brace', 'i stopped midstride'].
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "relationships". Make sure it contains several words related to "relationships", such as ['fathers feeling marginalized', 'our vows unimpeachable', 'relationship became painfully'].
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "silence". Make sure it contains several words related to "silence", such as ['sits there silent', 'try to sneak', 'room went silent'].
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "religion". Make sure it contains several words related to "religion", such as ['believe however tenuously', 'like creationist biology', 'boyish almost biblical'].

@@ -1,0 +1,31 @@
+Write the beginning paragraph of a long, coherent story. The story should be about "communication". Make sure it contains several words related to "communication", such as ['skype the unboyfriend', 'tell her sisters', 'already called ahead'].
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "food preparation". Make sure it contains several words related to "food preparation", such as ['sliced red onion', 'cucumber and mayonnaise', 'cut the apples'].
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "clothing". Make sure it contains several words related to "clothing", such as ['boots clanking', 'rolled up sleeves', 'wearing flower aprons'].
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "something negative or undesirable". Make sure it contains several words related to "something negative or undesirable", such as ['became painfully intimate', 'said very rudely', 'drinks are unhealthy'].
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "religion". Make sure it contains several words related to "religion", such as ['believe however tenuously', 'a particularly devout', 'boyish almost biblical'].
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "location". Make sure it contains several words related to "location", such as ['middlebury vermont', 'ship to hoboken', 'our small rural'].
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "illness". Make sure it contains several words related to "illness", such as ['bipolar obsessive compulsive', 'three month prognosis', 'personality any diagnosis'].
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "movement". Make sure it contains several words related to "movement", such as ['pass the baton', 'i stopped midstride', 'job running interference'].
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "fear". Make sure it contains several words related to "fear", such as ['could escape quietly', 'runs out crying', 'fled the house'].
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "silence". Make sure it contains several words related to "silence", such as ['become very silent', 'try to sneak', 'i crawled quietly'].
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "physical appearance". Make sure it contains several words related to "physical appearance", such as ['back my unibrow', 'skin stripped from', 'long shaggy hair'].
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "moment in time". Make sure it contains several words related to "moment in time", such as ['later the doorbell', 'hour later he', 'suddenly he stops'].
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "food". Make sure it contains several words related to "food", such as ['lemon slices', 'sugar cubes', 'piece of tomato'].
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "movement". Make sure it contains several words related to "movement", such as ['he came downstairs', 'enters the room', 'neighbor came over'].
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "action". Make sure it contains several words related to "action", such as ['we washed dishes', 'shopped the registries', 'became a chemist'].
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "relationships". Make sure it contains several words related to "relationships", such as ['fathers feeling marginalized', 'children an incomprehensibly', 'relationship became painfully'].

@@ -1,0 +1,31 @@
+Write the beginning paragraph of a long, coherent story. The story should be about "moment in time". Make sure it contains several words related to "moment in time", such as ['suddenly he stops', 'hour later he', 'moment later'].
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "movement". Make sure it contains several words related to "movement", such as ['pass the baton', 'stalls i brace', 'i stopped midstride'].
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "communication". Make sure it contains several words related to "communication", such as ['tell her sisters', 'skype the unboyfriend', 'phone through colleagues'].
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "physical appearance". Make sure it contains several words related to "physical appearance", such as ['rolled up sleeves', 'that many wrinkles', 'back my unibrow'].
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "silence". Make sure it contains several words related to "silence", such as ['become very silent', 'try to sneak', 'sits there silent'].
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "relationships". Make sure it contains several words related to "relationships", such as ['our vows unimpeachable', 'fathers feeling marginalized', 'children an incomprehensibly'].
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "food preparation". Make sure it contains several words related to "food preparation", such as ['sliced red onion', 'cut the apples', 'peel and cut'].
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "religion". Make sure it contains several words related to "religion", such as ['boyish almost biblical', 'believe however tenuously', 'like creationist biology'].
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "clothing". Make sure it contains several words related to "clothing", such as ['rolled up sleeves', 'shirt the suspenders', 'wearing flower aprons'].
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "action". Make sure it contains several words related to "action", such as ['shopped the registries', 'clean an office', 'we washed dishes'].
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "something negative or undesirable". Make sure it contains several words related to "something negative or undesirable", such as ['became painfully intimate', 'very conception unnatural', 'drinks are unhealthy'].
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "illness". Make sure it contains several words related to "illness", such as ['three month prognosis', 'suicidal depressed', 'personality any diagnosis'].
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "food". Make sure it contains several words related to "food", such as ['lemon slices', 'sugar cubes', 'some sliced cucumber'].
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "location". Make sure it contains several words related to "location", such as ['middlebury vermont', 'my whole hometown', 'ship to hoboken'].
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "movement". Make sure it contains several words related to "movement", such as ['he came downstairs', 'neighbor came over', 'comes walking towards'].
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "fear". Make sure it contains several words related to "fear", such as ['fled the house', 'darted to safety', 'runs out crying'].

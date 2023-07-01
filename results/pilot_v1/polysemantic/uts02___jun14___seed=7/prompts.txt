@@ -1,0 +1,31 @@
+Write the beginning paragraph of a long, coherent story. The story should be about "fear". Make sure it contains several words related to "fear", such as ['fled the house', 'runs out crying', 'instinct to hide'].
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "communication". Make sure it contains several words related to "communication", such as ['tell my friends', 'already called ahead', 'tell her sisters'].
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "religion". Make sure it contains several words related to "religion", such as ['in this metaphysical', 'boyish almost biblical', 'believe however tenuously'].
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "something negative or undesirable". Make sure it contains several words related to "something negative or undesirable", such as ['drinks are unhealthy', 'very conception unnatural', 'i was overreacting'].
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "moment in time". Make sure it contains several words related to "moment in time", such as ['moment later', 'suddenly he stops', 'hour later he'].
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "physical appearance". Make sure it contains several words related to "physical appearance", such as ['rolled up sleeves', 'skin stripped from', 'long shaggy hair'].
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "food preparation". Make sure it contains several words related to "food preparation", such as ['cucumber and mayonnaise', 'thinly sliced', 'cut the apples'].
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "action". Make sure it contains several words related to "action", such as ['became a chemist', 'clean an office', 'shopped the registries'].
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "movement". Make sure it contains several words related to "movement", such as ['son comes running', 'he came downstairs', 'neighbor came over'].
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "clothing". Make sure it contains several words related to "clothing", such as ['a white handkerchief', 'rolled up sleeves', 'wearing flower aprons'].
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "illness". Make sure it contains several words related to "illness", such as ['bipolar obsessive compulsive', 'three month prognosis', 'personality any diagnosis'].
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "relationships". Make sure it contains several words related to "relationships", such as ['children an incomprehensibly', 'our vows unimpeachable', 'fathers feeling marginalized'].
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "food". Make sure it contains several words related to "food", such as ['sugar cubes', 'lemon slices', 'steamed mussels'].
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "silence". Make sure it contains several words related to "silence", such as ['room went silent', 'become very silent', 'i crawled quietly'].
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "movement". Make sure it contains several words related to "movement", such as ['pass the baton', 'job running interference', 'i stopped midstride'].
+
+Write the next paragraph of the story, staying consistent with the story so far, but now make it about "location". Make sure it contains several words related to "location", such as ['our small rural', 'hotel across town', 'ship to hoboken'].
