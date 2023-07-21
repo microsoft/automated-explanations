@@ -154,8 +154,8 @@ def process_story(EXPT_DIR, EXPT_NAME, text, timings_fname_prefix):
 
 
 if __name__ == "__main__":
-    # setting = "default"
-    setting = "polysemantic"
+    setting = "default"
+    # setting = "polysemantic"
     # setting = "interactions"
     EXPT_NAMES = os.listdir(join(RESULTS_DIR, "pilot_v1", setting))
     # shuffle EXPT_NAMES

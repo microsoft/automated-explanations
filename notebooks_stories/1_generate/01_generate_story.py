@@ -112,18 +112,18 @@ if __name__ == "__main__":
     # random.shuffle(seeds)
     n_examples_per_prompt = 3
     n_examples_per_prompt_to_consider = 5
-    for setting in ["polysemantic"]:  # default, interactions, polysemantic
+    for setting in ["interactions"]:  # default, interactions, polysemantic
         for subject in ["UTS02"]:  # ["UTS01", "UTS03"]:
             for seed in seeds:
                 # for version in ["v5_noun"]:
                 version = VERSIONS[setting]
-                STORIES_DIR = join(RESULTS_DIR, "pilot_v1")
+                STORIES_DIR = join(RESULTS_DIR, "stories")
 
                 EXPT_NAME = f"{subject.lower()}___jun14___seed={seed}"
                 EXPT_DIR = join(STORIES_DIR, setting, EXPT_NAME)
                 os.makedirs(EXPT_DIR, exist_ok=True)
 
-                if setting in ["default", 'polysemantic']:
+                if setting in ["default", "polysemantic"]:
                     rows, prompts, PV = get_rows_and_prompts_default(
                         subject,
                         setting,
@@ -134,7 +134,7 @@ if __name__ == "__main__":
                     )
                     rows.to_csv(join(EXPT_DIR, f"rows.csv"), index=False)
                     rows.to_pickle(join(EXPT_DIR, f"rows.pkl"))
-                    
+
                 elif setting == "interactions":
                     rows1, rows2, prompts, PV = get_rows_and_prompts_interactions(
                         subject,
@@ -144,11 +144,12 @@ if __name__ == "__main__":
                         n_examples_per_prompt,
                         version,
                     )
-                    
+
                     # repeat
-                    reps = [pd.concat([rows1.iloc[[0]]] * 4, ignore_index=True)]
-                    for i in range(1, len(rows1)):
-                        reps.append(pd.concat([rows1.iloc[[i]]] * 3, ignore_index=True))
+                    reps = [rows1.iloc[0]]
+                      # [pd.concat([rows1.iloc[[0]]] * 4, ignore_index=True)]
+                    for i in range(0, len(rows1)):
+                        reps.append(pd.concat([rows1.iloc[i], rows2.iloc[i], rows1.iloc[i]], ignore_index=True))
                     rows1_rep = pd.concat(
                         reps,
                         ignore_index=True,
@@ -158,8 +159,6 @@ if __name__ == "__main__":
                     rows2.to_csv(join(EXPT_DIR, f"rows2.csv"), index=False)
                     rows2.to_pickle(join(EXPT_DIR, f"rows2.pkl"))
                     rows1_rep.to_pickle(join(EXPT_DIR, f"rows.pkl"))
-
-                
 
                 # generate paragraphs
                 paragraphs = sasc.generate_helper.get_paragraphs(

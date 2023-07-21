@@ -27,5 +27,5 @@ submit_utils.run_args_list(
     repeat_failed_jobs=True,
     # reverse=True,
     # n_cpus=15,
-    gpu_ids=[0, 1, 2, 3],
+    gpu_ids=[0, 1], #, 2, 3],
 )
