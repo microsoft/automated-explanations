@@ -156,3 +156,27 @@ def quickshow(X: np.ndarray, subject="UTS03", fname_save=None, title=None):
         plt.savefig(fname_save)
         plt.savefig(fname_save.replace(".pdf", ".png"))
         plt.close()
+
+def outline_diagonal(shape, color='gray', lw=1, block_size=1):
+    for r in range(shape[0]):
+        for c in range(shape[1]):
+            # outline the diagonal with blocksize 1
+            if block_size == 1 and r == c:
+                plt.plot([r - 0.5, r + 0.5], [c - 0.5, c - 0.5], color=color, lw=lw)
+                plt.plot([r - 0.5, r + 0.5], [c + 0.5, c + 0.5], color=color, lw=lw)
+                plt.plot([r - 0.5, r - 0.5], [c - 0.5, c + 0.5], color=color, lw=lw)
+                plt.plot([r + 0.5, r + 0.5], [c - 0.5, c + 0.5], color=color, lw=lw)
+            if block_size == 2 and r == c and r % 2 == 0:
+                rx = r + 0.5
+                cx = c + 0.5
+                plt.plot([rx - 1, rx + 1], [cx - 1, cx - 1], color=color, lw=lw)
+                plt.plot([rx - 1, rx + 1], [cx + 1, cx + 1], color=color, lw=lw)
+                plt.plot([rx - 1, rx - 1], [cx - 1, cx + 1], color=color, lw=lw)
+                plt.plot([rx + 1, rx + 1], [cx - 1, cx + 1], color=color, lw=lw)
+            if block_size == 3 and r == c and r % 3 == 0:
+                rx = r + 1
+                cx = c + 1
+                plt.plot([rx - 1.5, rx + 1.5], [cx - 1.5, cx - 1.5], color=color, lw=lw)
+                plt.plot([rx - 1.5, rx + 1.5], [cx + 1.5, cx + 1.5], color=color, lw=lw)
+                plt.plot([rx - 1.5, rx - 1.5], [cx - 1.5, cx + 1.5], color=color, lw=lw)
+                plt.plot([rx + 1.5, rx + 1.5], [cx - 1.5, cx + 1.5], color=color, lw=lw)
