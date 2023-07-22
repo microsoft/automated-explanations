@@ -15,15 +15,20 @@ import os.path
 import numpy as np
 import fire
 import random
+from sklearn.linear_model import RidgeCV
 
 
 def text_to_speech(text, speech_fname):
     # Intialize TTS (tacotron2) and Vocoder (HiFIGAN)
     tacotron2 = Tacotron2.from_hparams(
-        source="speechbrain/tts-tacotron2-ljspeech", savedir="~/.tmpdir_tts"
+        source="speechbrain/tts-tacotron2-ljspeech",
+        savedir="~/.tmpdir_tts",
+        run_opts={"device": "cuda"},
     )
     hifi_gan = HIFIGAN.from_hparams(
-        source="speechbrain/tts-hifigan-ljspeech", savedir="~/.tmpdir_vocoder"
+        source="speechbrain/tts-hifigan-ljspeech",
+        savedir="~/.tmpdir_vocoder",
+        run_opts={"device": "cuda"},
     )
 
     # Running the TTS
@@ -72,10 +77,14 @@ def process_story(EXPT_DIR, EXPT_NAME, text, timings_fname_prefix):
     # initialize TTS (tacotron2) and Vocoder (HiFIGAN)
     # device = 'cuda'
     tacotron2 = Tacotron2.from_hparams(
-        source="speechbrain/tts-tacotron2-ljspeech", savedir=".tmp/.tmpdir_tts"
+        source="speechbrain/tts-tacotron2-ljspeech",
+        savedir=".tmp/.tmpdir_tts",
+        run_opts={"device": "cuda"},
     )
     hifi_gan = HIFIGAN.from_hparams(
-        source="speechbrain/tts-hifigan-ljspeech", savedir=".tmp/.tmpdir_vocoder"
+        source="speechbrain/tts-hifigan-ljspeech",
+        savedir=".tmp/.tmpdir_vocoder",
+        run_opts={"device": "cuda"},
     )
 
     # initialize STT
@@ -92,6 +101,7 @@ def process_story(EXPT_DIR, EXPT_NAME, text, timings_fname_prefix):
     )
     timing = []
     # timing2 = [np.nan] # offset by one word
+
     for i in tqdm(range(len(ngrams_list))):
         ngram = ngrams_list[i]
 
@@ -102,7 +112,7 @@ def process_story(EXPT_DIR, EXPT_NAME, text, timings_fname_prefix):
         waveforms = hifi_gan.decode_batch(mel_output)
 
         # Save the waveform
-        torchaudio.save(speech_fname, waveforms.squeeze(1), 22050)
+        torchaudio.save(speech_fname, waveforms.squeeze(1).cpu(), 22050)
 
         try:
             # Transcribe and save
@@ -153,32 +163,56 @@ def process_story(EXPT_DIR, EXPT_NAME, text, timings_fname_prefix):
     ).to_csv(join(EXPT_DIR, "timings.csv"), index=False)
 
 
+def process_timings(df: pd.DataFrame) -> pd.DataFrame:
+    df["word_len"] = df["word"].apply(len)
+    df["ends_in_period"] = df["word"].str.endswith(".")
+    df["ends_in_comma"] = df["word"].str.endswith(",")
+
+    # truncate values that are too large
+    df["timing"] = df["timing"].apply(lambda x: min(x, 0.85))
+
+    # fill na values with linreg
+    X = df[["word_len", "ends_in_period", "ends_in_comma"]].values
+    y = df["timing"].values
+    print("n", y.size, "n_nan", np.sum(pd.isna(y)))
+    idxs = ~pd.isna(y)
+    m = RidgeCV()
+    m.fit(X[idxs], y[idxs])
+    if np.any(pd.isna(y)):
+        df["timing"][~idxs] = m.predict(X[~idxs])
+
+        # recompute running time
+        df["time_running"] = np.cumsum(df["timing"])
+    return df
+
+
 if __name__ == "__main__":
     setting = "default"
     # setting = "polysemantic"
     # setting = "interactions"
-    EXPT_NAMES = os.listdir(join(RESULTS_DIR, "pilot_v1", setting))
+    EXPT_NAMES = [
+        k
+        for k in os.listdir(join(RESULTS_DIR, "stories", setting))
+        if "uts03" in k or "uts01" in k
+    ]
     # shuffle EXPT_NAMES
     random.shuffle(EXPT_NAMES)
 
     for EXPT_NAME in tqdm(EXPT_NAMES):
-        EXPT_DIR = join(RESULTS_DIR, "pilot_v1", setting, EXPT_NAME)
-        if setting in ["polysemantic", "default"]:
-            rows = joblib.load(join(EXPT_DIR, "rows.pkl"))
-            try:
-                prompts_paragraphs = joblib.load(
-                    join(EXPT_DIR, "prompts_paragraphs.pkl"),
-                )
-                text = "\n".join(prompts_paragraphs["paragraphs"])
-            except:
-                text = "\n".join(rows.paragraph.values)
-        elif setting == "interactions":
+        EXPT_DIR = join(RESULTS_DIR, "stories", setting, EXPT_NAME)
+
+        # get text
+        try:
             prompts_paragraphs = joblib.load(
                 join(EXPT_DIR, "prompts_paragraphs.pkl"),
             )
             text = "\n".join(prompts_paragraphs["paragraphs"])
+        except:
+            rows = joblib.load(join(EXPT_DIR, "rows.pkl"))
+            text = "\n".join(rows.paragraph.values)
 
-        if os.path.exists(join(EXPT_DIR, "timings.csv")):
+        timings_file = join(EXPT_DIR, "timings.csv")
+        if os.path.exists(timings_file):
             print("already cached", EXPT_NAME)
             continue
         else:
@@ -189,3 +223,12 @@ if __name__ == "__main__":
                 text,
                 timings_fname_prefix=join(EXPT_DIR, f"{EXPT_NAME}_timings"),
             )
+
+        # process timings
+        timings_processed_file = join(EXPT_DIR, "timings_processed.csv")
+        if os.path.exists(timings_processed_file):
+            print("already processed", EXPT_NAME)
+        else:
+            df = pd.read_csv(timings_file)
+            df = process_timings(df)
+            df.to_csv(timings_processed_file, index=False)
