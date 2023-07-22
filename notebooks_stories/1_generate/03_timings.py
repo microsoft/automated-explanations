@@ -142,16 +142,6 @@ def process_story(EXPT_DIR, EXPT_NAME, text, timings_fname_prefix):
             # timing2.append(np.nan)
             # print(ngram, timings)
 
-        # if i % 20 == 0:
-        #     # save early
-        #     n = len(timing)
-        #     pd.DataFrame.from_dict({
-        #         'word': text.split()[:n],
-        #         'timing': timing[:n], # difference between word2 middle and word1 middle
-        #         # 'timing2': timing2[:n], # difference between word3 middle and word2 middle (no offsetting needed)
-        #         'time_running': np.nancumsum(timing)
-        #     }).to_csv(join(EXPT_DIR, 'timings.csv'), index=False)
-
     n = len(timing)
     pd.DataFrame.from_dict(
         {
@@ -169,20 +159,31 @@ def process_timings(df: pd.DataFrame) -> pd.DataFrame:
     df["ends_in_comma"] = df["word"].str.endswith(",")
 
     # truncate values that are too large
-    df["timing"] = df["timing"].apply(lambda x: min(x, 0.85))
+    df["timing"] = df["timing"].apply(lambda x: min(x, 0.75))
 
     # fill na values with linreg
     X = df[["word_len", "ends_in_period", "ends_in_comma"]].values
     y = df["timing"].values
     print("n", y.size, "n_nan", np.sum(pd.isna(y)))
+
     idxs = ~pd.isna(y)
     m = RidgeCV()
     m.fit(X[idxs], y[idxs])
-    if np.any(pd.isna(y)):
+
+    # fill na values
+    if np.any(idxs):
         df["timing"][~idxs] = m.predict(X[~idxs])
 
-        # recompute running time
-        df["time_running"] = np.cumsum(df["timing"])
+    # fix values that are too small
+    idxs = y <= 0.05
+    if np.any(idxs):
+        df["timing"][idxs] = m.predict(X[idxs])
+
+    # truncate values that are too large
+    df["timing"] = df["timing"].apply(lambda x: min(x, 0.8))
+
+    # recompute running time
+    df["time_running"] = np.cumsum(df["timing"])
     return df
 
 
@@ -190,13 +191,16 @@ if __name__ == "__main__":
     setting = "default"
     # setting = "polysemantic"
     # setting = "interactions"
-    EXPT_NAMES = [
-        k
-        for k in os.listdir(join(RESULTS_DIR, "stories", setting))
-        if "uts03" in k or "uts01" in k
-    ]
+    EXPT_NAMES = sorted(
+        [
+            k
+            for k in os.listdir(join(RESULTS_DIR, "stories", setting))
+            if "uts03" in k or "uts01" in k
+        ]
+    )
     # shuffle EXPT_NAMES
-    random.shuffle(EXPT_NAMES)
+    # random.shuffle(EXPT_NAMES)
+    EXPT_NAMES = EXPT_NAMES[::-1]
 
     for EXPT_NAME in tqdm(EXPT_NAMES):
         EXPT_DIR = join(RESULTS_DIR, "stories", setting, EXPT_NAME)
@@ -212,9 +216,10 @@ if __name__ == "__main__":
             text = "\n".join(rows.paragraph.values)
 
         timings_file = join(EXPT_DIR, "timings.csv")
+
+        # get timings for timings_file
         if os.path.exists(timings_file):
             print("already cached", EXPT_NAME)
-            continue
         else:
             print("running", EXPT_NAME)
             process_story(
@@ -225,10 +230,6 @@ if __name__ == "__main__":
             )
 
         # process timings
-        timings_processed_file = join(EXPT_DIR, "timings_processed.csv")
-        if os.path.exists(timings_processed_file):
-            print("already processed", EXPT_NAME)
-        else:
-            df = pd.read_csv(timings_file)
-            df = process_timings(df)
-            df.to_csv(timings_processed_file, index=False)
+        df = pd.read_csv(timings_file)
+        df = process_timings(df)
+        df.to_csv(join(EXPT_DIR, "timings_processed.csv"), index=False)
