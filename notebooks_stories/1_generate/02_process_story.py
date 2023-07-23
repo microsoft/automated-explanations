@@ -25,6 +25,7 @@ from pprint import pprint
 import joblib
 from sasc.config import RESULTS_DIR
 import torch.cuda
+import scipy.special
 
 
 def explanation_story_match(EXPT_DIR, expls, paragraphs, prompts):
@@ -83,7 +84,21 @@ def module_story_match(EXPT_DIR, expls, paragraphs, voxel_nums, subjects):
     )
 
     # make plot
-    sasc.viz.heatmap(scores_mod.T, expls, ylab="Story", xlab="Module")
+    s = scores_mod.T
+    s = scipy.special.softmax(s, axis=0)
+    sasc.viz.heatmap(s, expls, ylab="Story", xlab="Module")
+
+    diag_diff = (
+        np.mean(np.diag(s))
+        - (
+            np.mean(s[np.triu_indices_from(s, k=1)])
+            + np.mean(s[np.tril_indices_from(s, k=-1)])
+        )
+        / 2
+    ).round(5)
+    plt.title(os.path.basename(EXPT_DIR) + ' diag_diff=' + str(diag_diff))
+
+
     plt.savefig(join(EXPT_DIR, f"story_module_match.pdf"), bbox_inches="tight")
 
     # with overlaps

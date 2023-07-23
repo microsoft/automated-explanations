@@ -112,8 +112,8 @@ if __name__ == "__main__":
     # random.shuffle(seeds)
     n_examples_per_prompt = 3
     n_examples_per_prompt_to_consider = 5
-    for setting in ["interactions"]:  # default, interactions, polysemantic
-        for subject in ["UTS02"]:  # ["UTS01", "UTS03"]:
+    for setting in ["default"]:  # default, interactions, polysemantic
+        for subject in ["UTS01"]:  # ["UTS01", "UTS03"]:
             for seed in seeds:
                 # for version in ["v5_noun"]:
                 version = VERSIONS[setting]
