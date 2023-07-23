@@ -101,14 +101,17 @@ def module_story_match(EXPT_DIR, expls, paragraphs, voxel_nums, subjects):
     #     }, join(EXPT_DIR, f'scores_mod_ngram_length={ngram_length}.pkl'))
 
 
-def sweep_default_and_polysemantic(setting="default"):    
-    EXPT_PARENT_DIR = join(RESULTS_DIR, "pilot_v1", setting)
-    # if setting == 'default':
-        # seeds = range(1, 8)
-        # versions  = ["v4_noun", "v5_noun"]
-        # EXPT_NAMES = [f"uts02_pilot_gpt4_mar28___ver={version}___seed={seed}" for seed in seeds for version in versions]
-    # elif setting == 'interactions':
+def sweep_default_and_polysemantic(subjects=['UTS01', 'UTS03'], setting="default"):    
+    EXPT_PARENT_DIR = join(RESULTS_DIR, "stories", setting)
     EXPT_NAMES = os.listdir(EXPT_PARENT_DIR)
+
+    # filter EXPT_NAMES that don't contain any of the subjects
+    EXPT_NAMES = [
+        expt_name
+        for expt_name in EXPT_NAMES
+        if any([subject.lower() in expt_name for subject in subjects])
+    ]
+
     for EXPT_NAME in EXPT_NAMES:
         EXPT_DIR = join(EXPT_PARENT_DIR, EXPT_NAME)
         rows = joblib.load(join(EXPT_DIR, "rows.pkl"))
@@ -139,13 +142,13 @@ def sweep_default_and_polysemantic(setting="default"):
         torch.cuda.empty_cache()
 
 
-def sweep_interactions():
+def sweep_interactions(subjects=['UTS01', 'UTS03']):
     # iterate over seeds
     seeds = range(1, 8)
     setting = "interactions"
-    for subject in ["UTS02"]:  # ["UTS01", "UTS03"]:
+    for subject in subjects:  # ["UTS01", "UTS03"]:
         for seed in seeds:
-            STORIES_DIR = join(RESULTS_DIR, "pilot_v1")
+            STORIES_DIR = join(RESULTS_DIR, "stories")
             EXPT_NAME = f"{subject.lower()}___jun14___seed={seed}"
             EXPT_DIR = join(STORIES_DIR, setting, EXPT_NAME)
             # rows = joblib.load(join(EXPT_DIR, "rows1.pkl"))
@@ -174,6 +177,6 @@ def sweep_interactions():
 
 
 if __name__ == "__main__":
-    sweep_default_and_polysemantic(setting="polysemantic")
-    sweep_default_and_polysemantic(setting="default")
+    sweep_default_and_polysemantic(subjects=['UTS01', 'UTS03'], setting="default")
+    # sweep_default_and_polysemantic(subjects=['UTS01', 'UTS03'], setting="polysemantic")
     # sweep_interactions()

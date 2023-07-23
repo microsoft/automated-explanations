@@ -2,7 +2,7 @@ import matplotlib
 import numpy as np
 import matplotlib.pyplot as plt
 from typing import List
-
+import seaborn as sns
 import numpy as np
 from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib.pyplot as plt
@@ -24,6 +24,12 @@ cs_mpl = [
 # a nice blue/red color
 cblue = "#66ccff"
 cred = "#cc0000"
+
+def imshow_diverging(mat):
+    vabs = np.nanmax(np.abs(mat))
+    plt.imshow(mat, cmap=sns.diverging_palette(29, 220, as_cmap=True), vmin=-vabs, vmax=vabs)
+    plt.colorbar(label='Mean response ($\sigma_f$)')
+
 
 
 def save_figs_to_single_pdf(filename):
