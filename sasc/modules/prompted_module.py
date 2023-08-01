@@ -12,7 +12,7 @@ import pickle as pkl
 from os.path import dirname, join
 import os.path
 import re
-import imodelsx.sasc.llm
+import imodelsx.llm
 from langchain import PromptTemplate
 from sasc.data.data import TASKS
 modules_dir = dirname(os.path.abspath(__file__))
@@ -26,7 +26,7 @@ class PromptedModule():
         ------
         """
         print(f'loading {checkpoint}...')
-        self.llm = sasc.llm.get_llm(checkpoint)
+        self.llm = imodelsx.llm.get_llm(checkpoint)
         self._init_task(task_str)
 
     def _init_task(self, task_str: str):

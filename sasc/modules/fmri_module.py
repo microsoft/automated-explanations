@@ -16,23 +16,35 @@ import torch.cuda
 import os.path
 import torch
 import numpy.random
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import AutoModelForCausalLM, AutoTokenizer, LlamaTokenizer
 import joblib
 
 modules_dir = dirname(os.path.abspath(__file__))
 from sasc.config import SAVE_DIR_FMRI
 
-# SAVE_DIR_FMRI = join(modules_dir, 'fmri')
 NUM_TOP_VOXELS = 500
 
+"""
+When adding a new model, need to:
+- run cache_preprocessor() on the extracted features
+"""
+
+
 def convert_module_num_to_voxel_num(module_num: int, subject: str):
-    voxel_idxs = joblib.load(join(SAVE_DIR_FMRI, 'voxel_lists', f'{subject}_voxel_selectivity.jbl'))
+    voxel_idxs = joblib.load(
+        join(SAVE_DIR_FMRI, "voxel_lists", f"{subject}_voxel_selectivity.jbl")
+    )
     numpy.random.default_rng(seed=42).shuffle(voxel_idxs)
     return voxel_idxs[module_num]
 
 
 class fMRIModule:
-    def __init__(self, voxel_num_best: int = 0, subject: str = "UTS01"):
+    def __init__(
+        self,
+        voxel_num_best: int = 0,
+        subject: str = "UTS01",
+        checkpoint="facebook/opt-30b",
+    ):
         """
         Params
         ------
@@ -41,8 +53,17 @@ class fMRIModule:
         """
 
         # load opt model & tokenizer
-        self.checkpoint = "facebook/opt-30b"
-        self.tokenizer = AutoTokenizer.from_pretrained(self.checkpoint)
+        assert checkpoint in ["facebook/opt-30b", "decapoda-research/llama-30b-hf"]
+        self.checkpoint = checkpoint
+        self.model_dir = {
+            "facebook/opt-30b": "opt_model",
+            "decapoda-research/llama-30b-hf": "llama_model",
+        }[checkpoint]
+        if checkpoint == "decapoda-research/llama-30b-hf":
+            self.tokenizer = LlamaTokenizer.from_pretrained(self.checkpoint)
+        else:
+            self.tokenizer = AutoTokenizer.from_pretrained(self.checkpoint)
+
         self.model = AutoModelForCausalLM.from_pretrained(
             self.checkpoint, device_map="auto", torch_dtype=torch.float16
         )
@@ -71,9 +92,13 @@ class fMRIModule:
         )
 
         # load weights
-        weights_file = join(SAVE_DIR_FMRI, "model_weights", f"wt_{subject}.jbl")
+        weights_file = join(
+            SAVE_DIR_FMRI, self.model_dir, "model_weights", f"wt_{subject}.jbl"
+        )
         self.weights = joblib.load(weights_file)
-        self.preproc = pkl.load(open(join(SAVE_DIR_FMRI, "preproc.pkl"), "rb"))
+        self.preproc = pkl.load(
+            open(join(SAVE_DIR_FMRI, self.model_dir, "preproc.pkl"), "rb")
+        )
         self.weights = self.weights[:, voxel_idxs]
 
         # load corr performance
@@ -82,9 +107,13 @@ class fMRIModule:
             corrs = joblib.load(
                 join(
                     SAVE_DIR_FMRI,
+                    self.model_dir,
                     "voxel_performances",
                     f"{subject}_voxel_performance.jbl",
                 )
+            )
+            print(
+                f"voxel_idx: {voxel_idx} voxel_num_best: {voxel_num_best} corrs.shape: {corrs.shape}"
             )
             self.corr = corrs[voxel_idx]
 
@@ -96,6 +125,10 @@ class fMRIModule:
             (n_examples, 7168)
         """
         embs = []
+        layer = {
+            "facebook/opt-30b": 33,
+            "decapoda-research/llama-30b-hf": 18,
+        }[self.checkpoint]
         for i in tqdm(range(len(X))):
             text = self.tokenizer.encode(X[i])
             inputs = {}
@@ -104,7 +137,7 @@ class fMRIModule:
 
             # Ideally, you would use downsampled features instead of copying features across time delays
             emb = (
-                list(self.model(**inputs, output_hidden_states=True)[2])[33][0][-1]
+                list(self.model(**inputs, output_hidden_states=True)[2])[layer][0][-1]
                 .cpu()
                 .detach()
                 .numpy()
@@ -384,6 +417,7 @@ def cache_test_data():
         grids = joblib.load(join(SAVE_DIR_FMRI, "stories", "grids_all.jbl"))
         trfiles = joblib.load(join(SAVE_DIR_FMRI, "stories", "trfiles_all.jbl"))
         from huth.utils_ds import make_word_ds
+
         wordseqs = make_word_ds(grids, trfiles)
 
         # loop over stories
@@ -417,25 +451,24 @@ def cache_test_data():
     joblib.dump(out, join(SAVE_DIR_FMRI, "stories", "running_words.jbl"))
 
 
-def cache_preprocessor():
-    embs_dict = joblib.load(
-        join(SAVE_DIR_FMRI, "stimulus_features", "OPT_features.jbl")
-    )
+def cache_preprocessor(model_dir="llama_model"):
+    embs_dict = joblib.load(join(SAVE_DIR_FMRI, model_dir, "stimulus_features.jbl"))
     embs = np.concatenate([embs_dict[k] for k in embs_dict])
     preproc = sklearn.preprocessing.StandardScaler()
     preproc.fit(embs)
-    pkl.dump(preproc, open(join(SAVE_DIR_FMRI, "preproc.pkl"), "wb"))
+    pkl.dump(preproc, open(join(SAVE_DIR_FMRI, model_dir, "preproc.pkl"), "wb"))
 
 
 if __name__ == "__main__":
     # cache_preprocessor()
-    cache_test_data()
+    # cache_test_data()
     # story_text = get_train_story_texts()
 
-    # mod = fMRIModule(voxel_num_best=[1, 2, 3])
-    # X = ["I am happy", "I am sad", "I am angry"]
-    # # print(X[0][:50])
-    # resp = mod(X[:3])
-    # print(resp.shape)
-    # print(resp)
-    # # print(mod.corrs[:20])
+    mod = fMRIModule(
+        voxel_num_best=[1, 2, 3], checkpoint="decapoda-research/llama-30b-hf"
+    )
+    X = ["I am happy", "I am sad", "I am angry"]
+    print(X[0][:50])
+    resp = mod(X[:3])
+    print(resp.shape)
+    print(resp)
