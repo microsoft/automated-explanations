@@ -112,6 +112,8 @@ class fMRIModule:
                     f"{subject}_voxel_performance.jbl",
                 )
             )
+            if self.checkpoint == "decapoda-research/llama-30b-hf":
+                corrs = corrs[0]
             print(
                 f"voxel_idx: {voxel_idx} voxel_num_best: {voxel_num_best} corrs.shape: {corrs.shape}"
             )
