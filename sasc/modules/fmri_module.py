@@ -69,55 +69,63 @@ class fMRIModule:
         )
 
         # load fmri-specific stuff
-        self._init_fmri(voxel_num_best, subject)
+        self._init_fmri(subject)
+        self._init_fmri_voxel(voxel_num_best, subject)
 
-    def _init_fmri(self, voxel_num_best: Union[int, List[int]], subject: str):
-        self.voxel_num_best = voxel_num_best
-        self.subject = subject
-        self.ndel = 4
-
+    def _init_fmri(self, subject: str):
+        print("initializing fmri...")
         # select voxel index
-        voxel_idxs = joblib.load(
-            join(SAVE_DIR_FMRI, "voxel_lists", f"{subject}_voxel_selectivity.jbl")
-        )
-        numpy.random.default_rng(seed=42).shuffle(voxel_idxs)
-        voxel_idxs = voxel_idxs[:NUM_TOP_VOXELS]
-        joblib.dump(
-            voxel_idxs,
+        # voxel_idxs = joblib.load(
+        #     join(SAVE_DIR_FMRI, "voxel_lists", f"{subject}_voxel_selectivity.jbl")
+        # )
+        # numpy.random.default_rng(seed=42).shuffle(voxel_idxs)
+        # voxel_idxs = voxel_idxs[:NUM_TOP_VOXELS]
+        # joblib.dump(
+        #     voxel_idxs,
+        #     join(
+        #         SAVE_DIR_FMRI,
+        #         "voxel_lists",
+        #         f"{subject}_voxel_selectivity_shuffled.jbl",
+        #     ),
+        # )
+        self.voxel_idxs = joblib.load(
             join(
                 SAVE_DIR_FMRI,
                 "voxel_lists",
                 f"{subject}_voxel_selectivity_shuffled.jbl",
-            ),
+            )
         )
 
         # load weights
         weights_file = join(
             SAVE_DIR_FMRI, self.model_dir, "model_weights", f"wt_{subject}.jbl"
         )
-        self.weights = joblib.load(weights_file)
+        weights = joblib.load(weights_file)
+        self.weights = weights[:, self.voxel_idxs]
         self.preproc = pkl.load(
             open(join(SAVE_DIR_FMRI, self.model_dir, "preproc.pkl"), "rb")
         )
-        self.weights = self.weights[:, voxel_idxs]
+        self.ndel = 4
+
+        # load corrs
+        self.corrs = joblib.load(
+            join(
+                SAVE_DIR_FMRI,
+                self.model_dir,
+                "voxel_performances",
+                f"{subject}_voxel_performance.jbl",
+            )
+        )
+        if self.checkpoint == "decapoda-research/llama-30b-hf":
+            self.corrs = self.corrs[0]
+
+    def _init_fmri_voxel(self, voxel_num_best: Union[int, List[int]], subject: str):
+        self.voxel_num_best = voxel_num_best
+        self.subject = subject
 
         # load corr performance
         if isinstance(voxel_num_best, int):
-            voxel_idx = voxel_idxs[voxel_num_best]
-            corrs = joblib.load(
-                join(
-                    SAVE_DIR_FMRI,
-                    self.model_dir,
-                    "voxel_performances",
-                    f"{subject}_voxel_performance.jbl",
-                )
-            )
-            if self.checkpoint == "decapoda-research/llama-30b-hf":
-                corrs = corrs[0]
-            print(
-                f"voxel_idx: {voxel_idx} voxel_num_best: {voxel_num_best} corrs.shape: {corrs.shape}"
-            )
-            self.corr = corrs[voxel_idx]
+            self.corr = self.corrs[self.voxel_idxs[voxel_num_best]]
 
     def _get_embs(self, X: List[str]):
         """

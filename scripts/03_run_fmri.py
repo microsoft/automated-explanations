@@ -15,13 +15,10 @@ params_shared_dict = {
         1
     ],  # pass binary values with 0/1 instead of the ambiguous strings True/False
     "subsample_frac": [1],
-    # 'module_num': list(range(250)),
-    # 'module_num': [0],
-    "module_num": list(range(500)),
     "module_name": ["fmri"],
-    # 'subject': ['UTS02'],
-    # 'subject': ['UTS02', 'UTS01', 'UTS03'],
-    "subject": ["UTS02", "UTS01", "UTS03"],  # , 'UTS03'],
+    "subject": ["UTS02", "UTS03", "UTS01"],  # , 'UTS03'],
+    # "module_num": list(range(500)),
+    "module_num": ["all"],  # list(range(500)),
     "num_top_ngrams_to_use": [30],
     "num_top_ngrams_to_consider": [50],
     "num_summaries": [5],
@@ -45,6 +42,6 @@ submit_utils.run_args_list(
     repeat_failed_jobs=True,
     reverse=True,
     # actually_run=False,
-    shuffle=False,
+    # shuffle=False,
     n_cpus=1,
 )
