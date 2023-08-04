@@ -471,14 +471,24 @@ def cache_preprocessor(model_dir="llama_model"):
 
 if __name__ == "__main__":
     # cache_preprocessor()
-    # cache_test_data()
-    # story_text = get_train_story_texts()
+    cache_test_data()
 
-    mod = fMRIModule(
-        voxel_num_best=[1, 2, 3], checkpoint="decapoda-research/llama-30b-hf"
-    )
-    X = ["I am happy", "I am sad", "I am angry"]
-    print(X[0][:50])
-    resp = mod(X[:3])
-    print(resp.shape)
-    print(resp)
+    # story_texts = get_train_story_texts()
+    # story_text = ' '.join(story_texts)
+    # print(len(set(story_text.split())))
+    # with open('story_text.txt', 'w') as f:
+    #     f.write(story_text)
+
+    # mod = fMRIModule(
+    # voxel_num_best=[1, 2, 3], checkpoint="decapoda-research/llama-30b-hf"
+    # )
+    # X = ["I am happy", "I am sad", "I am angry"]
+    # print(X[0][:50])
+    # resp = mod(X[:3])
+    # print(resp.shape)
+    # print(resp)
+
+    for subj in ['UTS01', 'UTS02', 'UTS03']:
+        print(joblib.load(
+            f"/home/chansingh/mntv1/deep-fMRI/rj_models/llama_model/voxel_performances/{subj}_voxel_performance.jbl"
+        )[0].mean())

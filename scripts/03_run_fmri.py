@@ -16,7 +16,7 @@ params_shared_dict = {
     ],  # pass binary values with 0/1 instead of the ambiguous strings True/False
     "subsample_frac": [1],
     "module_name": ["fmri"],
-    "subject": ["UTS02", "UTS03", "UTS01"],  # , 'UTS03'],
+    "subject": ["UTS03", "UTS01"],  # , 'UTS03', 'UTS02',
     # "module_num": list(range(500)),
     "module_num": ["all"],  # list(range(500)),
     "num_top_ngrams_to_use": [30],
@@ -40,7 +40,7 @@ submit_utils.run_args_list(
     args_list,
     script_name=join(repo_dir, "experiments", "01_explain.py"),
     repeat_failed_jobs=True,
-    reverse=True,
+    # reverse=True,
     # actually_run=False,
     # shuffle=False,
     n_cpus=1,

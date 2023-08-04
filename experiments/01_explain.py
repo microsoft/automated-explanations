@@ -11,6 +11,7 @@ from sklearn.model_selection import train_test_split
 import pickle as pkl
 import imodelsx
 import torch
+from tqdm import tqdm
 import sasc.modules.old_fmri_module
 import sasc.modules.fmri_module
 import sasc.modules.prompted_module
@@ -93,7 +94,7 @@ def add_main_args(parser):
         type=str,
         # default='google/flan-t5-xxl',
         default="text-davinci-003",
-        help="which llm to use for each step",
+        help="which llm to use for both summarization and generation",
     )
     parser.add_argument(
         "--checkpoint_module",
@@ -243,7 +244,7 @@ if __name__ == "__main__":
         module_nums = [int(args.module_num)]
 
     # loop over module_nums
-    for i in range(len(module_nums)):
+    for i in tqdm(range(len(module_nums))):
         if len(module_nums) > 1:
             logging.info(f"\n\n{i + 1} / {len(module_nums)}")
         args.module_num = module_nums[i]  # an integer

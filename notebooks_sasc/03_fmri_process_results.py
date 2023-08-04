@@ -8,7 +8,6 @@ from os.path import join
 from tqdm import tqdm
 import pandas as pd
 import pickle as pkl
-import notebook_helper
 import imodelsx.process_results
 import sys
 import bert_score
@@ -95,14 +94,12 @@ def add_expl_preds(r):
 
 
 if __name__ == "__main__":
-    # results_dir = '../results/feb12_fmri_sweep/'
-    # results_dir = '/home/chansingh/mntv1/mprompt/feb12_fmri_sweep_gen_template1/'
-    # results_dir = '/home/chansingh/mntv1/mprompt/mar7_test/'
-    # results_dir = '/home/chansingh/mntv1/mprompt/mar8/'
-    # results_dir = '/home/chansingh/mntv1/mprompt/mar9/'
-    results_dir = "/home/chansingh/mntv1/mprompt/mar13/"
+    # results_dir = "/home/chansingh/mntv1/mprompt/mar13/"
+    # suffix = '_opt'
+    results_dir = "/home/chansingh/mntv1/mprompt/aug1_llama/"
+    suffix = "_llama"
 
-    
+    print("Loading results...")
     r = imodelsx.process_results.get_results_df(results_dir, use_cached=False)
     print(f"Loaded {r.shape[0]} results")
     for num in [25, 50, 75, 100]:
@@ -153,15 +150,14 @@ if __name__ == "__main__":
     r["top_score_normalized"] = r["top_score_synthetic"] / r["top_score_std"]
 
     # Save results
-    r.to_pickle(join(RESULTS_DIR, "results_fmri_1500.pkl"))
-
+    r.to_pickle(join(RESULTS_DIR, f"results_fmri_1500{suffix}.pkl"))
 
     # Add explanation<>test response match
-    r = pd.read_pickle(join(RESULTS_DIR, "results_fmri_1500.pkl"))
+    r = pd.read_pickle(join(RESULTS_DIR, f"results_fmri_1500{suffix}.pkl"))
     torch.cuda.empty_cache()
     print("Saved original results, now computing expl<>resp match...")
     r = add_expl_preds(r)
-    r.to_pickle(join(RESULTS_DIR, "results_fmri_full_1500.pkl"))
+    r.to_pickle(join(RESULTS_DIR, f"results_fmri_full_1500{suffix}.pkl"))
 
     # Unnecessary metrics
     # r['top_ngrams_test_correct_score'] = correct_ngrams_module_scores # these scores are basically just 0/1 for each ngram
