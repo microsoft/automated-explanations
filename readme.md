@@ -2,11 +2,11 @@
 <p align="center"> Explaining black box text modules in natural language with language models (<a href="https://arxiv.org/abs/2305.09863">arXiv 2023</a>)
 </p>
 
-This repo contains code to reproduce the experiments in [the SASC paper]([https://arxiv.org/abs/2209.11799](https://arxiv.org/abs/2305.09863)). SASC takes in a text module and produces a natural explanation for it (see Fig below).
+This repo contains code to reproduce the experiments in [the SASC paper]([https://arxiv.org/abs/2209.11799](https://arxiv.org/abs/2305.09863)). SASC takes in a text module and produces a natural explanation for it that describes what it types of inputs elicit the largest response from the module (see Fig below).
 
 <img src="https://microsoft.github.io/automated-explanations/fig.svg?sanitize=True&kill_cache=1" width="90%">
 
-SASC is similar to the very nice [concurrent paper](https://github.com/openai/automated-interpretability) by OpenAI, but simplifies explanations to describe the function rather than produce token-level activations. This makes it simpler/faster, and makes it more effective at describing semantic functions from limited data (e.g. fMRI voxels) but worse at finding patterns that depend on sequences / ordering.
+SASC is similar to the nice [concurrent paper](https://github.com/openai/automated-interpretability) by OpenAI, but simplifies explanations to describe the function rather than produce token-level activations. This makes it simpler/faster, and makes it more effective at describing semantic functions from limited data (e.g. fMRI voxels) but worse at finding patterns that depend on sequences / ordering.
 
 
 For a simple scikit-learn interface to use SASC, use the [imodelsX library](https://github.com/csinva/imodelsX). Install with `pip install imodelsx` then the below shows a quickstart example.
