@@ -130,7 +130,7 @@ class fMRIModule:
         if self.checkpoint == "decapoda-research/llama-30b-hf":
             self.corrs = self.corrs[0]
 
-    def _init_fmri_voxel(self, voxel_num_best: Union[int, List[int]], subject: str):
+    def _init_fmri_voxel(self, voxel_num_best: Union[int, np.ndarray[int]], subject: str):
         self.voxel_num_best = voxel_num_best
         self.subject = subject
 

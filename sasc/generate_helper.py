@@ -23,7 +23,7 @@ def get_paragraphs(
     checkpoint="gpt-4-0314",
     prefix_first="Write the beginning paragraph of a story about",
     prefix_next="Write the next paragraph of the story, but now make it about",
-    cache_dir='~/.cache/llm_stories',
+    cache_dir="~/.cache/llm_stories",
 ):
     """
     Example messages
@@ -40,7 +40,7 @@ def get_paragraphs(
         "gpt-4-0314": 30000,
     }[checkpoint]
 
-    llm = imodelsx.llm.get_llm(checkpoint, CACHE_DIR=cache_dir)
+    llm = imodelsx.llm.get_llm(checkpoint, CACHE_DIR=cache_dir, repeat_delay=10)
     response = None
     messages = [{"role": "system", "content": "You are a helpful assistant."}]
     all_content = []
@@ -76,25 +76,25 @@ def get_paragraphs(
     assert len(paragraphs) == len(prompts)
     return paragraphs
 
+
 def select_top_examples_randomly(
-    examples_list,
+    examples_list: List[str],
     n_examples_per_prompt_to_consider: int,
     n_examples_per_prompt: int,
     seed: int,
 ) -> List[str]:
     rng = np.random.RandomState(seed)
     return [
-        # ", ".join(
-        [
-            # f'"{x}"'
-            x
-            for x in rng.choice(
-                examples[:n_examples_per_prompt_to_consider],
-                n_examples_per_prompt,
-                replace=False,
-            ).tolist()
-        ]
-        # )
+        ", ".join(
+            [
+                f'"{x}"'
+                for x in rng.choice(
+                    examples[:n_examples_per_prompt_to_consider],
+                    n_examples_per_prompt,
+                    replace=False,
+                ).tolist()
+            ]
+        )
         for examples in examples_list
     ]
 
@@ -181,7 +181,7 @@ def get_prompt_templates(version):
     return PROMPTS[version]
 
 
-def get_prompts(expls: List[str], examples_list: List[List[str]], version):
+def get_prompts(expls: List[str], examples_list: List[str], version):
     # get templates
     PV = get_prompt_templates(version)
     prompt_init = PV["prefix_first"] + PV["suffix"]
@@ -218,8 +218,8 @@ def get_prompt_templates_interaction(version):
 def get_prompts_interaction(
     expls_one: List[str],
     expls_two: List[str],
-    examples_list_one: List[List[str]],
-    examples_list_two: List[List[str]],
+    examples_list_one: List[str],
+    examples_list_two: List[str],
     version: str = "v0",
 ):
     """Get prompts for an entire story, alternative 3 paragraphs for each explanation"""
@@ -237,30 +237,40 @@ def get_prompts_interaction(
     prompts = [PV["prefix_first"].format(expls=", ".join(all_examples))]
 
     for i in range(len(expls_one)):
-        ex1 = [f'"{x}"' for x in examples_list_one[i]]
-        ex2 = [f'"{x}"' for x in examples_list_two[i]]
+        # ex1 = ", ".join([f'"{x}"' for x in examples_list_one[i]])
+        # ex2 = ", ".join([f'"{x}"' for x in examples_list_two[i]])
+        ex1 = examples_list_one[i]
+        ex2 = examples_list_two[i]
         prompts.append(
             PV["prefix_one_not_two"].format(
                 expl_one=expls_one[i],
-                examples_one=", ".join(ex1),
+                examples_one=ex1,
                 expl_two=expls_two[i],
             )
         )
         prompts.append(
             PV["prefix_one_and_two"].format(
                 expl_one=expls_one[i],
-                examples_one=", ".join(ex1),
+                examples_one=ex1,
                 expl_two=expls_two[i],
-                examples_two=", ".join(ex2),
+                examples_two=ex2,
             )
         )
         prompts.append(
             PV["prefix_two_not_one"].format(
                 expl_one=expls_one[i],
-                examples_two=", ".join(ex2),
+                examples_two=ex2,
                 expl_two=expls_two[i],
             )
         )
+    # print(expls_one)
+    # for ex_list in examples_list_one[:3]:
+    #     print(repr(ex_list))
+    # print(all_examples)
+    # print(prompts)
+    # print(prompts)
+    # for p in prompts:
+        # print(p, end='\n\n')
     return prompts
 
 
@@ -353,8 +363,7 @@ def compute_expl_module_match_heatmap_cached_single_subject(
     scores = np.zeros((n, n))
     scores_max = np.zeros((n, n))
     all_scores = []
-    mod = fMRIModule()
-    mod._init_fmri(subject=subject, voxel_num_best=voxel_nums)
+    mod = fMRIModule(subject=subject, voxel_num_best=voxel_nums)
 
     # loop over paragraphs
     for idx_paragraph in tqdm(range(n)):

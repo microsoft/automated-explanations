@@ -6,6 +6,7 @@ import seaborn as sns
 import numpy as np
 from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib.pyplot as plt
+# import matplotlib.colormaps
 
 # default matplotlib colors
 cs_mpl = [
@@ -53,7 +54,7 @@ def colorize(
     color_array
         an array of numbers between 0 and 1 of length equal to words
     """
-    cmap = matplotlib.cm.get_cmap("viridis")
+    cmap = matplotlib.colormaps.get_cmap("viridis")
     # cmap = matplotlib.cm.get_cmap('viridis_r')
     template = (
         '<span class="barcode"; style="color: black; background-color: {}">{}</span>'

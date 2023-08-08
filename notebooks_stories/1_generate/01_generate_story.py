@@ -66,6 +66,8 @@ def get_rows_and_prompts_interactions(
 ):
     # get voxels
     rows1, rows2 = get_voxels.get_rows_voxels(subject=subject, setting=setting)
+    print(rows1.expl.values)
+    print(rows2.expl.values)
 
     # shuffle order (this is the 1st place randomness is applied)
     rows1 = rows1.sample(frac=1, random_state=seed, replace=False)
@@ -79,11 +81,12 @@ def get_rows_and_prompts_interactions(
         n_examples_per_prompt=n_examples_per_prompt,
         seed=seed,
     )
+
     examples_list1 = sasc.generate_helper.select_top_examples_randomly(
-        rows1["top_ngrams_module_correct"], **kwargs
+        rows1["top_ngrams_module_correct"].values.tolist(), **kwargs
     )
     examples_list2 = sasc.generate_helper.select_top_examples_randomly(
-        rows2["top_ngrams_module_correct"], **kwargs
+        rows2["top_ngrams_module_correct"].values.tolist(), **kwargs
     )
     prompts = sasc.generate_helper.get_prompts_interaction(
         expls1,
@@ -94,6 +97,7 @@ def get_rows_and_prompts_interactions(
     )
     for p in prompts:
         print(p)
+    exit(0)
     PV = sasc.generate_helper.get_prompt_templates_interaction(version)
 
     return rows1, rows2, prompts, PV
@@ -112,7 +116,7 @@ if __name__ == "__main__":
     # random.shuffle(seeds)
     n_examples_per_prompt = 3
     n_examples_per_prompt_to_consider = 5
-    for setting in ["default"]:  # default, interactions, polysemantic
+    for setting in ["polysemantic", "default", "interactions"]:  # default, interactions, polysemantic
         for subject in ["UTS01"]:  # ["UTS01", "UTS03"]:
             for seed in seeds:
                 # for version in ["v5_noun"]:

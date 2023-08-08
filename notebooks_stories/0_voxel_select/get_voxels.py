@@ -99,6 +99,18 @@ VOXEL_DICT = {
 
 
 INTERACTIONS_DICT = {
+    "UTS01": [
+        # very related (0.74)
+        (186, 149),  # location, clothing
+        # high related (~0.5)
+        (484, 171),  # repetition, physical movement
+        # medium (0.25)
+        (153, 187),  # movement, relationships
+        # low (0.19)
+        (171, 232),  # physical movement, violence and injury
+        # very low (~0)
+        (451, 186),  # speaking, location
+    ],
     "UTS02": [
         # related (>0.4)
         (212, 171),  # time, measurements
@@ -153,14 +165,15 @@ def get_rows_voxels(subject: str, setting="default"):
     # UTS02 - Pilot voxels
     if setting in ["default", "interactions"]:
         VOXEL_DICT_FNAMES = {
-            "UTS02": "notebooks_stories/0_voxel_select/pilot/uts02_concepts_pilot_mar22.json",
-            "UTS01": "notebooks_stories/0_voxel_select/pilot/uts01_concepts_pilot_jun14.json",
-            "UTS03": "notebooks_stories/0_voxel_select/pilot/uts03_concepts_pilot_jun14.json",
+            "UTS02": "notebooks_stories/0_voxel_select/default/uts02_concepts_pilot_mar22.json",
+            "UTS01": "notebooks_stories/0_voxel_select/default/uts01_concepts_pilot_jun14.json",
+            "UTS03": "notebooks_stories/0_voxel_select/default/uts03_concepts_pilot_jun14.json",
         }
 
     elif setting == "polysemantic":
         VOXEL_DICT_FNAMES = {
-            "UTS02": "notebooks_stories/0_voxel_select/polysemantic_UTS02.json",
+            "UTS02": "notebooks_stories/0_voxel_select/polysemantic/polysemantic_UTS02.json",
+            "UTS01": "notebooks_stories/0_voxel_select/polysemantic/polysemantic_UTS01.json",
         }
     voxels_dict = json.load(open(join(REPO_DIR, VOXEL_DICT_FNAMES[subject]), "r"))
     vals = pd.DataFrame([tuple(x) for x in sum(list(voxels_dict.values()), [])])
@@ -193,7 +206,7 @@ def get_rows_voxels(subject: str, setting="default"):
             polysemantic_ngrams = joblib.load(
                 join(
                     REPO_DIR,
-                    f"notebooks_stories/0_voxel_select/polysemantic_ngrams_{subject}.pkl",
+                    f"notebooks_stories/0_voxel_select/polysemantic/polysemantic_ngrams_{subject}.pkl",
                 )
             )
         else:
@@ -207,17 +220,17 @@ def get_rows_voxels(subject: str, setting="default"):
         for i in range(2):
             voxel_nums = [x[i] for x in INTERACTIONS_DICT[subject]]
             print(
+                i,
                 "len(voxel_nums)",
                 len(voxel_nums),
                 "nunique",
                 len(np.unique(voxel_nums)),
             )
-            v = vals[vals["module_num"].isin(voxel_nums)]
+            v = pd.concat(vals[vals["module_num"] == x] for x in voxel_nums)
             for voxel_num in voxel_nums:
                 if not voxel_num in v["module_num"].values:
                     print("missing", voxel_num)
             assert v["module_num"].nunique() == v.shape[0], "no duplicates"
             assert len(v) == len(voxel_nums), "all voxels found"
-
             rows_list.append(_voxels_to_rows(v.values))
         return tuple(rows_list)

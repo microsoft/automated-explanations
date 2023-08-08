@@ -1,0 +1,159 @@
+{
+"temporal": [
+[
+"time passing",
+"UTS03",
+171
+]
+],
+"numeric": [
+[
+"birthdays, birth years",
+"UTS03",
+39
+],
+[
+"measurements (distance and time)",
+"UTS03",
+253
+]
+],
+"locational": [
+[
+"distance or proximity",
+"UTS03",
+377
+],
+[
+"travel and movement",
+"UTS03",
+404
+],
+[
+"location or place",
+"UTS03",
+56
+]
+],
+"emotional": [
+[
+"surprise, confusion",
+"UTS03",
+161
+],
+[
+"emotional expressions",
+"UTS03",
+47
+],
+[
+"self-reflection",
+"UTS03",
+305
+],
+[
+"laughter",
+"UTS03",
+110
+],
+[
+"profanity",
+"UTS03",
+439
+],
+[
+"love and joy",
+"UTS03",
+337
+]
+],
+"social": [
+[
+"relationships and emotions",
+"UTS03",
+494
+],
+[
+"family and friends",
+"UTS03",
+339
+],
+[
+"relationships",
+"UTS03",
+354
+],
+[
+"speaking / responding",
+"UTS03",
+343
+]
+],
+"professional": [],
+"food": [
+[
+"food and drinks",
+"UTS03",
+481
+]
+],
+"movement": [
+[
+"physical movement",
+"UTS03",
+215
+],
+[
+"physical injury",
+"UTS03",
+148
+],
+[
+"physical actions",
+"UTS03",
+121
+],
+[
+"physical movement",
+"UTS03",
+393
+],
+[
+"physical_contact_or_",
+"UTS03",
+331
+],
+[
+"physical_contact_or_",
+"UTS03",
+288
+],
+[
+"body language",
+"UTS03",
+99
+]
+],
+"manual": [
+[
+"lying, deception",
+"UTS03",
+246
+],
+[
+"unhealthy",
+"UTS03",
+400
+],
+[
+"vomiting, sickness",
+"UTS03",
+395
+],
+[
+"hair and clothing",
+"UTS03",
+24
+]
+]
+}

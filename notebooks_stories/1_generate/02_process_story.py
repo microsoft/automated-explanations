@@ -118,7 +118,7 @@ def module_story_match(EXPT_DIR, expls, paragraphs, voxel_nums, subjects):
 
 def sweep_default_and_polysemantic(subjects=['UTS01', 'UTS03'], setting="default"):    
     EXPT_PARENT_DIR = join(RESULTS_DIR, "stories", setting)
-    EXPT_NAMES = os.listdir(EXPT_PARENT_DIR)
+    EXPT_NAMES = sorted(os.listdir(EXPT_PARENT_DIR))
 
     # filter EXPT_NAMES that don't contain any of the subjects
     EXPT_NAMES = [
@@ -193,5 +193,5 @@ def sweep_interactions(subjects=['UTS01', 'UTS03']):
 
 if __name__ == "__main__":
     sweep_default_and_polysemantic(subjects=['UTS01', 'UTS03'], setting="default")
-    # sweep_default_and_polysemantic(subjects=['UTS01', 'UTS03'], setting="polysemantic")
+    sweep_default_and_polysemantic(subjects=['UTS01', 'UTS03'], setting="polysemantic")
     # sweep_interactions()
