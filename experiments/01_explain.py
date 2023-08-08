@@ -62,7 +62,7 @@ def _get_cache_filename(args, CACHE_DIR) -> str:
     if args.module_name == "fmri":
         suffix = ""
         if args.checkpoint_module == "decapoda-research/llama-30b-hf":
-            suffix = "_opt"
+            suffix = "_llama"
         return join(
             CACHE_DIR, "cache_ngrams", f"{args.module_name}_{args.subject}{suffix}.pkl"
         )

@@ -18,9 +18,10 @@ import torch
 import numpy.random
 from transformers import AutoModelForCausalLM, AutoTokenizer, LlamaTokenizer
 import joblib
+from copy import deepcopy
 
 modules_dir = dirname(os.path.abspath(__file__))
-from sasc.config import SAVE_DIR_FMRI
+from sasc.config import RESULTS_DIR, SAVE_DIR_FMRI
 
 NUM_TOP_VOXELS = 500
 
@@ -28,14 +29,24 @@ NUM_TOP_VOXELS = 500
 When adding a new model, need to:
 - run cache_preprocessor() on the extracted features
 """
+VOXELS_IDXS_DICT = {
+    subject: joblib.load(
+        join(SAVE_DIR_FMRI, "voxel_lists", f"{subject}_voxel_selectivity.jbl")
+    )
+    for subject in ["UTS01", "UTS02", "UTS03"]
+}
+
+STABILITY_SCORES_DICT = joblib.load(join(RESULTS_DIR, "fmri_stability_scores.jbl"))
 
 
 def convert_module_num_to_voxel_num(module_num: int, subject: str):
-    voxel_idxs = joblib.load(
-        join(SAVE_DIR_FMRI, "voxel_lists", f"{subject}_voxel_selectivity.jbl")
-    )
+    voxel_idxs = deepcopy(VOXELS_IDXS_DICT[subject])
     numpy.random.default_rng(seed=42).shuffle(voxel_idxs)
     return voxel_idxs[module_num]
+
+
+def add_stability_score(module_num: int, subject: str):
+    return STABILITY_SCORES_DICT[subject][module_num]
 
 
 class fMRIModule:
@@ -488,7 +499,9 @@ if __name__ == "__main__":
     # print(resp.shape)
     # print(resp)
 
-    for subj in ['UTS01', 'UTS02', 'UTS03']:
-        print(joblib.load(
-            f"/home/chansingh/mntv1/deep-fMRI/rj_models/llama_model/voxel_performances/{subj}_voxel_performance.jbl"
-        )[0].mean())
+    for subj in ["UTS01", "UTS02", "UTS03"]:
+        print(
+            joblib.load(
+                f"/home/chansingh/mntv1/deep-fMRI/rj_models/llama_model/voxel_performances/{subj}_voxel_performance.jbl"
+            )[0].mean()
+        )

@@ -27,6 +27,7 @@ import scipy.stats
 from sasc.evaluate import D5_Validator
 import torch.cuda
 from sasc.config import CACHE_DIR
+from sasc.modules.fmri_module import convert_module_num_to_voxel_num
 
 
 def add_expl_preds(r):
@@ -94,13 +95,11 @@ def add_expl_preds(r):
 
 
 if __name__ == "__main__":
-    
     # results_dir = "/home/chansingh/mntv1/mprompt/mar13/"
     # suffix = '_opt'
     results_dir = "/home/chansingh/mntv1/mprompt/aug1_llama/"
     suffix = "_llama"
 
-    '''
     print("Loading results...")
     r = imodelsx.process_results.get_results_df(results_dir, use_cached=False)
     print(f"Loaded {r.shape[0]} results")
@@ -141,7 +140,10 @@ if __name__ == "__main__":
     # Add score normalized by std over ngrams
     scores_std = {}
     for subject in ["UTS01", "UTS02", "UTS03"]:
-        ngram_scores_filename = join(CACHE_DIR, "cache_ngrams", f"fmri_{subject}.pkl")
+        suff = "_llama" if suffix == "_llama" else ""
+        ngram_scores_filename = join(
+            CACHE_DIR, "cache_ngrams", f"fmri_{subject}{suffix}.pkl"
+        )
         ngram_scores = joblib.load(ngram_scores_filename)
         ngram_scores_std = np.std(ngram_scores, axis=0)
         scores_std[subject] = deepcopy(ngram_scores_std)
@@ -150,12 +152,15 @@ if __name__ == "__main__":
         lambda x: scores_std[x["subject"]][x["module_num"]], axis=1
     )
     r["top_score_normalized"] = r["top_score_synthetic"] / r["top_score_std"]
+    r["voxel_num"] = r.apply(
+        lambda row: convert_module_num_to_voxel_num(row["module_num"], row["subject"]),
+        axis=1,
+    )
 
     # Save results
     r.to_pickle(join(RESULTS_DIR, f"results_fmri_1500{suffix}.pkl"))
-    '''
 
-    ############# Sedondary metric ########################
+    ############# Secondary metric ########################
     # Add explanation<>test response match
     r = pd.read_pickle(join(RESULTS_DIR, f"results_fmri_1500{suffix}.pkl"))
     torch.cuda.empty_cache()
