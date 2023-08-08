@@ -18,49 +18,31 @@ import json
 
 VOXEL_DICT = {
     "UTS01": [
-        41,  # time period (numeric),
-        378,  # college days
-        186,  # location
-        322,  # embarrassment
-        434,  # laughter or amusement
-        244,  # emotional response
-        34,  # fear and anticipation
-        258,  # lonelineness
-        365,  # family and friends
-        # 204,  # family and friends
-        106,  # communication
-        187,  # relationships
-        # 399,  # relationships
-        # 122,  # relationships
-        # 162,  # communication
-        # 261,  # relationships
-        # 332,  # family and friends
-        # 432,  # relationships
-        # 142,  # family and friends
-        # 340,  # family and friends
-        # 71,  # family and friends
-        # 291,  # family and relationships
-        # 264,  # family and relationships
-        # 374,  # family and friends
-        # 400,  # relationships
-        # 145,  # relationships
-        # 479,  # family and relationships
-        197,  # flirting and relationships
-        # 144,  # family relationships
-        489,  # physical movement
-        # 469,  # physical contact
-        # 171,  # physical movement
-        # 46,  # physical contact
-        # 394,  # physical movement
-        # 456,  # physical contact
-        # 121,  # movement
-        # 456,  # physical contact
-        # 376,  # physical contact
-        311,  # vulgarities
-        232,  # violence and injury
-        203,  # food and drink
-        # 321,  # body positioning
-        484,  # repetition
+        # 322,  # embarrassment (0.125209)
+        # 311,  # vulgarities (0.132738)
+        # 258,  # lonelineness (0.135058)
+        # 469,  # physical contact (0.137269)
+        # 106,  # communication (0.154657)
+        # 162,  # communication (0.174878)
+        484,  # repetition (0.179070)
+        171,  # physical movement (0.182128)
+        186,  # location (0.184146)
+        378,  # college days (0.199483)
+        458,  # numbers (0.213608)
+        100,  # locations (0.214551)
+        451,  # speaking (0.218006)
+        187,  # relationships (0.221229)
+        # 332,  # family and friends (0.233957)
+        121,  # movement (0.235266)
+        149,  # clothing (0.238112)
+        # 192,  # family relationships (0.243154)
+        39,  # physical movement (0.253595)
+        232,  # violence and injury (0.266177)
+        107,  # family and friends (0.285960)
+        153,  # movement (0.286167)
+        144,  # family relationships (0.298463)
+        203,  # food and drink (0.313123)
+        473,  # food (0.351168)
     ],
     "UTS02": [
         # 8 voxels with 3 reps is ~15 mins
@@ -129,13 +111,12 @@ INTERACTIONS_DICT = {
     ],
 }
 
+
 def _voxels_to_rows(
     voxels: List[Tuple], polysemantic_ngrams: Dict = None
 ) -> pd.DataFrame:
     """Add extra data (like ngrams) to each row"""
-    r = pd.read_pickle(join(RESULTS_DIR, "results_fmri_full_1500.pkl")).sort_values(
-        by=["top_score_synthetic"], ascending=False
-    )
+    r = pd.read_pickle(join(RESULTS_DIR, "fmri_results_merged.pkl"))
     # put all voxel data into rows DataFrame
     rows = []
     expls = []
@@ -145,7 +126,7 @@ def _voxels_to_rows(
         # try:
         row = r[(r.subject == subj) & (r.module_num == vox_num)].iloc[0]
         if polysemantic_ngrams is not None:
-            row['top_ngrams_module_correct'] = polysemantic_ngrams[tuple(vox)]
+            row["top_ngrams_module_correct"] = polysemantic_ngrams[tuple(vox)]
         rows.append(row)
         expls.append(expl)
 
@@ -186,11 +167,15 @@ def get_rows_voxels(subject: str, setting="default"):
     vals.columns = ["expl", "subject", "module_num"]
 
     if setting in ["default", "polysemantic"]:
-
         # filter vals
-        if setting == 'default':
+        if setting == "default":
             voxel_nums = VOXEL_DICT[subject]
-            print("len(voxel_nums)", len(voxel_nums), "nunique", len(np.unique(voxel_nums)))
+            print(
+                "len(voxel_nums)",
+                len(voxel_nums),
+                "nunique",
+                len(np.unique(voxel_nums)),
+            )
             vals = vals[vals["module_num"].isin(voxel_nums)]
             for voxel_num in voxel_nums:
                 if not voxel_num in vals["module_num"].values:
@@ -199,7 +184,9 @@ def get_rows_voxels(subject: str, setting="default"):
             assert len(vals) == len(voxel_nums), "all voxels found"
             assert len(voxel_nums) == 17
         else:
-            print('len(vals)', len(vals), 'nunique voxels', vals['module_num'].nunique())
+            print(
+                "len(vals)", len(vals), "nunique voxels", vals["module_num"].nunique()
+            )
 
         # add extra data (like ngrams) to each row
         if setting == "polysemantic":

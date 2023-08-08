@@ -1,22 +1,28 @@
 {
 "temporal": [
 [
-"time period (numeric)",
-"UTS01",
-41
-],
-[
 "college days",
 "UTS01",
 378
 ]
 ],
-"numeric": [],
+"numeric": [
+[
+"numbers",
+"UTS01",
+458
+]
+],
 "locational": [
 [
 "location",
 "UTS01",
 186
+],
+[
+"locations",
+"UTS01",
+100
 ]
 ],
 "emotional": [
@@ -26,21 +32,6 @@
 322
 ],
 [
-"laughter or amusement",
-"UTS01",
-434
-],
-[
-"emotional response",
-"UTS01",
-244
-],
-[
-"fear and anticipation",
-"UTS01",
-34
-],
-[
 "lonelineness",
 "UTS01",
 258
@@ -48,14 +39,14 @@
 ],
 "social": [
 [
-"family and friends",
+"family relationships",
 "UTS01",
-365
+192
 ],
 [
 "family and friends",
 "UTS01",
-204
+107
 ],
 [
 "communication",
@@ -68,84 +59,14 @@
 187
 ],
 [
-"relationships",
-"UTS01",
-399
-],
-[
-"relationships",
-"UTS01",
-122
-],
-[
 "communication",
 "UTS01",
 162
 ],
 [
-"relationships",
-"UTS01",
-261
-],
-[
 "family and friends",
 "UTS01",
 332
-],
-[
-"relationships",
-"UTS01",
-432
-],
-[
-"family and friends",
-"UTS01",
-142
-],
-[
-"family and friends",
-"UTS01",
-340
-],
-[
-"family and friends",
-"UTS01",
-71
-],
-[
-"family and relationships",
-"UTS01",
-291
-],
-[
-"family and relationships",
-"UTS01",
-264
-],
-[
-"family and friends",
-"UTS01",
-374
-],
-[
-"relationships",
-"UTS01",
-400
-],
-[
-"relationships",
-"UTS01",
-145
-],
-[
-"family and relationships",
-"UTS01",
-479
-],
-[
-"flirting and relationships",
-"UTS01",
-197
 ],
 [
 "family relationships",
@@ -156,9 +77,14 @@
 "professional": [],
 "movement": [
 [
+"movement",
+"UTS01",
+153
+],
+[
 "physical movement",
 "UTS01",
-489
+39
 ],
 [
 "physical contact",
@@ -171,34 +97,9 @@
 171
 ],
 [
-"physical contact",
-"UTS01",
-46
-],
-[
-"physical movement",
-"UTS01",
-394
-],
-[
-"physical contact",
-"UTS01",
-456
-],
-[
 "movement",
 "UTS01",
 121
-],
-[
-"physical contact",
-"UTS01",
-456
-],
-[
-"physical contact",
-"UTS01",
-376
 ]
 ],
 "manual": [
@@ -218,14 +119,24 @@
 203
 ],
 [
-"body positioning",
-"UTS01",
-321
-],
-[
 "repetition",
 "UTS01",
 484
+],
+[
+"food",
+"UTS01",
+473
+],
+[
+"clothing",
+"UTS01",
+149
+],
+[
+"speaking",
+"UTS01",
+451
 ]
 ]
 }
