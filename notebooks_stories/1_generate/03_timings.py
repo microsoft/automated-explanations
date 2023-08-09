@@ -188,48 +188,47 @@ def process_timings(df: pd.DataFrame) -> pd.DataFrame:
 
 
 if __name__ == "__main__":
-    setting = "default"
-    # setting = "polysemantic"
-    # setting = "interactions"
-    EXPT_NAMES = sorted(
-        [
-            k
-            for k in os.listdir(join(RESULTS_DIR, "stories", setting))
-            if "uts03" in k or "uts01" in k
-        ]
-    )
-    # shuffle EXPT_NAMES
-    # random.shuffle(EXPT_NAMES)
-    EXPT_NAMES = EXPT_NAMES[::-1]
-
-    for EXPT_NAME in tqdm(EXPT_NAMES):
-        EXPT_DIR = join(RESULTS_DIR, "stories", setting, EXPT_NAME)
-
-        # get text
-        try:
-            prompts_paragraphs = joblib.load(
-                join(EXPT_DIR, "prompts_paragraphs.pkl"),
+    for setting in ["default", "polysemantic", "interactions"]:
+        for subject in ["UTS01", "UTS03"]:
+            EXPT_NAMES = sorted(
+                [
+                    k
+                    for k in os.listdir(join(RESULTS_DIR, "stories", setting))
+                    if subject.lower() in k.lower()
+                ]
             )
-            text = "\n".join(prompts_paragraphs["paragraphs"])
-        except:
-            rows = joblib.load(join(EXPT_DIR, "rows.pkl"))
-            text = "\n".join(rows.paragraph.values)
+            # shuffle EXPT_NAMES
+            # random.shuffle(EXPT_NAMES)
+            EXPT_NAMES = EXPT_NAMES[::-1]
 
-        timings_file = join(EXPT_DIR, "timings.csv")
+            for EXPT_NAME in tqdm(EXPT_NAMES):
+                EXPT_DIR = join(RESULTS_DIR, "stories", setting, EXPT_NAME)
 
-        # get timings for timings_file
-        if os.path.exists(timings_file):
-            print("already cached", EXPT_NAME)
-        else:
-            print("running", EXPT_NAME)
-            process_story(
-                EXPT_DIR,
-                EXPT_NAME,
-                text,
-                timings_fname_prefix=join(EXPT_DIR, f"{EXPT_NAME}_timings"),
-            )
+                # get text
+                try:
+                    prompts_paragraphs = joblib.load(
+                        join(EXPT_DIR, "prompts_paragraphs.pkl"),
+                    )
+                    text = "\n".join(prompts_paragraphs["paragraphs"])
+                except:
+                    rows = joblib.load(join(EXPT_DIR, "rows.pkl"))
+                    text = "\n".join(rows.paragraph.values)
 
-        # process timings
-        df = pd.read_csv(timings_file)
-        df = process_timings(df)
-        df.to_csv(join(EXPT_DIR, "timings_processed.csv"), index=False)
+                timings_file = join(EXPT_DIR, "timings.csv")
+
+                # get timings for timings_file
+                if os.path.exists(timings_file):
+                    print("already cached", EXPT_NAME)
+                else:
+                    print("running", EXPT_NAME)
+                    process_story(
+                        EXPT_DIR,
+                        EXPT_NAME,
+                        text,
+                        timings_fname_prefix=join(EXPT_DIR, f"{EXPT_NAME}_timings"),
+                    )
+
+                # process timings
+                df = pd.read_csv(timings_file)
+                df = process_timings(df)
+                df.to_csv(join(EXPT_DIR, "timings_processed.csv"), index=False)

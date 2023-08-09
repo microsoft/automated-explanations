@@ -131,6 +131,8 @@ class fMRIModule:
             self.corrs = self.corrs[0]
 
     def _init_fmri_voxel(self, voxel_num_best: Union[int, np.ndarray[int]], subject: str):
+        if isinstance(voxel_num_best, np.ndarray):
+            voxel_num_best = voxel_num_best.astype(int)
         self.voxel_num_best = voxel_num_best
         self.subject = subject
 
@@ -185,7 +187,7 @@ class fMRIModule:
             return preds_fMRI  # self.weights was already restricted to top voxels
         else:
             pred_voxel = preds_fMRI[
-                :, np.array(self.voxel_num_best)
+                :, np.array(self.voxel_num_best).astype(int)
             ]  # select voxel (or potentially many voxels)
             return pred_voxel
 

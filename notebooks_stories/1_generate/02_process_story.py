@@ -62,19 +62,19 @@ def explanation_story_match(EXPT_DIR, expls, paragraphs, prompts):
     plt.savefig(join(EXPT_DIR, "story_data_match.pdf"), bbox_inches="tight")
 
 
-def module_story_match(EXPT_DIR, expls, paragraphs, voxel_nums, subjects):
+def module_story_match(EXPT_DIR, expls, paragraphs, voxel_nums, subject):
     if os.path.exists(join(EXPT_DIR, f"scores_mod_ngram_length={0}.pkl")):
         return
 
-    # run each paragraph separately
-    compute_func = (
-        sasc.generate_helper.compute_expl_module_match_heatmap_cached_single_subject
-    )
-    subjects = subjects[0]
-
     # compute with paragraphs overlapping into each other
-    # compute_func = sasc.generate_helper.compute_expl_module_match_heatmap
-    scores_mod, _, all_scores = compute_func(expls, paragraphs, voxel_nums, subjects)
+    # sasc.generate_helper.compute_expl_module_match_heatmap
+    (
+        scores_mod,
+        _,
+        all_scores,
+    ) = sasc.generate_helper.compute_expl_module_match_heatmap_cached_single_subject(
+        expls, paragraphs, voxel_nums, subject
+    )
     joblib.dump(
         {
             "scores_mean": scores_mod,
@@ -96,8 +96,7 @@ def module_story_match(EXPT_DIR, expls, paragraphs, voxel_nums, subjects):
         )
         / 2
     ).round(5)
-    plt.title(os.path.basename(EXPT_DIR) + ' diag_diff=' + str(diag_diff))
-
+    plt.title(os.path.basename(EXPT_DIR) + " diag_diff=" + str(diag_diff))
 
     plt.savefig(join(EXPT_DIR, f"story_module_match.pdf"), bbox_inches="tight")
 
@@ -116,7 +115,7 @@ def module_story_match(EXPT_DIR, expls, paragraphs, voxel_nums, subjects):
     #     }, join(EXPT_DIR, f'scores_mod_ngram_length={ngram_length}.pkl'))
 
 
-def sweep_default_and_polysemantic(subjects=['UTS01', 'UTS03'], setting="default"):    
+def sweep_default_and_polysemantic(subjects=["UTS01", "UTS03"], setting="default"):
     EXPT_PARENT_DIR = join(RESULTS_DIR, "stories", setting)
     EXPT_NAMES = sorted(os.listdir(EXPT_PARENT_DIR))
 
@@ -153,11 +152,11 @@ def sweep_default_and_polysemantic(subjects=['UTS01', 'UTS03'], setting="default
         torch.cuda.empty_cache()
 
         print("Computing module<>story match", EXPT_NAME)
-        module_story_match(EXPT_DIR, expls, paragraphs, voxel_nums, subjects)
+        module_story_match(EXPT_DIR, expls, paragraphs, voxel_nums, subjects[0])
         torch.cuda.empty_cache()
 
 
-def sweep_interactions(subjects=['UTS01', 'UTS03']):
+def sweep_interactions(subjects=["UTS01", "UTS03"]):
     # iterate over seeds
     seeds = range(1, 8)
     setting = "interactions"
@@ -187,11 +186,11 @@ def sweep_interactions(subjects=['UTS01', 'UTS03']):
             torch.cuda.empty_cache()
 
             print("Computing module<>story match", EXPT_NAME)
-            module_story_match(EXPT_DIR, expls, paragraphs, voxel_nums, subjects)
+            module_story_match(EXPT_DIR, expls, paragraphs, voxel_nums, subjects[0])
             torch.cuda.empty_cache()
 
 
 if __name__ == "__main__":
-    sweep_interactions(subjects=['UTS01', 'UTS03'])
-    sweep_default_and_polysemantic(subjects=['UTS01', 'UTS03'], setting="polysemantic")
-    sweep_default_and_polysemantic(subjects=['UTS01', 'UTS03'], setting="default")
+    sweep_interactions(subjects=["UTS01", "UTS03"])
+    # sweep_default_and_polysemantic(subjects=['UTS01', 'UTS03'], setting="polysemantic")
+    # sweep_default_and_polysemantic(subjects=['UTS01', 'UTS03'], setting="default")
