@@ -66,34 +66,23 @@ VOXEL_DICT = {
         342,  # rejection
     ],
     "UTS03": [
-        171,  # time passing
-        # 39, # birthdays, birth years
-        253,  # measurements (distance and time)
-        377,  # distance or proximity
-        # 404, # travel and movement
-        56,  # location or place
-        161,  # surprise, confusion
-        47,  # emotional expressions
-        # 305,  # self-reflection
-        # 110, # laughter
-        439,  # profanity
-        337,  # love and joy
-        494,  # relationships and emotions
-        339,  # family and friends
-        # 354, # relationships
-        343,  # speaking / responding
-        # 481, # food and drinks
-        # 215, # physical movement
-        148,  # physical injury
-        # 121, # physical actions
-        # 393, # physical movement
-        # 331, # physical contact
-        # 288, # physical contact
-        99,  # body language
-        246,  # lying, deception
-        400,  # unhealthy
-        395,  # vomiting, sickness
-        24,  # hair and clothing
+        337,  # love and joy (0.199992)
+        160,  # age (0.243015)
+        173,  # conflict resolution (0.245964)
+        403,  # negative experiences (0.247915)
+        99,  # body language (0.250279)
+        280,  # communication (0.252942)
+        395,  # vomiting, sickness (0.258195)
+        9,  # numbers (0.263722)
+        408,  # numbers or measurements (0.277489)
+        158,  # action or movement (0.277547)
+        458,  # agreement and questioning (0.278527)
+        466,  # food and drinks (0.296890)
+        109,  # age (0.299564)
+        342,  # locations (0.300802)
+        152,  # movement or action (0.300931)
+        148,  # physical injury (0.321311)
+        368,  # family and relationships (0.367439)
     ],
 }
 
@@ -120,6 +109,18 @@ INTERACTIONS_DICT = {
         # unrelated (< -0.3)
         (122, 299),  # locations, communication
         (398, 79),  # emotional expression, food preparation
+    ],
+    "UTS03": [
+        # very related (0.63)
+        (466, 158),  # food and drinks, action or movement
+        # pretty related (0.38)
+        (152, 403),  # movement or action, negative experiences
+        # medium (0.24)
+        (458, 9),  # agreement and questioning, numbers
+        # low (0.1)
+        (173, 109),  # conflict resolution, age
+        # very low (~0)
+        (342, 99),  # locations, body language
     ],
 }
 
@@ -172,8 +173,8 @@ def get_rows_voxels(subject: str, setting="default"):
 
     elif setting == "polysemantic":
         VOXEL_DICT_FNAMES = {
-            "UTS02": "notebooks_stories/0_voxel_select/polysemantic/polysemantic_UTS02.json",
-            "UTS01": "notebooks_stories/0_voxel_select/polysemantic/polysemantic_UTS01.json",
+            k: f"notebooks_stories/0_voxel_select/polysemantic/polysemantic_{k}.json"
+            for k in ["UTS01", "UTS02", "UTS03"]
         }
     voxels_dict = json.load(open(join(REPO_DIR, VOXEL_DICT_FNAMES[subject]), "r"))
     vals = pd.DataFrame([tuple(x) for x in sum(list(voxels_dict.values()), [])])

@@ -97,7 +97,6 @@ def get_rows_and_prompts_interactions(
     )
     for p in prompts:
         print(p)
-    exit(0)
     PV = sasc.generate_helper.get_prompt_templates_interaction(version)
 
     return rows1, rows2, prompts, PV
@@ -116,8 +115,12 @@ if __name__ == "__main__":
     # random.shuffle(seeds)
     n_examples_per_prompt = 3
     n_examples_per_prompt_to_consider = 5
-    for setting in ["polysemantic", "default", "interactions"]:  # default, interactions, polysemantic
-        for subject in ["UTS01"]:  # ["UTS01", "UTS03"]:
+    for setting in [
+        "default",
+        "polysemantic",
+        "interactions",
+    ]:  # default, interactions, polysemantic
+        for subject in ["UTS01", "UTS03"]:  # ["UTS01", "UTS03"]:
             for seed in seeds:
                 # for version in ["v5_noun"]:
                 version = VERSIONS[setting]
@@ -151,9 +154,14 @@ if __name__ == "__main__":
 
                     # repeat
                     reps = [rows1.iloc[0]]
-                      # [pd.concat([rows1.iloc[[0]]] * 4, ignore_index=True)]
+                    # [pd.concat([rows1.iloc[[0]]] * 4, ignore_index=True)]
                     for i in range(0, len(rows1)):
-                        reps.append(pd.concat([rows1.iloc[i], rows2.iloc[i], rows1.iloc[i]], ignore_index=True))
+                        reps.append(
+                            pd.concat(
+                                [rows1.iloc[i], rows2.iloc[i], rows1.iloc[i]],
+                                ignore_index=True,
+                            )
+                        )
                     rows1_rep = pd.concat(
                         reps,
                         ignore_index=True,
