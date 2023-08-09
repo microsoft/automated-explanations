@@ -35,6 +35,7 @@ def get_rows_and_prompts_default(
     # shuffle order (this is the 1st place randomness is applied)
     rows = rows.sample(frac=1, random_state=seed, replace=False)
 
+
     # get prompt inputs
     expls = rows.expl.values
     examples_list = rows.top_ngrams_module_correct
@@ -154,18 +155,15 @@ if __name__ == "__main__":
 
                     # repeat
                     reps = [rows1.iloc[0]]
-                    # [pd.concat([rows1.iloc[[0]]] * 4, ignore_index=True)]
                     for i in range(0, len(rows1)):
-                        reps.append(
-                            pd.concat(
-                                [rows1.iloc[i], rows2.iloc[i], rows1.iloc[i]],
-                                ignore_index=True,
-                            )
-                        )
+                        reps.append(rows1.iloc[i])
+                        reps.append(rows2.iloc[i])
+                        reps.append(rows1.iloc[i])
                     rows1_rep = pd.concat(
                         reps,
                         ignore_index=True,
-                    )
+                        axis=1,
+                    ).transpose()
                     rows1.to_csv(join(EXPT_DIR, f"rows1.csv"), index=False)
                     rows1.to_pickle(join(EXPT_DIR, f"rows1.pkl"))
                     rows2.to_csv(join(EXPT_DIR, f"rows2.csv"), index=False)

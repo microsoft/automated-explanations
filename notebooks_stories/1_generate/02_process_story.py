@@ -192,6 +192,6 @@ def sweep_interactions(subjects=['UTS01', 'UTS03']):
 
 
 if __name__ == "__main__":
+    sweep_interactions(subjects=['UTS01', 'UTS03'])
     sweep_default_and_polysemantic(subjects=['UTS01', 'UTS03'], setting="polysemantic")
     sweep_default_and_polysemantic(subjects=['UTS01', 'UTS03'], setting="default")
-    sweep_interactions(subjects=['UTS01', 'UTS03'])
