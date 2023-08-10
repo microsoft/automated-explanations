@@ -128,15 +128,19 @@ def heatmap(
     xlab="Explanation for matching",
     ylab="Explanation for generation",
     clab="Fraction of matching ngrams",
+    diverging=True,
 ):
     # plt.style.use('dark_background')
     plt.figure(figsize=(7, 6))
-    plt.imshow(data)
+    if diverging:
+        imshow_diverging(data)
+    else:
+        plt.imshow(data)
+        plt.colorbar(label=clab)
     plt.xticks(range(data.shape[0]), labels, rotation=90, fontsize="small")
     plt.yticks(range(data.shape[1]), labels, fontsize="small")
     plt.ylabel(ylab)
     plt.xlabel(xlab)
-    plt.colorbar(label=clab)
     plt.tight_layout()
     # plt.show()
 
