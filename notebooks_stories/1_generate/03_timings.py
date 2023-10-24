@@ -182,6 +182,9 @@ def process_timings(df: pd.DataFrame) -> pd.DataFrame:
     # truncate values that are too large
     df["timing"] = df["timing"].apply(lambda x: min(x, 0.8))
 
+    # remove repeated consecutive words    
+    df = df[df['word'] != df['word'].shift(1)]
+
     # recompute running time
     df["time_running"] = np.cumsum(df["timing"])
     return df
