@@ -1,6 +1,7 @@
 import os.path
 # if os.path.exists('/home/chansingh'):
 RESULTS_DIR = '/home/chansingh/automated-explanations/results/'
+STORIES_DIR = os.path.join(RESULTS_DIR, "stories")
 FMRI_DIR = '/home/chansingh/mntv1/deep-fMRI/'
 SAVE_DIR_FMRI = '/home/chansingh/mntv1/deep-fMRI/rj_models/'
 REPO_DIR = '/home/chansingh/automated-explanations/'

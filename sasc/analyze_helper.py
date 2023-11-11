@@ -45,13 +45,13 @@ def get_start_end_times(timing: pd.DataFrame, paragraphs: List[str]):
 
 
 def get_resp_chunks(timing, paragraphs, resp_story, offset=8, apply_offset=True):
-    # return responses for each paragraph (after applying offset)
-
+    '''return responses for each paragraph (after applying offset)
+    '''
     resp_chunks = []
     start_times, end_times = get_start_end_times(timing, paragraphs)
 
     for i in range(len(start_times)):
-        resp_paragraph = resp_story[:, start_times[i] : end_times[i]]
+        resp_paragraph = resp_story[:, start_times[i]: end_times[i]]
         if apply_offset:
             while resp_paragraph.shape[1] <= 2 * offset:
                 offset -= 1
@@ -80,7 +80,7 @@ def find_all_examples_within_quotes(x: str):
     # find all strings within quotes
     examples = []
     for i in range(0, len(idxs), 2):
-        examples.append(x[idxs[i] + 1 : idxs[i + 1]])
+        examples.append(x[idxs[i] + 1: idxs[i + 1]])
 
     return examples
 
