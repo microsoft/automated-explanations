@@ -172,3 +172,12 @@ def sort_expls_semantically(expls: List[str]):
     coefs = pca.transform(embs).flatten()
     ordering = np.argsort(coefs).flatten()
     return ordering
+
+
+def remove_repeated_words(paragraph):
+    words = paragraph.split()
+    new_words = [words[0]]
+    for w in words[1:]:
+        if w != new_words[-1]:
+            new_words.append(w)
+    return ' '.join(new_words)
