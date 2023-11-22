@@ -15,7 +15,8 @@ if __name__ == "__main__":
     # load data and corresponding resps
     pilot_data_dir = "/home/chansingh/mntv1/deep-fMRI/story_data/20230504"
     resp_np_files = os.listdir(pilot_data_dir)
-    resps_dict = {k: np.load(join(pilot_data_dir, k)) for k in tqdm(resp_np_files)}
+    resps_dict = {k: np.load(join(pilot_data_dir, k))
+                  for k in tqdm(resp_np_files)}
 
     # viz mean resp for all voxels (this has been normalized, so is extremely close to zero)
     """
@@ -27,7 +28,8 @@ if __name__ == "__main__":
     """
 
     # viz mean driving resp for each of the 16 voxels
-    story_data = joblib.load(join(path_to_repo, "results/pilot_story_data.pkl"))
+    story_data = joblib.load(
+        join(path_to_repo, "results/pilot_story_data.pkl"))
     resp_chunks_list = []
     for story_num in range(6):  # range(1, 7)
         rows = story_data["rows"][story_num]
@@ -50,7 +52,8 @@ if __name__ == "__main__":
         resp_story = resps_dict[
             story_data["story_name_new"][story_num]
         ].T  # (voxels, time)
-        resp_chunks = story_helper.get_resp_chunks(timing, paragraphs, resp_story)
+        resp_chunks = story_helper.get_resp_chunks(
+            timing, paragraphs, resp_story)
 
         args = np.argsort(rw["expl"].values)
         resp_chunks_list.append([resp_chunks[i].mean(axis=1) for i in args])
@@ -64,7 +67,8 @@ if __name__ == "__main__":
             fname_save=join(
                 path_to_repo,
                 "results",
-                "pilot_plots",
+                "figs",
+                'flatmaps',
                 f"_resps_flatmap_{i}_{expls[i]}.pdf",
             ),
             title=expls[i],
