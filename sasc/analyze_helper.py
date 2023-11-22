@@ -1,3 +1,4 @@
+from collections import defaultdict
 import numpy as np
 import re
 from matplotlib.backends.backend_pdf import PdfPages
@@ -13,8 +14,8 @@ def _remove_punc(s):
     return s.translate(str.maketrans("", "", string.punctuation))
 
 
-def get_start_end_times(timing: pd.DataFrame, paragraphs: List[str]):
-    """Returns start/end times for each paragraph in the story.
+def get_start_end_indexes_for_paragraphs(timing: pd.DataFrame, paragraphs: List[str]):
+    """Returns start/end indexes for each paragraph in the story.
     If the entire story was not played, the number of start/end times will be less than the number of paragraphs.
     """
     idx = 0
@@ -39,19 +40,40 @@ def get_start_end_times(timing: pd.DataFrame, paragraphs: List[str]):
         if idx == len(timing):
             break
 
-    start_times = (np.array(start_times) // 2).astype(int)
-    end_times = (np.array(end_times) // 2).astype(int)
-    return start_times, end_times
+    start_indexes = (np.array(start_times) //
+                     2).astype(int)  # - offset_trim
+    end_indexes = (np.array(end_times) // 2).astype(int)  # - offset_trim
+    start_indexes = start_indexes.clip(min=0)
+    end_indexes = end_indexes.clip(min=0)
+    return start_indexes, end_indexes
 
 
-def get_resp_chunks(timing, paragraphs, resp_story, offset=8, apply_offset=True):
-    '''return responses for each paragraph (after applying offset)
+def get_resps_for_paragraphs(timing, paragraphs, resp_story, offset=2, apply_offset=True, trim=5) -> List[np.ndarray]:
+    '''Return responses for each paragraph (after applying offset)
+
+    Params
+    ------
+    offset: int
+        Number of TRs to remove from the beginning and end of each paragraph.
+        The offset is applied to each paragraph separately.
+
+    Returns
+    -------
+    resp_chunks : List[np.ndarray]
+        List of responses for each paragraph.
+        Each response is a 2D array of shape (n_features, n_timepoints)
     '''
     resp_chunks = []
-    start_times, end_times = get_start_end_times(timing, paragraphs)
+    start_indexes, end_indexes = get_start_end_indexes_for_paragraphs(
+        timing, paragraphs)
 
-    for i in range(len(start_times)):
-        resp_paragraph = resp_story[:, start_times[i]: end_times[i]]
+    for i in range(len(start_indexes)):
+        # get paragraph
+        start_idx = max(0, start_indexes[i] - trim)
+        end_idx = end_indexes[i] - trim
+        resp_paragraph = resp_story[:, start_idx: end_idx]
+
+        # apply offset
         if apply_offset:
             while resp_paragraph.shape[1] <= 2 * offset:
                 offset -= 1
@@ -66,9 +88,51 @@ def get_resp_chunks(timing, paragraphs, resp_story, offset=8, apply_offset=True)
     return resp_chunks
 
 
+def _get_word_chunks(t):
+    '''
+    Split words based on timing into bins of 2 seconds
+    '''
+    word_chunks = []
+    current_time = 0
+    for i in range(len(t)):
+        if i == 0:
+            word_chunks.append([t['word'][i]])
+        elif t['time_running'][i] - current_time < 2:
+            word_chunks[-1].append(t['word'][i])
+        else:
+            word_chunks.append([t['word'][i]])
+            current_time += 2
+    return word_chunks
+
+
+def compute_word_chunk_deltas_for_single_paragraph(
+        start_times, end_times, voxel_resp,
+        word_chunks_contain_example_ngrams, voxel_num,
+        deltas=range(1, 8)
+):
+
+    i_start_voxel = start_times[voxel_num]
+    i_end_voxel = end_times[voxel_num] + 1
+    if i_end_voxel > len(voxel_resp):
+        i_end_voxel = len(voxel_resp)
+    idxs = np.arange(i_start_voxel, i_end_voxel)
+    idxs_wc = np.where(word_chunks_contain_example_ngrams[idxs])[0]
+
+    word_chunk_deltas = defaultdict(list)
+    for delta_num in deltas:
+        for idx in idxs_wc:
+            if idx + delta_num < len(idxs):
+                word_chunk_deltas[delta_num].append(
+                    voxel_resp[idxs][idx + delta_num] - voxel_resp[idxs][idx]
+                )
+    return word_chunk_deltas
+
+
 def find_all_examples_within_quotes(x: str):
-    # return a list of strings that are within quotes
-    # e.g. This is a "hello" world string about "cars" -> ["hello", "cars"]
+    '''
+    return a list of strings that are within quotes
+    e.g. This is a "hello" world string about "cars" -> ["hello", "cars"]
+    '''
 
     # find all indices of quotes
     idxs = []

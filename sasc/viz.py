@@ -6,6 +6,7 @@ import seaborn as sns
 import numpy as np
 from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib.pyplot as plt
+import adjustText
 # import matplotlib.colormaps
 
 # default matplotlib colors
@@ -26,11 +27,12 @@ cs_mpl = [
 cblue = "#66ccff"
 cred = "#cc0000"
 
+
 def imshow_diverging(mat):
     vabs = np.nanmax(np.abs(mat))
-    plt.imshow(mat, cmap=sns.diverging_palette(29, 220, as_cmap=True), vmin=-vabs, vmax=vabs)
+    plt.imshow(mat, cmap=sns.diverging_palette(
+        29, 220, as_cmap=True), vmin=-vabs, vmax=vabs)
     plt.colorbar(label='Mean response ($\sigma_f$)')
-
 
 
 def save_figs_to_single_pdf(filename):
@@ -44,7 +46,7 @@ def save_figs_to_single_pdf(filename):
 
 def colorize(
     words: List[str],
-    color_array, #: np.ndarray[float],
+    color_array,  # : np.ndarray[float],
     char_width_max=60,
     title: str = None,
     subtitle: str = None,
@@ -159,7 +161,8 @@ def quickshow(X: np.ndarray, subject="UTS03", fname_save=None, title=None):
     vol.vmin = -vabs
     vol.vmax = vabs
     # fig = plt.figure()
-    cortex.quickshow(vol, with_rois=True, cmap="PuBu")  # , vmin=-vabs, vmax=vabs)
+    # , vmin=-vabs, vmax=vabs)
+    cortex.quickshow(vol, with_rois=True, cmap="PuBu")
     # fig = plt.gcf()
     # add title
     # fig.axes[0].set_title(title, fontsize='xx-small')
@@ -168,26 +171,123 @@ def quickshow(X: np.ndarray, subject="UTS03", fname_save=None, title=None):
         plt.savefig(fname_save.replace(".pdf", ".png"))
         plt.close()
 
+
 def outline_diagonal(shape, color='gray', lw=1, block_size=1):
     for r in range(shape[0]):
         for c in range(shape[1]):
             # outline the diagonal with blocksize 1
             if block_size == 1 and r == c:
-                plt.plot([r - 0.5, r + 0.5], [c - 0.5, c - 0.5], color=color, lw=lw)
-                plt.plot([r - 0.5, r + 0.5], [c + 0.5, c + 0.5], color=color, lw=lw)
-                plt.plot([r - 0.5, r - 0.5], [c - 0.5, c + 0.5], color=color, lw=lw)
-                plt.plot([r + 0.5, r + 0.5], [c - 0.5, c + 0.5], color=color, lw=lw)
+                plt.plot([r - 0.5, r + 0.5],
+                         [c - 0.5, c - 0.5], color=color, lw=lw)
+                plt.plot([r - 0.5, r + 0.5],
+                         [c + 0.5, c + 0.5], color=color, lw=lw)
+                plt.plot([r - 0.5, r - 0.5],
+                         [c - 0.5, c + 0.5], color=color, lw=lw)
+                plt.plot([r + 0.5, r + 0.5],
+                         [c - 0.5, c + 0.5], color=color, lw=lw)
             if block_size == 2 and r == c and r % 2 == 0:
                 rx = r + 0.5
                 cx = c + 0.5
-                plt.plot([rx - 1, rx + 1], [cx - 1, cx - 1], color=color, lw=lw)
-                plt.plot([rx - 1, rx + 1], [cx + 1, cx + 1], color=color, lw=lw)
-                plt.plot([rx - 1, rx - 1], [cx - 1, cx + 1], color=color, lw=lw)
-                plt.plot([rx + 1, rx + 1], [cx - 1, cx + 1], color=color, lw=lw)
+                plt.plot([rx - 1, rx + 1], [cx - 1, cx - 1],
+                         color=color, lw=lw)
+                plt.plot([rx - 1, rx + 1], [cx + 1, cx + 1],
+                         color=color, lw=lw)
+                plt.plot([rx - 1, rx - 1], [cx - 1, cx + 1],
+                         color=color, lw=lw)
+                plt.plot([rx + 1, rx + 1], [cx - 1, cx + 1],
+                         color=color, lw=lw)
             if block_size == 3 and r == c and r % 3 == 0:
                 rx = r + 1
                 cx = c + 1
-                plt.plot([rx - 1.5, rx + 1.5], [cx - 1.5, cx - 1.5], color=color, lw=lw)
-                plt.plot([rx - 1.5, rx + 1.5], [cx + 1.5, cx + 1.5], color=color, lw=lw)
-                plt.plot([rx - 1.5, rx - 1.5], [cx - 1.5, cx + 1.5], color=color, lw=lw)
-                plt.plot([rx + 1.5, rx + 1.5], [cx - 1.5, cx + 1.5], color=color, lw=lw)
+                plt.plot([rx - 1.5, rx + 1.5],
+                         [cx - 1.5, cx - 1.5], color=color, lw=lw)
+                plt.plot([rx - 1.5, rx + 1.5],
+                         [cx + 1.5, cx + 1.5], color=color, lw=lw)
+                plt.plot([rx - 1.5, rx - 1.5],
+                         [cx - 1.5, cx + 1.5], color=color, lw=lw)
+                plt.plot([rx + 1.5, rx + 1.5],
+                         [cx - 1.5, cx + 1.5], color=color, lw=lw)
+
+
+def plot_annotated_resp(
+    voxel_num: int,
+    word_chunks,
+    voxel_resp,
+    expl_voxel,
+    start_times,
+    end_times,
+    stories_data_dict,
+    expls,
+    story_num,
+    word_chunks_contain_example_ngrams,
+    trim=5,
+):
+    plt.figure(figsize=(22, 6))
+    plt.plot(voxel_resp)
+
+    # annotate top 5 voxel_resps with word_chunks
+    texts = []
+    top_5_resp_positions = np.argsort(voxel_resp)[::-1][:5]
+    for i, resp_position in enumerate(top_5_resp_positions):
+        plt.plot(resp_position, voxel_resp[resp_position], "o", color="black")
+        text = (
+            " ".join(word_chunks[resp_position - 1])
+            + "\n"
+            + " ".join(word_chunks[resp_position])
+        )
+        texts.append(
+            plt.annotate(
+                text, (resp_position,
+                       voxel_resp[resp_position]), fontsize="x-small"
+            )
+        )
+
+    # annotate bottom 5 voxel_resps with word_chunks
+    bottom_5_resp_positions = np.argsort(voxel_resp)[:5]
+    for i, resp_position in enumerate(bottom_5_resp_positions):
+        plt.plot(resp_position, voxel_resp[resp_position], "o", color="black")
+        text = (
+            " ".join(word_chunks[resp_position - 2])
+            + "\n"
+            + " ".join(word_chunks[resp_position - 1])
+            + "\n"
+            + " ".join(word_chunks[resp_position])
+        )
+        texts.append(
+            plt.annotate(
+                text, (resp_position,
+                       voxel_resp[resp_position]), fontsize="x-small"
+            )
+        )
+
+    # plot key ngrams
+    i_start_voxel = start_times[voxel_num]
+    i_end_voxel = end_times[voxel_num] + 1
+    if i_end_voxel > len(voxel_resp):
+        i_end_voxel = len(voxel_resp)
+    idxs = np.arange(i_start_voxel, i_end_voxel)
+    idxs_wc = np.where(word_chunks_contain_example_ngrams[idxs])[0]
+    plt.plot(idxs, voxel_resp[idxs], color="C0", linewidth=2)
+    plt.plot(idxs[idxs_wc], voxel_resp[idxs[idxs_wc]],
+             "^", color="C1", linewidth=2)
+
+    # clean up plot and add in trim
+    adjustText.adjust_text(texts, arrowprops=dict(
+        arrowstyle="->", color="gray"))
+    plt.grid(alpha=0.4, axis="y")
+    xticks = np.array([start_times - trim, end_times - trim]).mean(axis=0)
+    plt.xticks(xticks, expls, rotation=45, fontsize="x-small")
+
+    for i, (start_time, end_time) in enumerate(zip(start_times - trim, end_times - trim)):
+        if i == voxel_num:
+            plt.axvspan(start_time, end_time, facecolor="green", alpha=0.1)
+        elif i % 2 == 0:
+            plt.axvspan(start_time, end_time, facecolor="gray", alpha=0.1)
+        else:
+            plt.axvspan(start_time, end_time, facecolor="gray", alpha=0.0)
+
+    plt.ylabel(
+        f'"{expl_voxel}" voxel response\n({stories_data_dict["story_name_new"][story_num][3:-10]})'
+    )
+
+    # plt.show()
