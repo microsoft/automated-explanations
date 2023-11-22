@@ -1,3 +1,4 @@
+from sasc.config import RESULTS_DIR, SAVE_DIR_FMRI
 from collections import defaultdict
 import pandas as pd
 import logging
@@ -21,7 +22,6 @@ import joblib
 from copy import deepcopy
 
 modules_dir = dirname(os.path.abspath(__file__))
-from sasc.config import RESULTS_DIR, SAVE_DIR_FMRI
 
 NUM_TOP_VOXELS = 500
 
@@ -36,7 +36,8 @@ VOXELS_IDXS_DICT = {
     for subject in ["UTS01", "UTS02", "UTS03"]
 }
 
-STABILITY_SCORES_DICT = joblib.load(join(RESULTS_DIR, "fmri_stability_scores.jbl"))
+STABILITY_SCORES_DICT = joblib.load(
+    join(RESULTS_DIR, "sasc", "fmri_stability_scores.jbl"))
 
 
 def convert_module_num_to_voxel_num(module_num: int, subject: str):
@@ -64,7 +65,8 @@ class fMRIModule:
         """
 
         # load opt model & tokenizer
-        assert checkpoint in ["facebook/opt-30b", "decapoda-research/llama-30b-hf"]
+        assert checkpoint in ["facebook/opt-30b",
+                              "decapoda-research/llama-30b-hf"]
         self.checkpoint = checkpoint
         self.model_dir = {
             "facebook/opt-30b": "opt_model",
@@ -160,7 +162,8 @@ class fMRIModule:
 
             # Ideally, you would use downsampled features instead of copying features across time delays
             emb = (
-                list(self.model(**inputs, output_hidden_states=True)[2])[layer][0][-1]
+                list(self.model(**inputs, output_hidden_states=True)
+                     [2])[layer][0][-1]
                 .cpu()
                 .detach()
                 .numpy()
@@ -212,7 +215,8 @@ def get_roi(voxel_num_best: int = 0, roi_type: str = "anat", subject: str = "UTS
             )
         )
     voxel_idxs = joblib.load(
-        join(SAVE_DIR_FMRI, "voxel_lists", f"{subject}_voxel_selectivity_shuffled.jbl")
+        join(SAVE_DIR_FMRI, "voxel_lists",
+             f"{subject}_voxel_selectivity_shuffled.jbl")
     )
     voxel_idx = voxel_idxs[voxel_num_best]
     return rois.get(str(voxel_idx), "--")
@@ -431,14 +435,17 @@ def get_train_story_texts(subject: str = "UTS01"):
 
 def cache_test_data():
     """Format the test data as a supervised task (text, resp) using 4 delays"""
-    TEST_STORIES = ["wheretheressmoke", "onapproachtopluto", "fromboyhoodtofatherhood"]
+    TEST_STORIES = ["wheretheressmoke",
+                    "onapproachtopluto", "fromboyhoodtofatherhood"]
     out = defaultdict(dict)
     for subject in tqdm(["UTS01", "UTS02", "UTS03"]):
         voxel_idxs = joblib.load(
-            join(SAVE_DIR_FMRI, "voxel_lists", f"{subject}_voxel_selectivity.jbl")
+            join(SAVE_DIR_FMRI, "voxel_lists",
+                 f"{subject}_voxel_selectivity.jbl")
         )[:NUM_TOP_VOXELS]
         grids = joblib.load(join(SAVE_DIR_FMRI, "stories", "grids_all.jbl"))
-        trfiles = joblib.load(join(SAVE_DIR_FMRI, "stories", "trfiles_all.jbl"))
+        trfiles = joblib.load(
+            join(SAVE_DIR_FMRI, "stories", "trfiles_all.jbl"))
         from huth.utils_ds import make_word_ds
 
         wordseqs = make_word_ds(grids, trfiles)
@@ -463,7 +470,8 @@ def cache_test_data():
 
         # get resp
         # these are already normalized
-        resp = joblib.load(join(SAVE_DIR_FMRI, "responses", f"{subject}_responses.jbl"))
+        resp = joblib.load(join(SAVE_DIR_FMRI, "responses",
+                           f"{subject}_responses.jbl"))
         resp = {
             k: resp[k][:, voxel_idxs] for k in TEST_STORIES
         }  # narrow down the stories/voxels
@@ -475,7 +483,8 @@ def cache_test_data():
 
 
 def cache_preprocessor(model_dir="llama_model"):
-    embs_dict = joblib.load(join(SAVE_DIR_FMRI, model_dir, "stimulus_features.jbl"))
+    embs_dict = joblib.load(
+        join(SAVE_DIR_FMRI, model_dir, "stimulus_features.jbl"))
     embs = np.concatenate([embs_dict[k] for k in embs_dict])
     preproc = sklearn.preprocessing.StandardScaler()
     preproc.fit(embs)
