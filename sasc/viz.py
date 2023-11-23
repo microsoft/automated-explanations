@@ -331,7 +331,7 @@ def barplot_default(
     plt.errorbar(2, off_diag_mean, yerr=np.nanstd(off_diag_means) / np.sqrt(len(off_diag_means)),
                  fmt='.', ms=0, color='black', elinewidth=3, capsize=5)
 
-    plt.xticks([1, 2], ['Driving paragraph', 'Baseline paragraphs'])
+    plt.xticks([1, 2], ['Drive', 'Baseline'])
     plt.ylabel('Mean voxel response ($\sigma_f$)')
     plt.grid(axis='y')
 
@@ -434,7 +434,7 @@ def barplot_interaction(
     print('median', np.nanmedian(diag_means_interaction) -
           np.nanmedian(off_diag_means_interaction))
     # move title down into plot
-    plt.title('Interaction condition', y=0.9)
+    plt.title('Voxel interaction', y=0.9)
     # plt.title(f'use_clusters={use_clusters}')
     plt.savefig(join(sasc.config.RESULTS_DIR, 'figs/main',
                      pilot_name[:pilot_name.index('_')] + '_interaction_means.pdf'), bbox_inches='tight')
