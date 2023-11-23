@@ -7,6 +7,8 @@ import numpy as np
 from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib.pyplot as plt
 import adjustText
+import sasc.config
+from os.path import join
 # import matplotlib.colormaps
 
 # default matplotlib colors
@@ -291,3 +293,148 @@ def plot_annotated_resp(
     )
 
     # plt.show()
+
+
+def barplot_default(
+        diag_means_list: List[np.ndarray], off_diag_means_list: List[np.ndarray],
+        pilot_name, expls, annot_points=True, spread=60
+):
+
+    plt.figure(dpi=300)
+
+    # raw inputs
+    markers = ['o', '^', 'x']
+    n = sum([len(diag_means) for diag_means in diag_means_list])
+    x = np.arange(n) - n / 2
+    offset = 0
+    for i in range(len(diag_means_list)):
+        diag_means = diag_means_list[i]
+        off_diag_means = off_diag_means_list[i]
+
+        # plot individual points
+        xp = x[offset:offset + len(diag_means)]
+        offset += len(diag_means)
+        plt.plot(1 + xp/spread, diag_means,
+                 markers[i], color='C0', alpha=0.9, markersize=3)
+        plt.plot(2 + xp/spread, off_diag_means,
+                 markers[i], color='C1', markersize=3)
+
+    # plot overarching bars
+    # get mean of each row excluding the diagonal
+    diag_mean = np.nanmean(np.concatenate(diag_means_list))
+    off_diag_mean = np.nanmean(np.concatenate(off_diag_means_list))
+    plt.bar(1, diag_mean, width=0.5, alpha=0.2, color='C0')
+    plt.errorbar(1, diag_mean, yerr=np.nanstd(diag_means) / np.sqrt(len(diag_means)),
+                 fmt='.', ms=0, color='black', elinewidth=3, capsize=5, lw=1)
+
+    plt.bar(2, off_diag_mean, width=0.5, alpha=0.1, color='C1')
+    plt.errorbar(2, off_diag_mean, yerr=np.nanstd(off_diag_means) / np.sqrt(len(off_diag_means)),
+                 fmt='.', ms=0, color='black', elinewidth=3, capsize=5)
+
+    plt.xticks([1, 2], ['Driving paragraph', 'Baseline paragraphs'])
+    plt.ylabel('Mean voxel response ($\sigma_f$)')
+    plt.grid(axis='y')
+
+    # annotate the point with the highest mean
+    if annot_points:
+        kwargs = dict(
+            arrowprops=dict(arrowstyle='->', color='#333'), fontsize='x-small', color='#333'
+        )
+        idx = np.argmax(diag_means)
+        print(expls[idx])
+        plt.annotate(f"{expls[idx]}", (1 + x[idx]/50, diag_means[idx]),
+                     xytext=(1.1, diag_means[idx] + 0.1), **kwargs)
+
+        # annotate the point with the second highest mean
+        idx = np.argsort(diag_means)[-2]
+        print(expls[idx])
+        plt.annotate(f"{expls[idx]}", (1 + x[idx]/50, diag_means[idx]),
+                     xytext=(1.1, diag_means[idx] + 0.1), **kwargs)
+
+        # annotate the point with the lowest mean
+        idx = np.argmin(diag_means)
+        plt.annotate(f"{expls[idx]}", (1 + x[idx]/50, diag_means[idx]),
+                     xytext=(1.1, diag_means[idx]), **kwargs)
+
+    plt.tight_layout()
+    print('mean', diag_mean - off_diag_mean)
+    # plt.title(f'use_clusters={use_clusters}')
+    plt.title('Single voxel', y=0.9)
+    plt.savefig(join(sasc.config.RESULTS_DIR, 'figs/main',
+                pilot_name[:pilot_name.index('_')] + '_default_means.pdf'), bbox_inches='tight')
+
+
+def barplot_interaction(
+    diag_means_list, off_diag_means_list, diag_means_interaction_list, off_diag_means_interaction_list,
+        pilot_name, spread=60
+):
+    plt.figure(dpi=300)
+
+    n0 = sum([len(diag_means) for diag_means in diag_means_list])
+    n1 = sum([len(off_diag_means) for off_diag_means in off_diag_means_list])
+    n2 = sum([len(diag_means_interaction)
+             for diag_means_interaction in diag_means_interaction_list])
+    x0 = np.arange(n0) - n0 / 2
+    x1 = np.arange(n1) - n1 / 2
+    x2 = np.arange(n2) - n2 / 2
+    offset0 = 0
+    offset1 = 0
+    offset2 = 0
+    markers = ['o', '^', 'x']
+    for i in range(len(diag_means_list)):
+
+        diag_means = diag_means_list[i]
+        off_diag_means = off_diag_means_list[i]
+        diag_means_interaction = diag_means_interaction_list[i]
+        off_diag_means_interaction = off_diag_means_interaction_list[i]
+
+        # n = len(diag_means)
+        m = markers[i]
+        plt.plot(0 + x0[offset0:offset0 + len(diag_means)] /
+                 spread, diag_means, m, color='C0', markersize=3)
+        plt.plot(2 + x1[offset1:offset1 + len(off_diag_means)] /
+                 spread, off_diag_means, m, color='C1', markersize=3)
+        plt.plot(1 + x2[offset2:offset2 + len(diag_means_interaction)]/spread,
+                 diag_means_interaction, m, color='C2', markersize=3)
+
+        offset0 += len(diag_means)
+        offset1 += len(off_diag_means)
+        offset2 += len(diag_means_interaction)
+
+    diag_means = np.concatenate(diag_means_list)
+    off_diag_means = np.concatenate(off_diag_means_list)
+    diag_means_interaction = np.concatenate(diag_means_interaction_list)
+    off_diag_means_interaction = np.concatenate(
+        off_diag_means_interaction_list)
+    diag_mean = np.nanmean(diag_means)
+    off_diag_mean = np.nanmean(off_diag_means)
+    diag_mean_interaction = np.nanmean(diag_means_interaction)
+    off_diag_mean_interaction = np.nanmean(off_diag_means_interaction)
+    plt.bar(0, diag_mean, width=0.5,
+            label='Diagonal', alpha=0.2, color='C0')
+    plt.errorbar(0, diag_mean, yerr=np.nanstd(diag_means) / np.sqrt(len(diag_means)),
+                 fmt='.', label='Diagonal', ms=0, color='black', elinewidth=3, capsize=5, lw=1)
+    plt.bar(2, off_diag_mean, width=0.5,
+            label='Off-diagonal', alpha=0.2, color='C1')
+    plt.errorbar(2, off_diag_mean, yerr=np.nanstd(off_diag_means) / np.sqrt(len(off_diag_means)),
+                 fmt='.', label='Diagonal', ms=0, color='black', elinewidth=3, capsize=5)
+
+    plt.bar(1, diag_mean_interaction, width=0.5,
+            label='Diagonal', alpha=0.2, color='C2')
+    plt.errorbar(1, diag_mean_interaction, yerr=np.nanstd(diag_means_interaction) / np.sqrt(len(diag_means_interaction)),
+                 fmt='.', label='Diagonal', ms=0, color='black', elinewidth=3, capsize=5, lw=1)
+
+    plt.xticks([0, 1, 2], ['Drive single', 'Drive pair', 'Baseline'])
+    plt.ylabel('Mean voxel response ($\sigma_f$)')
+    plt.grid(axis='y')
+
+    plt.tight_layout()
+    print('mean single', diag_mean - off_diag_mean)
+    print('mean inter', diag_mean - off_diag_mean_interaction)
+    print('median', np.nanmedian(diag_means_interaction) -
+          np.nanmedian(off_diag_means_interaction))
+    # move title down into plot
+    plt.title('Interaction condition', y=0.9)
+    # plt.title(f'use_clusters={use_clusters}')
+    plt.savefig(join(sasc.config.RESULTS_DIR, 'figs/main',
+                     pilot_name[:pilot_name.index('_')] + '_interaction_means.pdf'), bbox_inches='tight')
