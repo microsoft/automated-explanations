@@ -30,11 +30,11 @@ cblue = "#66ccff"
 cred = "#cc0000"
 
 
-def imshow_diverging(mat):
+def imshow_diverging(mat, clab="Mean response ($\sigma_f$)"):
     vabs = np.nanmax(np.abs(mat))
     plt.imshow(mat, cmap=sns.diverging_palette(
         29, 220, as_cmap=True), vmin=-vabs, vmax=vabs)
-    plt.colorbar(label='Mean response ($\sigma_f$)')
+    plt.colorbar(label=clab)
 
 
 def save_figs_to_single_pdf(filename):
@@ -137,9 +137,9 @@ def heatmap(
     # plt.style.use('dark_background')
     plt.figure(figsize=(7, 6))
     if diverging:
-        imshow_diverging(data)
+        imshow_diverging(data, clab=clab)
     else:
-        plt.imshow(data)
+        plt.imshow(data, cmap='Blues')
         plt.colorbar(label=clab)
     plt.xticks(range(data.shape[0]), labels, rotation=90, fontsize="small")
     plt.yticks(range(data.shape[1]), labels, fontsize="small")
