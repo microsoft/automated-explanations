@@ -515,3 +515,11 @@ def barplot_polysemantic(
     plt.title('Polysemantic', y=0.9)
     plt.savefig(join(sasc.config.RESULTS_DIR, 'figs/main',
                 pilot_name[:pilot_name.index('_')] + '_poly_means.pdf'), bbox_inches='tight')
+
+
+def stories_barplot(story_scores_df):
+    story_scores_df = story_scores_df.melt(id_vars='story', value_vars=[
+        'driving', 'baseline'], var_name='condition', value_name='mean')
+    story_scores_df = story_scores_df.sort_values(by='story')
+    sns.barplot(data=story_scores_df, x='story', y='mean', hue='condition')
+    plt.ylabel('Mean voxel response ($\sigma_f$)')
