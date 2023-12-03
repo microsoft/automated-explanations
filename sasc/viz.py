@@ -438,3 +438,80 @@ def barplot_interaction(
     # plt.title(f'use_clusters={use_clusters}')
     plt.savefig(join(sasc.config.RESULTS_DIR, 'figs/main',
                      pilot_name[:pilot_name.index('_')] + '_interaction_means.pdf'), bbox_inches='tight')
+
+
+def barplot_polysemantic(
+    diag_means_list: List[np.ndarray], off_diag_means_list: List[np.ndarray],
+    pilot_name, expls, annot_points=True, spread=60
+):
+
+    plt.figure(dpi=300)
+
+    # raw inputs
+    markers = ['o', '^', 'x']
+    n = sum([len(diag_means) for diag_means in diag_means_list])
+    x = np.arange(n) - n / 2
+    offset = 0
+    for i in range(len(diag_means_list)):
+        diag_means = diag_means_list[i]
+        off_diag_means = off_diag_means_list[i]
+
+        # plot individual points
+        print('offset', offset, len(diag_means))
+        xp = x[offset:offset + len(diag_means)]
+        offset += len(diag_means)
+
+        m = markers[i]
+        for j in range(0, len(diag_means), 2):
+            bigger = max(diag_means[j], diag_means[j + 1])
+            smaller = min(diag_means[j], diag_means[j + 1])
+            xj = xp[j] / spread
+            plt.plot(1 + xj, bigger, m, color='C0', alpha=0.9, markersize=3)
+            plt.plot(1 + xj, smaller, m, color='C0', alpha=0.3, markersize=3)
+            plt.plot([1 + xj, 1 + xj],
+                     [bigger, smaller], color='gray', alpha=0.3)
+        plt.plot(2 + xp/spread, off_diag_means, m, color='C1', markersize=3)
+
+    # plot overarching bars
+    # get mean of each row excluding the diagonal
+    diag_mean = np.nanmean(np.concatenate(diag_means_list))
+    off_diag_mean = np.nanmean(np.concatenate(off_diag_means_list))
+    plt.bar(1, diag_mean, width=0.5, alpha=0.2, color='C0')
+    plt.errorbar(1, diag_mean, yerr=np.nanstd(diag_means) / np.sqrt(len(diag_means)),
+                 fmt='.', ms=0, color='black', elinewidth=3, capsize=5, lw=1)
+
+    plt.bar(2, off_diag_mean, width=0.5, alpha=0.1, color='C1')
+    plt.errorbar(2, off_diag_mean, yerr=np.nanstd(off_diag_means) / np.sqrt(len(off_diag_means)),
+                 fmt='.', ms=0, color='black', elinewidth=3, capsize=5)
+
+    plt.xticks([1, 2], ['Drive', 'Baseline'])
+    plt.ylabel('Mean voxel response ($\sigma_f$)')
+    plt.grid(axis='y')
+
+    # annotate the point with the highest mean
+    if annot_points:
+        kwargs = dict(
+            arrowprops=dict(arrowstyle='->', color='#333'), fontsize='x-small', color='#333'
+        )
+        idx = np.argmax(diag_means)
+        print(expls[idx])
+        plt.annotate(f"{expls[idx]}", (1 + x[idx]/50, diag_means[idx]),
+                     xytext=(1.1, diag_means[idx] + 0.1), **kwargs)
+
+        # annotate the point with the second highest mean
+        idx = np.argsort(diag_means)[-2]
+        print(expls[idx])
+        plt.annotate(f"{expls[idx]}", (1 + x[idx]/50, diag_means[idx]),
+                     xytext=(1.1, diag_means[idx] + 0.1), **kwargs)
+
+        # annotate the point with the lowest mean
+        idx = np.argmin(diag_means)
+        plt.annotate(f"{expls[idx]}", (1 + x[idx]/50, diag_means[idx]),
+                     xytext=(1.1, diag_means[idx]), **kwargs)
+
+    plt.tight_layout()
+    print('mean', diag_mean - off_diag_mean)
+    # plt.title(f'use_clusters={use_clusters}')
+    plt.title('Polysemantic', y=0.9)
+    plt.savefig(join(sasc.config.RESULTS_DIR, 'figs/main',
+                pilot_name[:pilot_name.index('_')] + '_poly_means.pdf'), bbox_inches='tight')
