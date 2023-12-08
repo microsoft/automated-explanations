@@ -4,11 +4,9 @@ from os.path import join, dirname
 from tqdm import tqdm
 import joblib
 import numpy as np
-import story_helper
+from sasc import analyze_helper
 import sasc.viz
-
-path_to_current_file = dirname(os.path.abspath(__file__))
-path_to_repo = dirname(path_to_current_file)
+from sasc.config import RESULTS_DIR
 
 
 if __name__ == "__main__":
@@ -29,7 +27,7 @@ if __name__ == "__main__":
 
     # viz mean driving resp for each of the 16 voxels
     story_data = joblib.load(
-        join(path_to_repo, "results/pilot_story_data.pkl"))
+        join(RESULTS_DIR, "processed/pilot_story_data.pkl"))
     resp_chunks_list = []
     for story_num in range(6):  # range(1, 7)
         rows = story_data["rows"][story_num]
@@ -50,10 +48,10 @@ if __name__ == "__main__":
         timing = story_data["timing"][story_num]
 
         resp_story = resps_dict[
-            story_data["story_name_new"][story_num]
+            story_data["story_name_new"][story_num].replace('_resps', '')
         ].T  # (voxels, time)
-        resp_chunks = story_helper.get_resp_chunks(
-            timing, paragraphs, resp_story)
+        resp_chunks = analyze_helper.get_resps_for_paragraphs(
+            timing, paragraphs, resp_story, offset=2)
 
         args = np.argsort(rw["expl"].values)
         resp_chunks_list.append([resp_chunks[i].mean(axis=1) for i in args])
@@ -61,15 +59,17 @@ if __name__ == "__main__":
     resp_chunks_arr = np.array(resp_chunks_list).mean(axis=0)
     expls = rw.sort_values(by="expl")["expl"].values
     for i in range(resp_chunks_arr.shape[0]):
+        joblib.dump(
+            resp_chunks_arr[i],
+            join(RESULTS_DIR, 'processed', 'flatmaps', f"avg_resp_{i}_{expls[i]}.jl"))
         sasc.viz.quickshow(
             resp_chunks_arr[i],
             subject="UTS02",
             fname_save=join(
-                path_to_repo,
-                "results",
+                RESULTS_DIR,
                 "figs",
                 'flatmaps',
-                f"_resps_flatmap_{i}_{expls[i]}.pdf",
+                f"flatmap_{i}_{expls[i]}.pdf",
             ),
             title=expls[i],
         )
