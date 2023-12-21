@@ -30,11 +30,14 @@ cblue = "#66ccff"
 cred = "#cc0000"
 
 
-def imshow_diverging(mat, clab="Mean response ($\sigma_f$)"):
+def imshow_diverging(mat, clab="Mean response ($\sigma_f$)", clab_size='medium'):
     vabs = np.nanmax(np.abs(mat))
     plt.imshow(mat, cmap=sns.diverging_palette(
         29, 220, as_cmap=True), vmin=-vabs, vmax=vabs)
-    plt.colorbar(label=clab)
+    cb = plt.colorbar()
+    # set tick label size
+    cb.ax.tick_params(labelsize=clab_size)
+    cb.set_label(label=clab, size=clab_size)
 
 
 def save_figs_to_single_pdf(filename):
