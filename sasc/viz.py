@@ -226,73 +226,80 @@ def plot_annotated_resp(
     story_num,
     word_chunks_contain_example_ngrams,
     trim=5,
+    annotate_texts=True,
+    plot_key_ngrams=True,
 ):
-    plt.figure(figsize=(22, 6))
-    plt.plot(voxel_resp)
+    plt.figure(figsize=(11, 3))
+    plt.plot(voxel_resp, color='black')
 
     # annotate top 5 voxel_resps with word_chunks
-    texts = []
-    top_5_resp_positions = np.argsort(voxel_resp)[::-1][:5]
-    for i, resp_position in enumerate(top_5_resp_positions):
-        plt.plot(resp_position, voxel_resp[resp_position], "o", color="black")
-        text = (
-            " ".join(word_chunks[resp_position - 1])
-            + "\n"
-            + " ".join(word_chunks[resp_position])
-        )
-        texts.append(
-            plt.annotate(
-                text, (resp_position,
-                       voxel_resp[resp_position]), fontsize="x-small"
+    if annotate_texts:
+        texts = []
+        top_5_resp_positions = np.argsort(voxel_resp)[::-1][:5]
+        for i, resp_position in enumerate(top_5_resp_positions):
+            plt.plot(resp_position,
+                     voxel_resp[resp_position], "o", color="black")
+            text = (
+                " ".join(word_chunks[resp_position - 1])
+                + "\n"
+                + " ".join(word_chunks[resp_position])
             )
-        )
+            texts.append(
+                plt.annotate(
+                    text, (resp_position,
+                           voxel_resp[resp_position]), fontsize="x-small"
+                )
+            )
 
-    # annotate bottom 5 voxel_resps with word_chunks
-    bottom_5_resp_positions = np.argsort(voxel_resp)[:5]
-    for i, resp_position in enumerate(bottom_5_resp_positions):
-        plt.plot(resp_position, voxel_resp[resp_position], "o", color="black")
-        text = (
-            " ".join(word_chunks[resp_position - 2])
-            + "\n"
-            + " ".join(word_chunks[resp_position - 1])
-            + "\n"
-            + " ".join(word_chunks[resp_position])
-        )
-        texts.append(
-            plt.annotate(
-                text, (resp_position,
-                       voxel_resp[resp_position]), fontsize="x-small"
+        # annotate bottom 5 voxel_resps with word_chunks
+        bottom_5_resp_positions = np.argsort(voxel_resp)[:5]
+        for i, resp_position in enumerate(bottom_5_resp_positions):
+            plt.plot(resp_position,
+                     voxel_resp[resp_position], "o", color="black")
+            text = (
+                " ".join(word_chunks[resp_position - 2])
+                + "\n"
+                + " ".join(word_chunks[resp_position - 1])
+                + "\n"
+                + " ".join(word_chunks[resp_position])
             )
-        )
+            texts.append(
+                plt.annotate(
+                    text, (resp_position,
+                           voxel_resp[resp_position]), fontsize="x-small"
+                )
+            )
+        adjustText.adjust_text(texts, arrowprops=dict(
+            arrowstyle="->", color="gray"))
 
     # plot key ngrams
-    i_start_voxel = start_times[voxel_num]
-    i_end_voxel = end_times[voxel_num] + 1
-    if i_end_voxel > len(voxel_resp):
-        i_end_voxel = len(voxel_resp)
-    idxs = np.arange(i_start_voxel, i_end_voxel)
-    idxs_wc = np.where(word_chunks_contain_example_ngrams[idxs])[0]
-    plt.plot(idxs, voxel_resp[idxs], color="C0", linewidth=2)
-    plt.plot(idxs[idxs_wc], voxel_resp[idxs[idxs_wc]],
-             "^", color="C1", linewidth=2)
+    if plot_key_ngrams:
+        i_start_voxel = start_times[voxel_num]
+        i_end_voxel = end_times[voxel_num] + 1
+        if i_end_voxel > len(voxel_resp):
+            i_end_voxel = len(voxel_resp)
+        idxs = np.arange(i_start_voxel, i_end_voxel)
+        idxs_wc = np.where(word_chunks_contain_example_ngrams[idxs])[0]
+        plt.plot(idxs, voxel_resp[idxs], color="C0", linewidth=2)
+        plt.plot(idxs[idxs_wc], voxel_resp[idxs[idxs_wc]],
+                 "^", color="C1", linewidth=2)
 
     # clean up plot and add in trim
-    adjustText.adjust_text(texts, arrowprops=dict(
-        arrowstyle="->", color="gray"))
     plt.grid(alpha=0.4, axis="y")
     xticks = np.array([start_times - trim, end_times - trim]).mean(axis=0)
     plt.xticks(xticks, expls, rotation=45, fontsize="x-small")
 
     for i, (start_time, end_time) in enumerate(zip(start_times - trim, end_times - trim)):
         if i == voxel_num:
-            plt.axvspan(start_time, end_time, facecolor="green", alpha=0.1)
+            plt.axvspan(start_time, end_time, facecolor="C0", alpha=0.12)
         elif i % 2 == 0:
-            plt.axvspan(start_time, end_time, facecolor="gray", alpha=0.1)
+            plt.axvspan(start_time, end_time, facecolor="gray", alpha=0.08)
         else:
             plt.axvspan(start_time, end_time, facecolor="gray", alpha=0.0)
+    plt.xlim((start_times[0] - trim, end_times[-1] - trim))
 
     plt.ylabel(
-        f'"{expl_voxel}" voxel response\n({stories_data_dict["story_name_new"][story_num][3:-10]})'
+        f'"{expl_voxel}"\nvoxel\nresponse ($\sigma_f$)', fontsize='x-small'
     )
 
     # plt.show()
