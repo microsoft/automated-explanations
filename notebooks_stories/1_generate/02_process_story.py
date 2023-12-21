@@ -117,7 +117,7 @@ def module_story_match(EXPT_DIR, expls, paragraphs, voxel_nums, subject):
 
 def sweep_default_and_polysemantic(subjects=["UTS01", "UTS03"], setting="default"):
     EXPT_PARENT_DIR = join(RESULTS_DIR, "stories", setting)
-    EXPT_NAMES = sorted(os.listdir(EXPT_PARENT_DIR))
+    EXPT_NAMES = sorted(os.listdir(EXPT_PARENT_DIR))[::-1]
 
     # filter EXPT_NAMES that don't contain any of the subjects
     EXPT_NAMES = [
@@ -128,20 +128,22 @@ def sweep_default_and_polysemantic(subjects=["UTS01", "UTS03"], setting="default
 
     for EXPT_NAME in EXPT_NAMES:
         EXPT_DIR = join(EXPT_PARENT_DIR, EXPT_NAME)
-        rows = joblib.load(join(EXPT_DIR, "rows.pkl"))
-        expls = rows.expl.values
+        try:
+            rows = joblib.load(join(EXPT_DIR, "rows.pkl"))
 
-        # original version
-        if "paragraph" in rows.columns:
-            paragraphs = rows.paragraph.values
-            prompts = rows.prompt.values
-        # new version
-        else:
             prompts_paragraphs = joblib.load(
                 join(EXPT_DIR, "prompts_paragraphs.pkl"),
             )
             prompts = prompts_paragraphs["prompts"]
             paragraphs = prompts_paragraphs["paragraphs"]
+
+        except:
+            # old version
+            rows = pd.read_csv(join(EXPT_DIR, "rows.csv"))
+            prompts = open(join(EXPT_DIR, "prompts.txt")).read().split('\n\n')
+            paragraphs = open(join(EXPT_DIR, "story.txt")).read().split('\n\n')
+
+        expls = rows.expl.values
 
         voxel_nums = rows.module_num.values
         subjects = rows.subject.values
@@ -152,7 +154,8 @@ def sweep_default_and_polysemantic(subjects=["UTS01", "UTS03"], setting="default
         torch.cuda.empty_cache()
 
         print("Computing module<>story match", EXPT_NAME)
-        module_story_match(EXPT_DIR, expls, paragraphs, voxel_nums, subjects[0])
+        module_story_match(EXPT_DIR, expls, paragraphs,
+                           voxel_nums, subjects[0])
         torch.cuda.empty_cache()
 
 
@@ -186,11 +189,14 @@ def sweep_interactions(subjects=["UTS01", "UTS03"]):
             torch.cuda.empty_cache()
 
             print("Computing module<>story match", EXPT_NAME)
-            module_story_match(EXPT_DIR, expls, paragraphs, voxel_nums, subjects[0])
+            module_story_match(EXPT_DIR, expls, paragraphs,
+                               voxel_nums, subjects[0])
             torch.cuda.empty_cache()
 
 
 if __name__ == "__main__":
-    sweep_interactions(subjects=["UTS01", "UTS03"])
+    # sweep_interactions(subjects=["UTS01", "UTS03"])
     # sweep_default_and_polysemantic(subjects=['UTS01', 'UTS03'], setting="polysemantic")
     # sweep_default_and_polysemantic(subjects=['UTS01', 'UTS03'], setting="default")
+
+    sweep_default_and_polysemantic(subjects=['UTS02'], setting="default")

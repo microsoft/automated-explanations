@@ -36,7 +36,7 @@ def imshow_diverging(mat, clab="Mean response ($\sigma_f$)", clab_size='medium')
         29, 220, as_cmap=True), vmin=-vabs, vmax=vabs)
     cb = plt.colorbar()
     # set tick label size
-    cb.ax.tick_params(labelsize=clab_size)
+    # cb.ax.tick_params(labelsize=clab_size)
     cb.set_label(label=clab, size=clab_size)
 
 
@@ -136,18 +136,21 @@ def heatmap(
     ylab="Explanation for generation",
     clab="Fraction of matching ngrams",
     diverging=True,
+    label_fontsize='medium',
 ):
     # plt.style.use('dark_background')
     plt.figure(figsize=(7, 6))
     if diverging:
-        imshow_diverging(data, clab=clab)
+        imshow_diverging(data, clab=clab, clab_size=label_fontsize)
     else:
         plt.imshow(data, cmap='Blues')
-        plt.colorbar(label=clab)
+        cb = plt.colorbar()
+        # cb.ax.tick_params(labelsize=clab_size)
+        cb.set_label(label=clab, size=label_fontsize)
     plt.xticks(range(data.shape[0]), labels, rotation=90, fontsize="small")
     plt.yticks(range(data.shape[1]), labels, fontsize="small")
-    plt.ylabel(ylab)
-    plt.xlabel(xlab)
+    plt.ylabel(ylab, fontsize=label_fontsize)
+    plt.xlabel(xlab, fontsize=label_fontsize)
     plt.tight_layout()
     # plt.show()
 
