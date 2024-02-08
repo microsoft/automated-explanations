@@ -13,3 +13,5 @@ There were several iterations of these experiments, causing these scripts to get
 - Important: responses must be aligned to the right part of the stories
   - Must account for trimming
   - Must account for story paragraph metadata not matching perfectly with the `timings_processed.csv` file, which is what actually gets used
+
+Note: to run the code, you need to first run `pip install -e .` from the main repo directory. Then, place the folders from the [fMRI data collection](https://app.box.com/folder/211367364142) into join(sasc.config.FMRI_DIR, 'story_data')
