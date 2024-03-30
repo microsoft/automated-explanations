@@ -310,16 +310,17 @@ def plot_annotated_resp(
 
 def barplot_default(
         diag_means_list: List[np.ndarray], off_diag_means_list: List[np.ndarray],
-        pilot_name, expls, annot_points=True, spread=60
+        pilot_name, expls, annot_points=True, spread=50
 ):
 
     plt.figure(dpi=300)
 
     # raw inputs
-    markers = ['o', '^', 'x']
+    markers = ['o', 'x', '^']
     n = sum([len(diag_means) for diag_means in diag_means_list])
     x = np.arange(n) - n / 2
     offset = 0
+    ms = 6
     for i in range(len(diag_means_list)):
         diag_means = diag_means_list[i]
         off_diag_means = off_diag_means_list[i]
@@ -328,15 +329,15 @@ def barplot_default(
         xp = x[offset:offset + len(diag_means)]
         offset += len(diag_means)
         plt.plot(1 + xp/spread, diag_means,
-                 markers[i], color='C0', alpha=0.9, markersize=3)
+                 markers[i], color='C0', alpha=0.9, markersize=ms, markeredgewidth=2)
         plt.plot(2 + xp/spread, off_diag_means,
-                 markers[i], color='C1', markersize=3)
+                 markers[i], color='C1', markersize=ms, markeredgewidth=2)
 
     # plot overarching bars
     # get mean of each row excluding the diagonal
     diag_mean = np.nanmean(np.concatenate(diag_means_list))
     off_diag_mean = np.nanmean(np.concatenate(off_diag_means_list))
-    plt.bar(1, diag_mean, width=0.5, alpha=0.2, color='C0')
+    plt.bar(1, diag_mean, width=0.7, alpha=0.2, color='C0')
     plt.errorbar(1, diag_mean, yerr=np.nanstd(diag_means) / np.sqrt(len(diag_means)),
                  fmt='.', ms=0, color='black', elinewidth=3, capsize=5, lw=1)
 
@@ -372,14 +373,14 @@ def barplot_default(
     plt.tight_layout()
     print('mean', diag_mean - off_diag_mean)
     # plt.title(f'use_clusters={use_clusters}')
-    plt.title('Single voxel', y=0.9)
+    # plt.title('Single voxel', y=0.9)
     plt.savefig(join(sasc.config.RESULTS_DIR, 'figs/main',
                 pilot_name[:pilot_name.index('_')] + '_default_means.pdf'), bbox_inches='tight')
 
 
 def barplot_interaction(
     diag_means_list, off_diag_means_list, diag_means_interaction_list, off_diag_means_interaction_list,
-        pilot_name, spread=60
+        pilot_name, spread=50
 ):
     plt.figure(dpi=300)
 
@@ -393,7 +394,7 @@ def barplot_interaction(
     offset0 = 0
     offset1 = 0
     offset2 = 0
-    markers = ['o', '^', 'x']
+    markers = ['o', 'x', '^']
     for i in range(len(diag_means_list)):
 
         diag_means = diag_means_list[i]
@@ -403,12 +404,14 @@ def barplot_interaction(
 
         # n = len(diag_means)
         m = markers[i]
+        ms = 6
+        me = 2
         plt.plot(0 + x0[offset0:offset0 + len(diag_means)] /
-                 spread, diag_means, m, color='C0', markersize=3)
+                 spread, diag_means, m, color='C0', markersize=ms, markeredgewidth=me)
         plt.plot(2 + x1[offset1:offset1 + len(off_diag_means)] /
-                 spread, off_diag_means, m, color='C1', markersize=3)
+                 spread, off_diag_means, m, color='C1', markersize=ms, markeredgewidth=me)
         plt.plot(1 + x2[offset2:offset2 + len(diag_means_interaction)]/spread,
-                 diag_means_interaction, m, color='C2', markersize=3)
+                 diag_means_interaction, m, color='C2', markersize=ms, markeredgewidth=me)
 
         offset0 += len(diag_means)
         offset1 += len(off_diag_means)
@@ -423,16 +426,16 @@ def barplot_interaction(
     off_diag_mean = np.nanmean(off_diag_means)
     diag_mean_interaction = np.nanmean(diag_means_interaction)
     off_diag_mean_interaction = np.nanmean(off_diag_means_interaction)
-    plt.bar(0, diag_mean, width=0.5,
+    plt.bar(0, diag_mean, width=0.6,
             label='Diagonal', alpha=0.2, color='C0')
     plt.errorbar(0, diag_mean, yerr=np.nanstd(diag_means) / np.sqrt(len(diag_means)),
                  fmt='.', label='Diagonal', ms=0, color='black', elinewidth=3, capsize=5, lw=1)
-    plt.bar(2, off_diag_mean, width=0.5,
+    plt.bar(2, off_diag_mean, width=0.6,
             label='Off-diagonal', alpha=0.2, color='C1')
     plt.errorbar(2, off_diag_mean, yerr=np.nanstd(off_diag_means) / np.sqrt(len(off_diag_means)),
                  fmt='.', label='Diagonal', ms=0, color='black', elinewidth=3, capsize=5)
 
-    plt.bar(1, diag_mean_interaction, width=0.5,
+    plt.bar(1, diag_mean_interaction, width=0.6,
             label='Diagonal', alpha=0.2, color='C2')
     plt.errorbar(1, diag_mean_interaction, yerr=np.nanstd(diag_means_interaction) / np.sqrt(len(diag_means_interaction)),
                  fmt='.', label='Diagonal', ms=0, color='black', elinewidth=3, capsize=5, lw=1)
@@ -447,7 +450,7 @@ def barplot_interaction(
     print('median', np.nanmedian(diag_means_interaction) -
           np.nanmedian(off_diag_means_interaction))
     # move title down into plot
-    plt.title('Voxel interaction', y=0.9)
+    # plt.title('Voxel interaction', y=0.9)
     # plt.title(f'use_clusters={use_clusters}')
     plt.savefig(join(sasc.config.RESULTS_DIR, 'figs/main',
                      pilot_name[:pilot_name.index('_')] + '_interaction_means.pdf'), bbox_inches='tight')
@@ -475,15 +478,16 @@ def barplot_polysemantic(
         offset += len(diag_means)
 
         m = markers[i]
+        ms = 3
         for j in range(0, len(diag_means), 2):
             bigger = max(diag_means[j], diag_means[j + 1])
             smaller = min(diag_means[j], diag_means[j + 1])
             xj = xp[j] / spread
-            plt.plot(1 + xj, bigger, m, color='C0', alpha=0.9, markersize=3)
-            plt.plot(1 + xj, smaller, m, color='C0', alpha=0.3, markersize=3)
+            plt.plot(1 + xj, bigger, m, color='C0', alpha=0.9, markersize=ms)
+            plt.plot(1 + xj, smaller, m, color='C0', alpha=0.3, markersize=ms)
             plt.plot([1 + xj, 1 + xj],
                      [bigger, smaller], color='gray', alpha=0.3)
-        plt.plot(2 + xp/spread, off_diag_means, m, color='C1', markersize=3)
+        plt.plot(2 + xp/spread, off_diag_means, m, color='C1', markersize=ms)
 
     # plot overarching bars
     # get mean of each row excluding the diagonal
@@ -525,7 +529,7 @@ def barplot_polysemantic(
     plt.tight_layout()
     print('mean', diag_mean - off_diag_mean)
     # plt.title(f'use_clusters={use_clusters}')
-    plt.title('Polysemantic', y=0.9)
+    # plt.title('Polysemantic', y=0.9)
     plt.savefig(join(sasc.config.RESULTS_DIR, 'figs/main',
                 pilot_name[:pilot_name.index('_')] + '_poly_means.pdf'), bbox_inches='tight')
 
