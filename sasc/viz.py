@@ -411,7 +411,7 @@ def barplot_interaction(
         plt.plot(2 + x1[offset1:offset1 + len(off_diag_means)] /
                  spread, off_diag_means, m, color='C1', markersize=ms, markeredgewidth=me)
         plt.plot(1 + x2[offset2:offset2 + len(diag_means_interaction)]/spread,
-                 diag_means_interaction, m, color='C2', markersize=ms, markeredgewidth=me)
+                 diag_means_interaction, m, color='#5D3F6A', markersize=ms, markeredgewidth=me)
 
         offset0 += len(diag_means)
         offset1 += len(off_diag_means)
@@ -436,7 +436,7 @@ def barplot_interaction(
                  fmt='.', label='Diagonal', ms=0, color='black', elinewidth=3, capsize=5)
 
     plt.bar(1, diag_mean_interaction, width=0.6,
-            label='Diagonal', alpha=0.2, color='C2')
+            label='Diagonal', alpha=0.2, color='#5D3F6A')
     plt.errorbar(1, diag_mean_interaction, yerr=np.nanstd(diag_means_interaction) / np.sqrt(len(diag_means_interaction)),
                  fmt='.', label='Diagonal', ms=0, color='black', elinewidth=3, capsize=5, lw=1)
 
