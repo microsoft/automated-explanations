@@ -33,7 +33,7 @@ cred = "#cc0000"
 def imshow_diverging(mat, clab="Mean response ($\sigma_f$)", clab_size='medium'):
     vabs = np.nanmax(np.abs(mat))
     plt.imshow(mat, cmap=sns.diverging_palette(
-        29, 220, as_cmap=True), vmin=-vabs, vmax=vabs)
+        220, 29, as_cmap=True), vmin=-vabs, vmax=vabs)
     cb = plt.colorbar()
     # set tick label size
     # cb.ax.tick_params(labelsize=clab_size)

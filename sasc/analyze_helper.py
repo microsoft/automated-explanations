@@ -164,7 +164,7 @@ def sort_expls_semantically(expls: List[str]):
     # expls_full = r['top_explanation_init_strs']
     expls_full = expls
     pca = PCA(n_components=1)
-    lf = imodelsx.linear_finetune.LinearFinetune()
+    lf = imodelsx.linear_finetune.LinearFinetune(device='cpu')
     embs_full = lf._get_embs(expls_full)
     pca.fit(embs_full)
 
