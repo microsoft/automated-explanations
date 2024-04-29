@@ -158,13 +158,13 @@ def save_figs_to_single_pdf(filename):
     p.close()
 
 
-def sort_expls_semantically(expls: List[str]):
+def sort_expls_semantically(expls: List[str], device='cpu'):
     # from sasc.config import RESULTS_DIR, REPO_DIR
     # r = pd.read_pickle(join(RESULTS_DIR, "results_fmri_full_1500.pkl"))
     # expls_full = r['top_explanation_init_strs']
     expls_full = expls
     pca = PCA(n_components=1)
-    lf = imodelsx.linear_finetune.LinearFinetune(device='cpu')
+    lf = imodelsx.linear_finetune.LinearFinetune(device=device)
     embs_full = lf._get_embs(expls_full)
     pca.fit(embs_full)
 
