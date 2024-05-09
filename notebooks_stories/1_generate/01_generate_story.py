@@ -16,9 +16,9 @@ from sasc.config import RESULTS_DIR, REPO_DIR
 from typing import Tuple
 import sys
 import json
+sys.path.append('../0_voxel_select')
 
 sys.path.append(join(REPO_DIR, "notebooks_stories", "0_voxel_select"))
-import get_voxels
 
 
 def get_rows_and_prompts_default(
@@ -34,7 +34,6 @@ def get_rows_and_prompts_default(
 
     # shuffle order (this is the 1st place randomness is applied)
     rows = rows.sample(frac=1, random_state=seed, replace=False)
-
 
     # get prompt inputs
     expls = rows.expl.values
@@ -104,30 +103,32 @@ def get_rows_and_prompts_interactions(
 
 
 if __name__ == "__main__":
+    import get_voxels
     generate_paragraphs = False
 
     VERSIONS = {
-        "default": "v5_noun",
+        # "default": "v5_noun",
+        "default": "v4_noun",
         "interactions": "v0",
         "polysemantic": "v5_noun",
     }
     # iterate over seeds
-    seeds = list(range(1, 8))
+    seeds = range(3, 7)
     # random.shuffle(seeds)
     n_examples_per_prompt = 3
     n_examples_per_prompt_to_consider = 5
     for setting in [
-        "default",
-        "polysemantic",
         "interactions",
+        "default",
+        # "polysemantic",
     ]:  # default, interactions, polysemantic
-        for subject in ["UTS01", "UTS03"]:  # ["UTS01", "UTS03"]:
+        for subject in ["UTS01"]:  # , "UTS03"]:  # ["UTS01", "UTS03"]:
             for seed in seeds:
                 # for version in ["v5_noun"]:
                 version = VERSIONS[setting]
                 STORIES_DIR = join(RESULTS_DIR, "stories")
 
-                EXPT_NAME = f"{subject.lower()}___jun14___seed={seed}"
+                EXPT_NAME = f"{subject.lower()}___may9___seed={seed}"
                 EXPT_DIR = join(STORIES_DIR, setting, EXPT_NAME)
                 os.makedirs(EXPT_DIR, exist_ok=True)
 
@@ -171,12 +172,17 @@ if __name__ == "__main__":
                     rows1_rep.to_pickle(join(EXPT_DIR, f"rows.pkl"))
 
                 # generate paragraphs
+                for p in prompts:
+                    print('\n' + p)
                 paragraphs = sasc.generate_helper.get_paragraphs(
                     prompts,
-                    checkpoint="gpt-4-0314",
+                    # checkpoint="gpt-4",
+                    # checkpoint='gpt-4-turbo',
+                    # checkpoint='gpt-4-1106-preview',
+                    checkpoint='gpt-4-32k',
                     prefix_first=PV["prefix_first"] if "prefix_first" in PV else None,
                     prefix_next=PV["prefix_next"] if "prefix_next" in PV else None,
-                    cache_dir="/home/chansingh/cache/llm_stories",
+                    cache_dir="/home/chansingh/cache/llm_stories_may8",
                 )
 
                 for i in tqdm(range(len(paragraphs))):

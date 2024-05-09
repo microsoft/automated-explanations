@@ -146,7 +146,8 @@ def process_story(EXPT_DIR, EXPT_NAME, text, timings_fname_prefix):
     pd.DataFrame.from_dict(
         {
             "word": text.split()[:n],
-            "timing": timing[:n],  # difference between word2 middle and word1 middle
+            # difference between word2 middle and word1 middle
+            "timing": timing[:n],
             # 'timing2': timing2[:n], # difference between word3 middle and word2 middle (no offsetting needed)
             "time_running": np.nancumsum(timing),
         }
@@ -182,7 +183,7 @@ def process_timings(df: pd.DataFrame) -> pd.DataFrame:
     # truncate values that are too large
     df["timing"] = df["timing"].apply(lambda x: min(x, 0.8))
 
-    # remove repeated consecutive words    
+    # remove repeated consecutive words
     df = df[df['word'] != df['word'].shift(1)]
 
     # recompute running time
@@ -191,13 +192,16 @@ def process_timings(df: pd.DataFrame) -> pd.DataFrame:
 
 
 if __name__ == "__main__":
-    for setting in ["default", "polysemantic", "interactions"]:
-        for subject in ["UTS01", "UTS03"]:
+    # "polysemantic", "interactions"]:
+    filter = 'may9'
+    for setting in ["interactions", "default"]:
+        for subject in ["UTS01"]:  # "UTS03"]:
             EXPT_NAMES = sorted(
                 [
                     k
                     for k in os.listdir(join(RESULTS_DIR, "stories", setting))
                     if subject.lower() in k.lower()
+                    and filter in k
                 ]
             )
             # shuffle EXPT_NAMES
@@ -228,7 +232,8 @@ if __name__ == "__main__":
                         EXPT_DIR,
                         EXPT_NAME,
                         text,
-                        timings_fname_prefix=join(EXPT_DIR, f"{EXPT_NAME}_timings"),
+                        timings_fname_prefix=join(
+                            EXPT_DIR, f"{EXPT_NAME}_timings"),
                     )
 
                 # process timings

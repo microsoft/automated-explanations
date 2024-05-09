@@ -1,21 +1,21 @@
+from tqdm import tqdm
+import imodelsx.llm
+import imodelsx.util
+import numpy.random
+import numpy as np
+import sasc.evaluate as evaluate
+import sasc.data.data
+import pandas as pd
 import argparse
 from copy import deepcopy
 import sys
 import os.path
 from os.path import dirname, join
 from typing import List
-
+import time
 from sasc.modules.fmri_module import fMRIModule
 
 repo_dir = dirname(dirname(os.path.abspath(__file__)))
-import pandas as pd
-import sasc.data.data
-import sasc.evaluate as evaluate
-import numpy as np
-import numpy.random
-import imodelsx.util
-import imodelsx.llm
-from tqdm import tqdm
 
 
 def get_paragraphs(
@@ -35,30 +35,56 @@ def get_paragraphs(
       {'role': 'user', 'content': 'Write the next paragraph of the story, but now make it about "animals". Make sure it contains several references to "animals".'},
     ]
     """
-    token_limit = {
-        "gpt-3.5-turbo": 3200,
-        "gpt-4-0314": 30000,
-    }[checkpoint]
 
-    llm = imodelsx.llm.get_llm(checkpoint, CACHE_DIR=cache_dir, repeat_delay=10)
+    llm = imodelsx.llm.get_llm(
+        checkpoint, CACHE_DIR=cache_dir)  # , repeat_delay=10)
     response = None
     messages = [{"role": "system", "content": "You are a helpful assistant."}]
     all_content = []
+
+    # for i in range(len(prompts)):
+    #     messages.append({"role": "user", "content": prompts[i]})
+    #     all_content.append(messages[-1])
+    #     # for message in messages:
+    #     # print(message)
+
+    #     if i >= 10:
+    #         response_text = llm(messages, use_cache=False)
+    #     else:
+    #         response_text = llm(messages, use_cache=True)
+    #     messages.append({"role": "assistant", "content": response_text})
+    #     all_content.append(messages[-1])
+
+    #     for msg in messages:
+    #         print(msg)
+    #     print(i, 'token_length', len(
+    #         ''.join([str(m) for m in messages]).split()))
+    #     print('----------\n\n')
+    #     print(i, len(prompts))
+    #     time.sleep(0.5)
+
+    # token_limit = {
+    #     "gpt-3.5-turbo": 3200,
+    #     "gpt-4-0314": 30000,
+    #     "gpt-4": 30000,
+    # }[checkpoint]
+    token_limit = 30000
+
     for i in range(len(prompts)):
         messages.append({"role": "user", "content": prompts[i]})
         all_content.append(messages[-1])
-        # for message in messages:
-        # print(message)
-        response = llm(messages, return_str=False)
+        response = llm(messages, return_str=False, use_cache=True)
         # print('resp', response)
         if response is not None:
-            response_text = response["choices"][0]["message"]["content"]
+            # response_text = response["choices"][0]["message"]["content"]
+            response_text = response.choices[0].message.content
             messages.append({"role": "assistant", "content": response_text})
             all_content.append(messages[-1])
 
         # need to drop beginning of story whenever we approach the tok limit
         # gpt-3.5.turbo has a limit of 4096, and it cant generate beyond that
-        num_tokens = response["usage"]["total_tokens"]
+        # num_tokens = response["usage"]["total_tokens"]
+        num_tokens = response.usage.total_tokens
         # print('num_tokens', num_tokens)
         if num_tokens >= token_limit:
             # drop the first (assistant, user) pair in messages
@@ -70,9 +96,17 @@ def get_paragraphs(
                     prefix_next, prefix_first
                 )
 
+        for msg in messages:
+            print(msg)
+        print(i, 'token_length', len(
+            ''.join([str(m) for m in messages]).split()))
+        print('----------\n\n')
+        print(i, len(prompts), num_tokens)
+        # time.sleep(0.5)
+
     # extract out paragraphs
-    paragraphs = [d["content"] for d in all_content if d["role"] == "assistant"]
-    paragraphs
+    paragraphs = [d["content"]
+                  for d in all_content if d["role"] == "assistant"]
     assert len(paragraphs) == len(prompts)
     return paragraphs
 
@@ -102,15 +136,18 @@ def select_top_examples_randomly(
 def process_and_add_scores(r: pd.DataFrame, add_bert_scores=False):
     # metadata
     r["task_str"] = r.apply(
-        lambda row: sasc.data.data.get_task_str(row["module_name"], row["module_num"]),
+        lambda row: sasc.data.data.get_task_str(
+            row["module_name"], row["module_num"]),
         axis=1,
     )
     r["task_keyword"] = r["task_str"].apply(
         lambda task_str: sasc.data.data.get_groundtruth_keyword(task_str)
     )
-    r["task_name (groundtruth)"] = r["task_str"].apply(lambda s: s.split("_")[-1])
+    r["task_name (groundtruth)"] = r["task_str"].apply(
+        lambda s: s.split("_")[-1])
     r["ngrams_restricted"] = ~(r["module_num_restrict"] == -1)
-    r["num_generated_explanations"] = r["explanation_init_strs"].apply(lambda x: len(x))
+    r["num_generated_explanations"] = r["explanation_init_strs"].apply(
+        lambda x: len(x))
 
     # recompute recovery metrics
     r["score_contains_keywords"] = r.apply(
@@ -121,7 +158,8 @@ def process_and_add_scores(r: pd.DataFrame, add_bert_scores=False):
     )
     if add_bert_scores:
         r["score_bert"] = r.progress_apply(
-            lambda row: evaluate.compute_score_bert(row, row["explanation_init_strs"]),
+            lambda row: evaluate.compute_score_bert(
+                row, row["explanation_init_strs"]),
             axis=1,
         )
 
@@ -143,7 +181,7 @@ def process_and_add_scores(r: pd.DataFrame, add_bert_scores=False):
 
 def get_prompt_templates(version):
     PROMPTS = {
-        # make story "coherent"
+        # make story "coherent" (this was used for UTS03)
         "v5_noun": {
             "prefix_first": "Write the beginning paragraph of a long, coherent story. The story should be about",
             "prefix_next": "Write the next paragraph of the story, staying consistent with the story so far, but now make it about",
@@ -199,7 +237,16 @@ def get_prompts(expls: List[str], examples_list: List[str], version):
         ]
     else:
         raise ValueError(version, "not supported in get_prompts")
+
+    prompts = [_process_prompts(p) for p in prompts]
+
     return prompts
+
+
+def _process_prompts(s):
+    for k in ['repetition', 'repetition', 'numbers', 'specific times']:
+        s = s.replace(f'about "{k}"', f'include {k}')
+    return s
 
 
 def get_prompt_templates_interaction(version):
@@ -231,7 +278,8 @@ def get_prompts_interaction(
     all_examples = [
         f'"{x}"'
         for x in np.unique(
-            np.concatenate((np.unique(expls_one[:3]), np.unique(expls_two[:3])))
+            np.concatenate(
+                (np.unique(expls_one[:3]), np.unique(expls_two[:3])))
         )
     ]
     prompts = [PV["prefix_first"].format(expls=", ".join(all_examples))]
@@ -263,6 +311,8 @@ def get_prompts_interaction(
                 expl_two=expls_two[i],
             )
         )
+
+    prompts = [_process_prompts(p) for p in prompts]
     # print(expls_one)
     # for ex_list in examples_list_one[:3]:
     #     print(repr(ex_list))
@@ -270,7 +320,7 @@ def get_prompts_interaction(
     # print(prompts)
     # print(prompts)
     # for p in prompts:
-        # print(p, end='\n\n')
+    # print(p, end='\n\n')
     return prompts
 
 
@@ -422,7 +472,7 @@ def compute_expl_module_match_heatmap_running(
             # get mean score for each story (after applying offset)
             story_end = story_start + len(paragraphs[j].split())
             ngrams_scores_paragraph = ngrams_scores_story[
-                story_start + paragraph_start_offset : story_end
+                story_start + paragraph_start_offset: story_end
             ]
             story_start = story_end
 
@@ -449,7 +499,8 @@ def viz_paragraphs(
 
         # normalize to 0-1 range
         if normalize_to_range:
-            scores_i = (scores_i - scores_i.min()) / (scores_i.max() - scores_i.min())
+            scores_i = (scores_i - scores_i.min()) / \
+                (scores_i.max() - scores_i.min())
         # scores_mod_i = scipy.special.softmax(scores_mod_i)
         if moving_average:
             scores_i = sasc.viz.moving_average(scores_i, n=3)

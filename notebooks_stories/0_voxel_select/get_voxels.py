@@ -17,33 +17,6 @@ import sys
 import json
 
 VOXEL_DICT = {
-    "UTS01": [
-        # 322,  # embarrassment (0.125209)
-        # 311,  # vulgarities (0.132738)
-        # 258,  # lonelineness (0.135058)
-        # 469,  # physical contact (0.137269)
-        # 106,  # communication (0.154657)
-        # 162,  # communication (0.174878)
-        484,  # repetition (0.179070)
-        171,  # physical movement (0.182128)
-        186,  # location (0.184146)
-        378,  # college days (0.199483)
-        458,  # numbers (0.213608)
-        100,  # locations (0.214551)
-        451,  # speaking (0.218006)
-        187,  # relationships (0.221229)
-        # 332,  # family and friends (0.233957)
-        121,  # movement (0.235266)
-        149,  # clothing (0.238112)
-        # 192,  # family relationships (0.243154)
-        39,  # physical movement (0.253595)
-        232,  # violence and injury (0.266177)
-        107,  # family and friends (0.285960)
-        153,  # movement (0.286167)
-        144,  # family relationships (0.298463)
-        203,  # food and drink (0.313123)
-        473,  # food (0.351168)
-    ],
     "UTS02": [
         # 8 voxels with 3 reps is ~15 mins
         337,
@@ -84,21 +57,77 @@ VOXEL_DICT = {
         148,  # physical injury (0.321311)
         368,  # family and relationships (0.367439)
     ],
+    "UTS01_original": [
+        # 322,  # embarrassment (0.125209)
+        # 311,  # vulgarities (0.132738)
+        # 258,  # lonelineness (0.135058)
+        # 469,  # physical contact (0.137269)
+        # 106,  # communication (0.154657)
+        # 162,  # communication (0.174878)
+        484,  # repetition (0.179070)
+        171,  # physical movement (0.182128)
+        186,  # location (0.184146)
+        378,  # college days (0.199483)
+        458,  # numbers (0.213608)
+        100,  # locations (0.214551)
+        451,  # speaking (0.218006)
+        187,  # relationships (0.221229)
+        # 332,  # family and friends (0.233957)
+        121,  # movement (0.235266)
+        149,  # clothing (0.238112)
+        # 192,  # family relationships (0.243154)
+        39,  # physical movement (0.253595)
+        232,  # violence and injury (0.266177)
+        107,  # family and friends (0.285960)
+        153,  # movement (0.286167)
+        144,  # family relationships (0.298463)
+        203,  # food and drink (0.313123)
+        473,  # food (0.351168)
+    ],
+    "UTS01": [
+        # 322,  # embarrassment (0.125209)
+        # 311,  # vulgarities (0.132738)
+        258,  # lonelineness (0.135058)
+        469,  # physical contact (0.137269)
+        # 106,  # communication (0.154657)
+        162,  # communication (0.174878)
+        484,  # repetition (0.179070)
+        # 171,  # physical movement (0.182128)
+        # 186,  # location (0.184146)
+        378,  # college days (0.199483)
+        458,  # numbers (0.213608)
+        100,  # locations (0.214551)
+        157,  # specific times (0.217809)
+        451,  # speaking (0.218006)
+        # 187,  # relationships (0.221229)
+        # 332,  # family and friends (0.233957)
+        # 121,  # movement (0.235266)
+        149,  # clothing (0.238112)
+        # 192,  # family relationships (0.243154)
+        39,  # physical movement (0.253595)
+        232,  # violence and injury (0.266177)
+        107,  # family and friends (0.285960)
+        153,  # movement (0.286167)
+        144,  # family relationships (0.298463)
+        203,  # food and drink (0.313123)
+        473,  # food (0.351168)
+    ],
 }
 
 
 INTERACTIONS_DICT = {
+    'UTS01_original': [],  # overwrote these
     "UTS01": [
         # very related (0.74)
-        (186, 149),  # location, clothing
+        (100, 149),  # location, clothing
         # high related (~0.5)
-        (484, 171),  # repetition, physical movement
+        (484, 473),  # repetition, food
         # medium (0.25)
-        (153, 187),  # movement, relationships
+        (153, 144),  # movement, family relationships
         # low (0.19)
-        (171, 232),  # physical movement, violence and injury
+        (144, 157),  # family relationships, specific times
         # very low (~0)
-        (451, 186),  # speaking, location
+        (451, 258),  # speaking, loneliness
     ],
     "UTS02": [
         # related (>0.4)
@@ -129,7 +158,7 @@ def _voxels_to_rows(
     voxels: List[Tuple], polysemantic_ngrams: Dict = None
 ) -> pd.DataFrame:
     """Add extra data (like ngrams) to each row"""
-    r = pd.read_pickle(join(RESULTS_DIR, "fmri_results_merged.pkl"))
+    r = pd.read_pickle(join(RESULTS_DIR, 'sasc', "fmri_results_merged.pkl"))
     # put all voxel data into rows DataFrame
     rows = []
     expls = []
@@ -176,8 +205,10 @@ def get_rows_voxels(subject: str, setting="default"):
             k: f"notebooks_stories/0_voxel_select/polysemantic/polysemantic_{k}.json"
             for k in ["UTS01", "UTS02", "UTS03"]
         }
-    voxels_dict = json.load(open(join(REPO_DIR, VOXEL_DICT_FNAMES[subject]), "r"))
-    vals = pd.DataFrame([tuple(x) for x in sum(list(voxels_dict.values()), [])])
+    voxels_dict = json.load(
+        open(join(REPO_DIR, VOXEL_DICT_FNAMES[subject]), "r"))
+    vals = pd.DataFrame([tuple(x)
+                        for x in sum(list(voxels_dict.values()), [])])
     vals.columns = ["expl", "subject", "module_num"]
 
     if setting in ["default", "polysemantic"]:
@@ -194,12 +225,14 @@ def get_rows_voxels(subject: str, setting="default"):
             for voxel_num in voxel_nums:
                 if not voxel_num in vals["module_num"].values:
                     print("missing", voxel_num)
-            assert vals["module_num"].nunique() == vals.shape[0], "no duplicates"
+            assert vals["module_num"].nunique(
+            ) == vals.shape[0], "no duplicates"
             assert len(vals) == len(voxel_nums), "all voxels found"
             assert len(voxel_nums) == 17
         else:
             print(
-                "len(vals)", len(vals), "nunique voxels", vals["module_num"].nunique()
+                "len(vals)", len(
+                    vals), "nunique voxels", vals["module_num"].nunique()
             )
 
         # add extra data (like ngrams) to each row
@@ -212,7 +245,8 @@ def get_rows_voxels(subject: str, setting="default"):
             )
         else:
             polysemantic_ngrams = None
-        rows = _voxels_to_rows(vals.values, polysemantic_ngrams=polysemantic_ngrams)
+        rows = _voxels_to_rows(
+            vals.values, polysemantic_ngrams=polysemantic_ngrams)
         return rows
 
     elif setting == "interactions":

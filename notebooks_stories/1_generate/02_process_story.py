@@ -115,16 +115,18 @@ def module_story_match(EXPT_DIR, expls, paragraphs, voxel_nums, subject):
     #     }, join(EXPT_DIR, f'scores_mod_ngram_length={ngram_length}.pkl'))
 
 
-def sweep_default_and_polysemantic(subjects=["UTS01", "UTS03"], setting="default"):
+def sweep_default_and_polysemantic(subjects=["UTS01", "UTS03"], setting="default", filter='may9'):
     EXPT_PARENT_DIR = join(RESULTS_DIR, "stories", setting)
-    EXPT_NAMES = sorted(os.listdir(EXPT_PARENT_DIR))[::-1]
+    EXPT_NAMES = sorted(os.listdir(EXPT_PARENT_DIR))
 
     # filter EXPT_NAMES that don't contain any of the subjects
     EXPT_NAMES = [
         expt_name
         for expt_name in EXPT_NAMES
         if any([subject.lower() in expt_name for subject in subjects])
+        and filter in expt_name
     ]
+    print('found', EXPT_NAMES)
 
     for EXPT_NAME in EXPT_NAMES:
         EXPT_DIR = join(EXPT_PARENT_DIR, EXPT_NAME)
@@ -160,43 +162,54 @@ def sweep_default_and_polysemantic(subjects=["UTS01", "UTS03"], setting="default
 
 
 def sweep_interactions(subjects=["UTS01", "UTS03"]):
+    setting = 'interactions'
+    EXPT_PARENT_DIR = join(RESULTS_DIR, "stories", setting)
+    EXPT_NAMES = sorted(os.listdir(EXPT_PARENT_DIR))
     # iterate over seeds
-    seeds = range(1, 8)
+    # seeds = range(1, 8)
+    # filter EXPT_NAMES that don't contain any of the subjects
+    EXPT_NAMES = [
+        expt_name
+        for expt_name in EXPT_NAMES
+        if any([subject.lower() in expt_name for subject in subjects])
+        and filter in expt_name
+    ]
+    print('found', EXPT_NAMES)
+
     setting = "interactions"
-    for subject in subjects:  # ["UTS01", "UTS03"]:
-        for seed in seeds:
-            STORIES_DIR = join(RESULTS_DIR, "stories")
-            EXPT_NAME = f"{subject.lower()}___jun14___seed={seed}"
-            EXPT_DIR = join(STORIES_DIR, setting, EXPT_NAME)
-            # rows = joblib.load(join(EXPT_DIR, "rows1.pkl"))
-            # expls = rows.expl.values
-            prompts_paragraphs = joblib.load(
-                join(EXPT_DIR, "prompts_paragraphs.pkl"),
-            )
-            rows1_rep = joblib.load(join(EXPT_DIR, "rows.pkl"))
-            prompts = prompts_paragraphs["prompts"]
-            paragraphs = prompts_paragraphs["paragraphs"]
-            voxel_nums = rows1_rep.module_num.values
-            subjects = rows1_rep.subject.values
-            expls = rows1_rep.expl.values
-            print(
-                f"Loaded {len(prompts)} prompts, {len(paragraphs)} paragraphs, {len(rows1_rep)} (repeated1) rows"
-            )
+    for EXPT_NAME in EXPT_NAMES:
+        STORIES_DIR = join(RESULTS_DIR, "stories")
+        # EXPT_NAME = f"{subject.lower()}___jun14___seed={seed}"
+        EXPT_DIR = join(STORIES_DIR, setting, EXPT_NAME)
+        # rows = joblib.load(join(EXPT_DIR, "rows1.pkl"))
+        # expls = rows.expl.values
+        prompts_paragraphs = joblib.load(
+            join(EXPT_DIR, "prompts_paragraphs.pkl"),
+        )
+        rows1_rep = joblib.load(join(EXPT_DIR, "rows.pkl"))
+        prompts = prompts_paragraphs["prompts"]
+        paragraphs = prompts_paragraphs["paragraphs"]
+        voxel_nums = rows1_rep.module_num.values
+        subjects = rows1_rep.subject.values
+        expls = rows1_rep.expl.values
+        print(
+            f"Loaded {len(prompts)} prompts, {len(paragraphs)} paragraphs, {len(rows1_rep)} (repeated1) rows"
+        )
 
-            # run things
-            print("Computing expl<>story match", EXPT_NAME)
-            explanation_story_match(EXPT_DIR, expls, paragraphs, prompts)
-            torch.cuda.empty_cache()
+        # run things
+        print("Computing expl<>story match", EXPT_NAME)
+        explanation_story_match(EXPT_DIR, expls, paragraphs, prompts)
+        torch.cuda.empty_cache()
 
-            print("Computing module<>story match", EXPT_NAME)
-            module_story_match(EXPT_DIR, expls, paragraphs,
-                               voxel_nums, subjects[0])
-            torch.cuda.empty_cache()
+        print("Computing module<>story match", EXPT_NAME)
+        module_story_match(EXPT_DIR, expls, paragraphs,
+                           voxel_nums, subjects[0])
+        torch.cuda.empty_cache()
 
 
 if __name__ == "__main__":
     # sweep_interactions(subjects=["UTS01", "UTS03"])
     # sweep_default_and_polysemantic(subjects=['UTS01', 'UTS03'], setting="polysemantic")
     # sweep_default_and_polysemantic(subjects=['UTS01', 'UTS03'], setting="default")
-
-    sweep_default_and_polysemantic(subjects=['UTS02'], setting="default")
+    sweep_default_and_polysemantic(subjects=['UTS01'], setting="default")
+    sweep_default_and_polysemantic(subjects=['UTS01'], setting="interactions")
