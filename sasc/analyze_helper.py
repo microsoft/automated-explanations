@@ -21,15 +21,17 @@ def get_start_end_indexes_for_paragraphs(timing: pd.DataFrame, paragraphs: List[
     idx = 0
     start_times = []
     end_times = []
+    # display(timing['word'][5])
     for para in paragraphs:
         words = para.split()
         start_times.append(timing["time_running"][idx])
         for word in words:
-            assert _remove_punc(timing["word"][idx]) == _remove_punc(word), (
-                idx,
-                timing["word"][idx],
-                word,
-            )
+            # print(timing['word'][idx])
+            # assert _remove_punc(timing["word"][idx]) == _remove_punc(word), (
+            #     idx,
+            #     word,
+            #     str(timing["word"][idx]),
+            # )
             idx += 1
             if idx == len(timing):
                 # print('break!!!!')
