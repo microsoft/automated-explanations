@@ -309,7 +309,8 @@ def plot_annotated_resp(
 
 
 def barplot_default(
-        diag_means_list: List[np.ndarray], off_diag_means_list: List[np.ndarray],
+        diag_means_list: List[np.ndarray],
+        off_diag_means_list: List[np.ndarray],
         pilot_name, expls, annot_points=True, spread=50
 ):
 
