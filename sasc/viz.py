@@ -465,7 +465,7 @@ def barplot_polysemantic(
     plt.figure(dpi=300)
 
     # raw inputs
-    markers = ['o', '^', 'x']
+    markers = ['X', '^']
     n = sum([len(diag_means) for diag_means in diag_means_list])
     x = np.arange(n) - n / 2
     offset = 0
@@ -479,7 +479,7 @@ def barplot_polysemantic(
         offset += len(diag_means)
 
         m = markers[i]
-        ms = 3
+        ms = 5
         for j in range(0, len(diag_means), 2):
             bigger = max(diag_means[j], diag_means[j + 1])
             smaller = min(diag_means[j], diag_means[j + 1])
@@ -488,7 +488,7 @@ def barplot_polysemantic(
             plt.plot(1 + xj, smaller, m, color='C0', alpha=0.3, markersize=ms)
             plt.plot([1 + xj, 1 + xj],
                      [bigger, smaller], color='gray', alpha=0.3)
-        plt.plot(2 + xp/spread, off_diag_means, m, color='C1', markersize=ms)
+        plt.plot(2 + xp/spread, off_diag_means, m, color='gray', markersize=ms)
 
     # plot overarching bars
     # get mean of each row excluding the diagonal
@@ -498,12 +498,12 @@ def barplot_polysemantic(
     plt.errorbar(1, diag_mean, yerr=np.nanstd(diag_means) / np.sqrt(len(diag_means)),
                  fmt='.', ms=0, color='black', elinewidth=3, capsize=5, lw=1)
 
-    plt.bar(2, off_diag_mean, width=0.5, alpha=0.1, color='C1')
+    plt.bar(2, off_diag_mean, width=0.5, alpha=0.1, color='gray')
     plt.errorbar(2, off_diag_mean, yerr=np.nanstd(off_diag_means) / np.sqrt(len(off_diag_means)),
                  fmt='.', ms=0, color='black', elinewidth=3, capsize=5)
 
     plt.xticks([1, 2], ['Drive', 'Baseline'])
-    plt.ylabel('Mean voxel response ($\sigma_f$)')
+    plt.ylabel('Mean voxel response ($\sigma$)')
     plt.grid(axis='y')
 
     # annotate the point with the highest mean
@@ -531,8 +531,6 @@ def barplot_polysemantic(
     print('mean', diag_mean - off_diag_mean)
     # plt.title(f'use_clusters={use_clusters}')
     # plt.title('Polysemantic', y=0.9)
-    plt.savefig(join(sasc.config.RESULTS_DIR, 'figs/main',
-                pilot_name[:pilot_name.index('_')] + '_poly_means.pdf'), bbox_inches='tight')
 
 
 def stories_barplot(story_scores_df):
