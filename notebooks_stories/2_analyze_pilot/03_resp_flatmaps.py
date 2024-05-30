@@ -11,7 +11,7 @@ from sasc.config import RESULTS_DIR
 
 if __name__ == "__main__":
     # load data and corresponding resps
-    pilot_data_dir = "/home/chansingh/mntv1/deep-fMRI/story_data/20230504"
+    pilot_data_dir = "/home/chansingh/mntv1/deep-fMRI/brain_tune/story_data/20230504"
     resp_np_files = os.listdir(pilot_data_dir)
     resps_dict = {k: np.load(join(pilot_data_dir, k))
                   for k in tqdm(resp_np_files)}
@@ -57,8 +57,15 @@ if __name__ == "__main__":
         resp_chunks_list.append([resp_chunks[i].mean(axis=1) for i in args])
 
     resp_chunks_arr = np.array(resp_chunks_list).mean(axis=0)
-    expls = rw.sort_values(by="expl")["expl"].values
-    for i in range(resp_chunks_arr.shape[0]):
+    rw = rw.sort_values(by="expl")
+    expls = rw["expl"].values
+    rw['resp_chunks'] = [resp_chunks_arr[i]
+                         for i in range(len(resp_chunks_arr))]
+    # rw['resp_chunks'] = resp_chunks_arr
+    joblib.dump(rw, join(RESULTS_DIR, 'processed', 'flatmaps',
+                'flatmaps_metadata.pkl'))
+
+    for i in tqdm(range(resp_chunks_arr.shape[0])):
         joblib.dump(
             resp_chunks_arr[i],
             join(RESULTS_DIR, 'processed', 'flatmaps', f"avg_resp_{i}_{expls[i]}.jl"))
