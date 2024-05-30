@@ -56,6 +56,8 @@ class fMRIModule:
         voxel_num_best: int = 0,
         subject: str = "UTS01",
         checkpoint="facebook/opt-30b",
+        init_model=True,
+        restrict_weights=True,
     ):
         """
         Params
@@ -72,20 +74,22 @@ class fMRIModule:
             "facebook/opt-30b": "opt_model",
             "decapoda-research/llama-30b-hf": "llama_model",
         }[checkpoint]
-        if checkpoint == "decapoda-research/llama-30b-hf":
-            self.tokenizer = LlamaTokenizer.from_pretrained(self.checkpoint)
-        else:
-            self.tokenizer = AutoTokenizer.from_pretrained(self.checkpoint)
+        if init_model:
+            if checkpoint == "decapoda-research/llama-30b-hf":
+                self.tokenizer = LlamaTokenizer.from_pretrained(
+                    self.checkpoint)
+            else:
+                self.tokenizer = AutoTokenizer.from_pretrained(self.checkpoint)
 
-        self.model = AutoModelForCausalLM.from_pretrained(
-            self.checkpoint, device_map="auto", torch_dtype=torch.float16
-        )
+            self.model = AutoModelForCausalLM.from_pretrained(
+                self.checkpoint, device_map="auto", torch_dtype=torch.float16
+            )
 
         # load fmri-specific stuff
-        self._init_fmri(subject)
+        self._init_fmri(subject, restrict_weights)
         self._init_fmri_voxel(voxel_num_best, subject)
 
-    def _init_fmri(self, subject: str):
+    def _init_fmri(self, subject: str, restrict_weights: bool = True):
         print("initializing fmri...")
         # select voxel index
         # voxel_idxs = joblib.load(
@@ -113,8 +117,9 @@ class fMRIModule:
         weights_file = join(
             SAVE_DIR_FMRI, self.model_dir, "model_weights", f"wt_{subject}.jbl"
         )
-        weights = joblib.load(weights_file)
-        self.weights = weights[:, self.voxel_idxs]
+        self.weights = joblib.load(weights_file)
+        if restrict_weights:
+            self.weights = self.weights[:, self.voxel_idxs]
         self.preproc = pkl.load(
             open(join(SAVE_DIR_FMRI, self.model_dir, "preproc.pkl"), "rb")
         )
@@ -171,13 +176,14 @@ class fMRIModule:
             embs.append(emb)
         return np.array(embs)
 
-    def __call__(self, X: List[str], return_all=False) -> np.ndarray:
+    def __call__(self, X: List[str] = None, embs=None, return_all=False) -> np.ndarray:
         """Returns a scalar continuous response for each element of X
         self.voxel_num_best may be a list, in which case it will return a 2d array (len(X), len(self.voxel_num_best))
         """
-        # get opt embeddings
-        embs = self._get_embs(X)
-        torch.cuda.empty_cache()
+        if embs is None:
+            # get opt embeddings
+            embs = self._get_embs(X)
+            torch.cuda.empty_cache()
 
         # apply StandardScaler (pre-trained)
         embs = self.preproc.transform(embs)
