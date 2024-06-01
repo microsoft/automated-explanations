@@ -181,6 +181,12 @@ def process_and_add_scores(r: pd.DataFrame, add_bert_scores=False):
 
 def get_prompt_templates(version):
     PROMPTS = {
+        # used for may 31 2024 onwards, helps clean up prompts
+        "v6_noun": {
+            "prefix_first": "Write the first paragraph of an interesting story told in first person. The story should have a plot and characters. The first paragraph of the story should contain many examples of",
+            "prefix_next": "Write the next paragraph of the story, but now make it contain several examples of",
+            "suffix": ' "{expl}". Make sure it contains many examples of "{expl}", such as {examples}.',
+        },
         # make story "coherent" (this was used for UTS03)
         "v5_noun": {
             "prefix_first": "Write the beginning paragraph of a long, coherent story. The story should be about",
@@ -230,7 +236,7 @@ def get_prompts(expls: List[str], examples_list: List[str], version):
         prompts = [prompt_init.format(expl=expls[0])] + [
             prompt_continue.format(expl=expl) for expl in expls[1:]
         ]
-    elif version in ["v2", "v4", "v4_noun", "v5_noun"]:
+    elif version in ["v2", "v4", "v4_noun", "v5_noun", 'v6_noun']:
         prompts = [prompt_init.format(expl=expls[0], examples=examples_list[0])] + [
             prompt_continue.format(expl=expl, examples=examples)
             for (expl, examples) in zip(expls[1:], examples_list[1:])

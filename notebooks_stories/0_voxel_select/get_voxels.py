@@ -192,6 +192,12 @@ def get_rows_voxels(subject: str, setting="default"):
         default, interactions
     """
 
+    if setting == 'qa':
+        return joblib.load(join(REPO_DIR, "notebooks_stories/0_voxel_select/rows_qa_may31.pkl"))
+
+    elif setting == 'roi':
+        return joblib.load(join(REPO_DIR, f"notebooks_stories/0_voxel_select/rows_roi_{subject.lower()}.pkl"))
+
     # UTS02 - Pilot voxels
     if setting in ["default", "interactions"]:
         VOXEL_DICT_FNAMES = {

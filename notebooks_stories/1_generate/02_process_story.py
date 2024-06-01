@@ -155,10 +155,11 @@ def sweep_default_and_polysemantic(subjects=["UTS01", "UTS03"], setting="default
         explanation_story_match(EXPT_DIR, expls, paragraphs, prompts)
         torch.cuda.empty_cache()
 
-        print("Computing module<>story match", EXPT_NAME)
-        module_story_match(EXPT_DIR, expls, paragraphs,
-                           voxel_nums, subjects[0])
-        torch.cuda.empty_cache()
+        if not setting == 'qa':
+            print("Computing module<>story match", EXPT_NAME)
+            module_story_match(EXPT_DIR, expls, paragraphs,
+                               voxel_nums, subjects[0])
+            torch.cuda.empty_cache()
 
 
 def sweep_interactions(subjects=["UTS01", "UTS03"]):
@@ -176,7 +177,6 @@ def sweep_interactions(subjects=["UTS01", "UTS03"]):
     ]
     print('found', EXPT_NAMES)
 
-    setting = "interactions"
     for EXPT_NAME in EXPT_NAMES:
         STORIES_DIR = join(RESULTS_DIR, "stories")
         # EXPT_NAME = f"{subject.lower()}___jun14___seed={seed}"
@@ -211,5 +211,7 @@ if __name__ == "__main__":
     # sweep_interactions(subjects=["UTS01", "UTS03"])
     # sweep_default_and_polysemantic(subjects=['UTS01', 'UTS03'], setting="polysemantic")
     # sweep_default_and_polysemantic(subjects=['UTS01', 'UTS03'], setting="default")
-    sweep_default_and_polysemantic(subjects=['UTS01'], setting="default")
-    sweep_default_and_polysemantic(subjects=['UTS01'], setting="interactions")
+    # sweep_default_and_polysemantic(subjects=['UTS01'], setting="default")
+    # sweep_default_and_polysemantic(subjects=['UTS01'], setting="interactions")
+    sweep_default_and_polysemantic(
+        subjects=['UTS02'], setting="qa", filter='')

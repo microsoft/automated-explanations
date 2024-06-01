@@ -22,6 +22,7 @@ ngrams_list = joblib.load(join(cache_ngrams_dir, 'fmri_UTS02_ngrams.pkl'))
 
 mod = sasc.modules.fmri_module.fMRIModule(
     # subject="UTS02", # doesnt matter for embs
-    checkpoint="facebook/opt-30b",)
+    # checkpoint="facebook/opt-30b",)
+    checkpoint="huggyllama/llama-30b",)
 embs = mod._get_embs(ngrams_list)
-joblib.dump(embs, join(cache_ngrams_dir, 'fmri_embs.pkl'))
+joblib.dump(embs, join(cache_ngrams_dir, 'fmri_embs_llama.pkl'))

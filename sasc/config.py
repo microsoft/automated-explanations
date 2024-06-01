@@ -18,3 +18,6 @@ CACHE_DIR = join(FMRI_DIR, 'sasc', 'mprompt', 'cache')
 
 # brain_tune
 PILOT_STORY_DATA_DIR = '/home/chansingh/mntv1/deep-fMRI/brain_tune/story_data'
+
+cache_ngrams_dir = join(FMRI_DIR, 'sasc/mprompt/cache/cache_ngrams')
+regions_idxs_dir = join(FMRI_DIR, 'sasc/brain_regions')

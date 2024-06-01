@@ -111,28 +111,33 @@ if __name__ == "__main__":
         "default": "v4_noun",
         "interactions": "v0",
         "polysemantic": "v5_noun",
+        'qa': 'v6_noun',
+        'roi': 'v6_noun',
     }
     # iterate over seeds
-    seeds = range(3, 7)
+    # seeds = range(3, 7)
+    seeds = range(1, 4)
     # random.shuffle(seeds)
     n_examples_per_prompt = 3
-    n_examples_per_prompt_to_consider = 5
+    n_examples_per_prompt_to_consider = 6
     for setting in [
-        "interactions",
-        "default",
+        # "interactions",
+        # "default",
         # "polysemantic",
+        # 'qa',
+        'roi',
     ]:  # default, interactions, polysemantic
-        for subject in ["UTS01"]:  # , "UTS03"]:  # ["UTS01", "UTS03"]:
+        for subject in ["UTS02"]:  # , "UTS03"]:  # ["UTS01", "UTS03"]:
             for seed in seeds:
                 # for version in ["v5_noun"]:
                 version = VERSIONS[setting]
                 STORIES_DIR = join(RESULTS_DIR, "stories")
 
-                EXPT_NAME = f"{subject.lower()}___may9___seed={seed}"
+                EXPT_NAME = f"{subject.lower()}___qa_may31___seed={seed}"
                 EXPT_DIR = join(STORIES_DIR, setting, EXPT_NAME)
                 os.makedirs(EXPT_DIR, exist_ok=True)
 
-                if setting in ["default", "polysemantic"]:
+                if setting in ["default", "polysemantic", 'qa', 'roi',]:
                     rows, prompts, PV = get_rows_and_prompts_default(
                         subject,
                         setting,
@@ -143,6 +148,8 @@ if __name__ == "__main__":
                     )
                     rows.to_csv(join(EXPT_DIR, f"rows.csv"), index=False)
                     rows.to_pickle(join(EXPT_DIR, f"rows.pkl"))
+                    print(prompts)
+                    exit(0)
 
                 elif setting == "interactions":
                     rows1, rows2, prompts, PV = get_rows_and_prompts_interactions(
@@ -179,7 +186,8 @@ if __name__ == "__main__":
                     # checkpoint="gpt-4",
                     # checkpoint='gpt-4-turbo',
                     # checkpoint='gpt-4-1106-preview',
-                    checkpoint='gpt-4-32k',
+                    # checkpoint='gpt-4-32k',
+                    checkpoint='gpt-4-turbo-0125-spot',
                     prefix_first=PV["prefix_first"] if "prefix_first" in PV else None,
                     prefix_next=PV["prefix_next"] if "prefix_next" in PV else None,
                     cache_dir="/home/chansingh/cache/llm_stories_may8",

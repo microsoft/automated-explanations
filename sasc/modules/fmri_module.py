@@ -68,14 +68,15 @@ class fMRIModule:
 
         # load opt model & tokenizer
         assert checkpoint in ["facebook/opt-30b",
-                              "decapoda-research/llama-30b-hf"]
+                              "huggyllama/llama-30b"]
+        #   "decapoda-research/llama-30b-hf"]
         self.checkpoint = checkpoint
         self.model_dir = {
             "facebook/opt-30b": "opt_model",
-            "decapoda-research/llama-30b-hf": "llama_model",
+            "huggyllama/llama-30b": "llama_model",
         }[checkpoint]
         if init_model:
-            if checkpoint == "decapoda-research/llama-30b-hf":
+            if checkpoint == "huggyllama/llama-30b":
                 self.tokenizer = LlamaTokenizer.from_pretrained(
                     self.checkpoint)
             else:
@@ -134,7 +135,7 @@ class fMRIModule:
                 f"{subject}_voxel_performance.jbl",
             )
         )
-        if self.checkpoint == "decapoda-research/llama-30b-hf":
+        if self.checkpoint == "huggyllama/llama-30b":
             self.corrs = self.corrs[0]
 
     def _init_fmri_voxel(self, voxel_num_best: Union[int, np.ndarray[int]], subject: str):
@@ -157,7 +158,7 @@ class fMRIModule:
         embs = []
         layer = {
             "facebook/opt-30b": 33,
-            "decapoda-research/llama-30b-hf": 18,
+            'huggyllama/llama-30b': 18,
         }[self.checkpoint]
         for i in tqdm(range(len(X))):
             text = self.tokenizer.encode(X[i])
