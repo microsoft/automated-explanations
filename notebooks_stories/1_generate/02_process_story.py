@@ -62,19 +62,18 @@ def explanation_story_match(EXPT_DIR, expls, paragraphs, prompts):
     plt.savefig(join(EXPT_DIR, "story_data_match.pdf"), bbox_inches="tight")
 
 
-def module_story_match(EXPT_DIR, expls, paragraphs, voxel_nums, subject):
+def module_story_match(EXPT_DIR, expls, paragraphs, voxel_nums, subject, setting='default'):
     if os.path.exists(join(EXPT_DIR, f"scores_mod_ngram_length={0}.pkl")):
         return
 
     # compute with paragraphs overlapping into each other
     # sasc.generate_helper.compute_expl_module_match_heatmap
-    (
-        scores_mod,
-        _,
-        all_scores,
-    ) = sasc.generate_helper.compute_expl_module_match_heatmap_cached_single_subject(
-        expls, paragraphs, voxel_nums, subject
-    )
+    if setting == 'roi':
+        func = sasc.generate_helper.compute_expl_module_match_heatmap
+    else:
+        func = sasc.generate_helper.compute_expl_module_match_heatmap_cached_single_subject
+    (scores_mod, _, all_scores) = func(expls, paragraphs, voxel_nums, subject)
+
     joblib.dump(
         {
             "scores_mean": scores_mod,
@@ -147,18 +146,17 @@ def sweep_default_and_polysemantic(subjects=["UTS01", "UTS03"], setting="default
 
         expls = rows.expl.values
 
-        voxel_nums = rows.module_num.values
-        subjects = rows.subject.values
-
         # run things
         print("Computing expl<>story match", EXPT_NAME)
         explanation_story_match(EXPT_DIR, expls, paragraphs, prompts)
         torch.cuda.empty_cache()
 
         if not setting == 'qa':
+            voxel_nums = rows.module_num.values
+            subjects = rows.subject.values
             print("Computing module<>story match", EXPT_NAME)
             module_story_match(EXPT_DIR, expls, paragraphs,
-                               voxel_nums, subjects[0])
+                               voxel_nums, subjects[0], setting=setting)
             torch.cuda.empty_cache()
 
 
@@ -213,5 +211,7 @@ if __name__ == "__main__":
     # sweep_default_and_polysemantic(subjects=['UTS01', 'UTS03'], setting="default")
     # sweep_default_and_polysemantic(subjects=['UTS01'], setting="default")
     # sweep_default_and_polysemantic(subjects=['UTS01'], setting="interactions")
+    # sweep_default_and_polysemantic(
+    # subjects=['UTS02'], setting="qa", filter='')
     sweep_default_and_polysemantic(
-        subjects=['UTS02'], setting="qa", filter='')
+        subjects=['UTS02'], setting="roi", filter='')

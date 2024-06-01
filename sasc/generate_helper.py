@@ -360,9 +360,12 @@ def compute_expl_data_match_heatmap(val, expls, paragraphs):
 
 
 def compute_expl_module_match_heatmap(
-    expls, paragraphs, voxel_nums, subjects, ngram_length=15
+    expls, paragraphs, voxel_nums: List[int], subjects: List[str], ngram_length=15
 ):
     """
+    Note: this function also works if voxel_nums is List[List[int]]
+
+
     Returns
     -------
     scores: np.array (n, n) (voxels x paragraphs)
@@ -373,6 +376,8 @@ def compute_expl_module_match_heatmap(
         Scores for each voxel for each ngram
     """
     n = len(expls)
+    if isinstance(subjects, str):
+        subjects = [subjects] * n
     scores = np.zeros((n, n))
     scores_max = np.zeros((n, n))
     all_scores = []
@@ -401,7 +406,7 @@ def compute_expl_module_match_heatmap(
 
 
 def compute_expl_module_match_heatmap_cached_single_subject(
-    expls, paragraphs, voxel_nums, subject, ngram_length=15
+    expls, paragraphs, voxel_nums: List[int], subject: List[str], ngram_length=15
 ):
     """Assume subject is the same for all stories - let's us easily run all voxels in parallel
     Returns exactly the same as compute_expl_module_match_heatmap

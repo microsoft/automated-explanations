@@ -193,9 +193,11 @@ def process_timings(df: pd.DataFrame) -> pd.DataFrame:
 
 if __name__ == "__main__":
     # "polysemantic", "interactions"]:
-    filter = 'may9'
-    for setting in ["interactions", "default"]:
-        for subject in ["UTS01"]:  # "UTS03"]:
+    # filter = 'may9'
+    filter = ''
+    for setting in ['qa', 'roi']:
+        # for setting in ["interactions", "default"]:
+        for subject in ["UTS02"]:  # "UTS03"]:
             EXPT_NAMES = sorted(
                 [
                     k
@@ -205,8 +207,8 @@ if __name__ == "__main__":
                 ]
             )
             # shuffle EXPT_NAMES
-            # random.shuffle(EXPT_NAMES)
-            EXPT_NAMES = EXPT_NAMES[::-1]
+            random.shuffle(EXPT_NAMES)
+            # EXPT_NAMES = EXPT_NAMES[::-1]
 
             for EXPT_NAME in tqdm(EXPT_NAMES):
                 EXPT_DIR = join(RESULTS_DIR, "stories", setting, EXPT_NAME)

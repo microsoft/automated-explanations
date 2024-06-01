@@ -133,7 +133,8 @@ if __name__ == "__main__":
                 version = VERSIONS[setting]
                 STORIES_DIR = join(RESULTS_DIR, "stories")
 
-                EXPT_NAME = f"{subject.lower()}___qa_may31___seed={seed}"
+                # EXPT_NAME = f"{subject.lower()}___qa_may31___seed={seed}"
+                EXPT_NAME = f"{subject.lower()}___roi_may31___seed={seed}"
                 EXPT_DIR = join(STORIES_DIR, setting, EXPT_NAME)
                 os.makedirs(EXPT_DIR, exist_ok=True)
 
