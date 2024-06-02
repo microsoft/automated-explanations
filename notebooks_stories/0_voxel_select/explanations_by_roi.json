@@ -2,7 +2,6 @@
     "pSTS": "Verbal interactions",
     "M1F": "Emotional and intellectual exploration",
     "OPA": "Direction and location descriptions",
-    "OPA_only": "Spatial positioning and direction.",
     "Broca": "Conversational reactions and interjections",
     "SMFA": "Reflection and personal growth",
     "M1M": "introspective and philosophical exploration",
@@ -11,7 +10,6 @@
     "ATFP": "Googling and personal milestones",
     "FO": "Years and dates",
     "PPA": "Scenes and settings",
-    "PPA_only": "Negative or critical expressions",
     "hMT": "Personal experiences and emotions",
     "LO": "Reflections on childhood and personal growth",
     "PMvh": "Passage of time and movement",
@@ -32,9 +30,11 @@
     "EBA": "Physical actions",
     "M1H": "Personal transformation and emotional experiences",
     "RSC": "Travel and locations",
-    "RSC_only": "Travel and location transitions",
     "sPMv": "Time and numbers",
     "IPS": "Descriptive elements of scenes or objects",
     "SMHA": "Reflective nostalgia",
-    "FFA": "Vivid imagery"
+    "FFA": "Vivid imagery",
+    "RSC_only": "Travel and location transitions",
+    "OPA_only": "Spatial positioning and direction.",
+    "PPA_only": "Negative or critical expressions"
 }

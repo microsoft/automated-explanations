@@ -48,10 +48,13 @@ def get_rows_and_prompts_default(
     )
 
     # get prompts
+    PV = sasc.generate_helper.get_prompt_templates(version)
     prompts = sasc.generate_helper.get_prompts(expls, examples_list, version)
+    if 'prompt_suffix' in rows.columns:
+        prompts = [p + row.prompt_suffix for p,
+                   row in zip(prompts, rows.itertuples())]
     for p in prompts:
         print(p)
-    PV = sasc.generate_helper.get_prompt_templates(version)
 
     return rows, prompts, PV
 
@@ -115,11 +118,17 @@ if __name__ == "__main__":
         'roi': 'v6_noun',
     }
     # iterate over seeds
-    # seeds = range(3, 7)
-    seeds = range(1, 4)
+    seeds = range(1, 8)
+    # seeds = range(2, 3)
     # random.shuffle(seeds)
-    n_examples_per_prompt = 3
-    n_examples_per_prompt_to_consider = 6
+
+    # original stories
+    # n_examples_per_prompt = 3
+    # n_examples_per_prompt_to_consider = 6
+
+    # increased for roi stories
+    n_examples_per_prompt = 5
+    n_examples_per_prompt_to_consider = 9
     for setting in [
         # "interactions",
         # "default",
@@ -150,7 +159,7 @@ if __name__ == "__main__":
                     rows.to_csv(join(EXPT_DIR, f"rows.csv"), index=False)
                     rows.to_pickle(join(EXPT_DIR, f"rows.pkl"))
                     print(prompts)
-                    exit(0)
+                    # exit(0)
 
                 elif setting == "interactions":
                     rows1, rows2, prompts, PV = get_rows_and_prompts_interactions(

@@ -360,7 +360,7 @@ def compute_expl_data_match_heatmap(val, expls, paragraphs):
 
 
 def compute_expl_module_match_heatmap(
-    expls, paragraphs, voxel_nums: List[int], subjects: List[str], ngram_length=15
+    expls, paragraphs, voxel_nums: List[int], subjects: List[str], ngram_length=15, restrict_weights=True,
 ):
     """
     Note: this function also works if voxel_nums is List[List[int]]
@@ -382,9 +382,9 @@ def compute_expl_module_match_heatmap(
     scores_max = np.zeros((n, n))
     all_scores = []
     all_ngrams = []
-    mod = fMRIModule()
+    mod = fMRIModule(subject=subjects[0], restrict_weights=restrict_weights)
     for i in tqdm(range(n)):
-        mod._init_fmri(subject=subjects[i], voxel_num_best=voxel_nums[i])
+        mod._init_fmri_voxel(subject=subjects[i], voxel_num_best=voxel_nums[i])
         ngrams_list = []
         ngrams_scores_list = []
         for j in range(n):

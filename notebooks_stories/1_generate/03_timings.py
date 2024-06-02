@@ -154,7 +154,7 @@ def process_story(EXPT_DIR, EXPT_NAME, text, timings_fname_prefix):
     ).to_csv(join(EXPT_DIR, "timings.csv"), index=False)
 
 
-def process_timings(df: pd.DataFrame) -> pd.DataFrame:
+def process_timings(df: pd.DataFrame, min_timing=0.16, target_mean=0.32) -> pd.DataFrame:
     df["word_len"] = df["word"].apply(len)
     df["ends_in_period"] = df["word"].str.endswith(".")
     df["ends_in_comma"] = df["word"].str.endswith(",")
@@ -176,12 +176,15 @@ def process_timings(df: pd.DataFrame) -> pd.DataFrame:
         df["timing"][~idxs] = m.predict(X[~idxs])
 
     # fix values that are too small
-    idxs = y <= 0.05
+    idxs = y <= min_timing
     if np.any(idxs):
         df["timing"][idxs] = m.predict(X[idxs])
 
     # truncate values that are too large
-    df["timing"] = df["timing"].apply(lambda x: min(x, 0.8))
+    df["timing"] = np.clip(df["timing"], min_timing, 0.8)
+
+    if df["timing"].mean() < target_mean:
+        df["timing"] = df["timing"] * target_mean / df["timing"].mean()
 
     # remove repeated consecutive words
     df = df[df['word'] != df['word'].shift(1)]

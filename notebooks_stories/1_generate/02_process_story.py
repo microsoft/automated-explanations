@@ -1,3 +1,4 @@
+from functools import partial
 import os
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -69,7 +70,8 @@ def module_story_match(EXPT_DIR, expls, paragraphs, voxel_nums, subject, setting
     # compute with paragraphs overlapping into each other
     # sasc.generate_helper.compute_expl_module_match_heatmap
     if setting == 'roi':
-        func = sasc.generate_helper.compute_expl_module_match_heatmap
+        func = partial(
+            sasc.generate_helper.compute_expl_module_match_heatmap, restrict_weights=False)
     else:
         func = sasc.generate_helper.compute_expl_module_match_heatmap_cached_single_subject
     (scores_mod, _, all_scores) = func(expls, paragraphs, voxel_nums, subject)
@@ -152,7 +154,11 @@ def sweep_default_and_polysemantic(subjects=["UTS01", "UTS03"], setting="default
         torch.cuda.empty_cache()
 
         if not setting == 'qa':
-            voxel_nums = rows.module_num.values
+            print(setting, rows.columns)
+            if hasattr(rows, 'module_num'):
+                voxel_nums = rows.module_num.values
+            else:
+                voxel_nums = rows.voxel_nums.values
             subjects = rows.subject.values
             print("Computing module<>story match", EXPT_NAME)
             module_story_match(EXPT_DIR, expls, paragraphs,
