@@ -10,6 +10,7 @@ import sasc.viz
 from sasc.config import RESULTS_DIR
 from sasc import config
 
+
 if __name__ == "__main__":
     pilot_name = 'pilot5_story_data.pkl'
     pilot_data_dir = join(config.PILOT_STORY_DATA_DIR, '20240604')
@@ -50,14 +51,11 @@ if __name__ == "__main__":
             timing, paragraphs, resp_story, offset=2)
         assert len(resp_chunks) <= len(paragraphs)
 
-        argsort = np.argsort(rows['roi'].values)
-        rois = [rows["roi"].values[a] for a in argsort]
-        resp_chunks = [resp_chunks[i] for i in argsort]
-        for i, roi in enumerate(rois):
-            resp_chunks_list[roi].append(resp_chunks[i])
+        for i, roi in enumerate(rows['roi'].values):
+            resp_chunks_list[roi].append(resp_chunks[i].mean(axis=1))
 
     resp_avg_dict = {
-        roi: np.hstack(resp_chunks_list[roi]).mean(axis=1)
+        roi: np.array(resp_chunks_list[roi]).mean(axis=0)
         for roi in resp_chunks_list.keys()
     }
     rw = rows.sort_values(by="roi")
@@ -86,3 +84,8 @@ if __name__ == "__main__":
         )
         plt.cla()
         plt.close()
+
+    # resp_avg_dict = joblib.load(join(RESULTS_DIR, 'processed', 'flatmaps_roi',
+    #  'resp_avg_dict.pkl'))
+
+    # print(resp_avg_dict.keys())
