@@ -30,8 +30,8 @@ cblue = "#66ccff"
 cred = "#cc0000"
 
 
-def imshow_diverging(mat, clab="Mean response ($\sigma$)", clab_size='medium'):
-    vabs = np.nanmax(np.abs(mat))
+def imshow_diverging(mat, clab="Mean response ($\sigma$)", clab_size='medium', vabs_multiplier=1):
+    vabs = np.nanmax(np.abs(mat)) * vabs_multiplier
     plt.imshow(mat, cmap=sns.diverging_palette(
         220, 29, as_cmap=True), vmin=-vabs, vmax=vabs)
     cb = plt.colorbar()

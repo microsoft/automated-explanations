@@ -14,7 +14,7 @@ def _remove_punc(s):
     return s.translate(str.maketrans("", "", string.punctuation))
 
 
-def get_start_end_indexes_for_paragraphs(timing: pd.DataFrame, paragraphs: List[str]):
+def get_start_end_indexes_for_paragraphs(timing: pd.DataFrame, paragraphs: List[str], validate=False):
     """Returns start/end indexes for each paragraph in the story.
     If the entire story was not played, the number of start/end times will be less than the number of paragraphs.
     """
@@ -26,12 +26,13 @@ def get_start_end_indexes_for_paragraphs(timing: pd.DataFrame, paragraphs: List[
         words = para.split()
         start_times.append(timing["time_running"][idx])
         for word in words:
-            # print(timing['word'][idx])
-            # assert _remove_punc(timing["word"][idx]) == _remove_punc(word), (
-            #     idx,
-            #     word,
-            #     str(timing["word"][idx]),
-            # )
+            if validate:
+                # print(timing['word'][idx])
+                assert _remove_punc(timing["word"][idx]) == _remove_punc(word), (
+                    idx,
+                    word,
+                    str(timing["word"][idx]),
+                )
             idx += 1
             if idx == len(timing):
                 # print('break!!!!')
@@ -50,7 +51,7 @@ def get_start_end_indexes_for_paragraphs(timing: pd.DataFrame, paragraphs: List[
     return start_indexes, end_indexes
 
 
-def get_resps_for_paragraphs(timing, paragraphs, resp_story, offset=2, apply_offset=True, trim=5) -> List[np.ndarray]:
+def get_resps_for_paragraphs(timing, paragraphs, resp_story, offset=2, apply_offset=True, trim=5, validate=False) -> List[np.ndarray]:
     '''Return responses for each paragraph (after applying offset)
 
     Params
@@ -67,7 +68,7 @@ def get_resps_for_paragraphs(timing, paragraphs, resp_story, offset=2, apply_off
     '''
     resp_chunks = []
     start_indexes, end_indexes = get_start_end_indexes_for_paragraphs(
-        timing, paragraphs)
+        timing, paragraphs, validate=validate)
 
     for i in range(len(start_indexes)):
         # get paragraph

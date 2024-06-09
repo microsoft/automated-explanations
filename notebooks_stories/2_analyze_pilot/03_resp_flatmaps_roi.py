@@ -64,6 +64,7 @@ if __name__ == "__main__":
     # rw['resp_chunks'] = [resp_chunks_arr[i]
     #  for i in range(len(resp_chunks_arr))]
     # rw['resp_chunks'] = resp_chunks_arr
+    os.makedirs(join(RESULTS_DIR, 'processed', 'flatmaps_roi'), exist_ok=True)
     joblib.dump(resp_avg_dict, join(RESULTS_DIR, 'processed', 'flatmaps_roi',
                                     'resp_avg_dict.pkl'))
 
