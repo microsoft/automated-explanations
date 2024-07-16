@@ -220,4 +220,4 @@ if __name__ == "__main__":
     # sweep_default_and_polysemantic(
     # subjects=['UTS02'], setting="qa", filter='')
     sweep_default_and_polysemantic(
-        subjects=['UTS02'], setting="roi", filter='')
+        subjects=['UTS03'], setting="roi", filter='')

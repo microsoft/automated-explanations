@@ -13,7 +13,6 @@ import stable_whisper
 import pandas as pd
 import os.path
 import numpy as np
-import fire
 import random
 from sklearn.linear_model import RidgeCV
 
@@ -198,9 +197,9 @@ if __name__ == "__main__":
     # "polysemantic", "interactions"]:
     # filter = 'may9'
     filter = ''
-    for setting in ['qa', 'roi']:
+    for setting in ['roi']:
         # for setting in ["interactions", "default"]:
-        for subject in ["UTS02"]:  # "UTS03"]:
+        for subject in ["UTS03"]:  # "UTS03"]:
             EXPT_NAMES = sorted(
                 [
                     k

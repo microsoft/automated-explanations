@@ -118,7 +118,7 @@ if __name__ == "__main__":
         'roi': 'v6_noun',
     }
     # iterate over seeds
-    seeds = range(1, 8)
+    seeds = range(1, 10)
     # seeds = range(2, 3)
     # random.shuffle(seeds)
 
@@ -136,7 +136,7 @@ if __name__ == "__main__":
         # 'qa',
         'roi',
     ]:  # default, interactions, polysemantic
-        for subject in ["UTS02"]:  # , "UTS03"]:  # ["UTS01", "UTS03"]:
+        for subject in ["UTS03"]:  # , "UTS03"]:  # ["UTS01", "UTS03"]:
             for seed in seeds:
                 # for version in ["v5_noun"]:
                 version = VERSIONS[setting]
