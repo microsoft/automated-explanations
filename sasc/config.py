@@ -1,8 +1,10 @@
 import os.path
-from os.path import join
+from os.path import join, dirname, abspath
 # if os.path.exists('/home/chansingh'):
-REPO_DIR = '/home/chansingh/automated-explanations/'
-RESULTS_DIR = '/home/chansingh/automated-explanations/results/'
+path_to_file = dirname(dirname(abspath(__file__)))
+# REPO_DIR = '/home/chansingh/automated-explanations/'
+REPO_DIR = path_to_file
+RESULTS_DIR = join(REPO_DIR, 'results')
 FMRI_DIR = '/home/chansingh/mntv1/deep-fMRI/'
 
 STORIES_DIR = join(RESULTS_DIR, "stories")
@@ -21,3 +23,6 @@ PILOT_STORY_DATA_DIR = '/home/chansingh/mntv1/deep-fMRI/brain_tune/story_data'
 
 cache_ngrams_dir = join(FMRI_DIR, 'sasc/mprompt/cache/cache_ngrams')
 regions_idxs_dir = join(FMRI_DIR, 'sasc/brain_regions')
+
+if __name__ == '__main__':
+    print('REPO_DIR:', REPO_DIR)

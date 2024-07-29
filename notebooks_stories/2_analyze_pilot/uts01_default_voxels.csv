@@ -1,0 +1,18 @@
+,expl,module_num,top_explanation_init_strs,subject,fmri_test_corr,stability_score,top_score_normalized,roi_anat,roi_func,voxel_num,test_corr_new
+270,family and friends,107,family and friends,UTS01,0.24193066103388064,0.28596019445736093,1.7565829354536224,['middletemporal'],"['PMvh', 'S2F']",15556,0.015414829188770776
+1353,specific times,157,age or a year in the past,UTS01,0.14542458458587482,0.2178087029174051,0.7175890084523266,"['isthmuscingulate', 'lingual']","['RSC', 'PMvh', 'S2F']",27345,0.03367674217268463
+189,physical contact,469,physical contact or body language,UTS01,0.33544124324019003,0.13726895944936912,3.2413280096757218,['rostralmiddlefrontal'],--,44350,0.13438932485195962
+1114,numbers,458,numbers or dates,UTS01,0.25729603865193423,0.2136083396801117,0.39733931517813426,['rostralmiddlefrontal'],--,47202,0.15051822762593806
+1277,violence and injury,232,violence and injury,UTS01,0.3823222228650615,0.2661770301194498,2.0722037355497656,"['parstriangularis', 'rostralmiddlefrontal']",--,42073,0.03365556841350905
+106,speaking,451,speaking or making some kind of sound,UTS01,0.3674623234379744,0.2180055041239909,0.6007650661041452,['bankssts'],--,27107,-0.09616354399978436
+532,food and drink,203,food and drink,UTS01,0.29797982742855966,0.3131227342889089,2.561042223799861,"['lateralorbitofrontal', 'parsorbitalis']",--,26055,0.2696161465219317
+1263,family relationships,144,family relationships,UTS01,0.3719068448387411,0.2984626604194079,1.489039156123391,['inferiorparietal'],['EBA'],41033,0.005554614615937798
+783,lonelineness,258,loneliness and isolation,UTS01,0.24277988450279087,0.13505771764252136,1.91822525022299,['superiorfrontal'],"['PMvh', 'S2F']",51791,0.015270176715959236
+950,movement,153,"movement, as many of the phrases involve going up or down stairs, corridors, halls, and embankments, as well as walking, running, and driving",UTS01,0.12833912905279768,0.28616653347712556,4.052942410435369,['inferiorparietal'],"['TOS', 'PMvh', 'S2F']",51347,0.41093339231824877
+1177,physical movement,39,physical movement,UTS01,0.23750304641287243,0.2535953538393582,1.5176480727659742,['middletemporal'],--,19341,0.001540155748455376
+740,college days,378,memories or experiences from the past,UTS01,0.2250738637614428,0.19948323384419006,2.2131809654932373,['inferiorparietal'],--,43720,0.030724182415806794
+460,clothing,149,clothing,UTS01,0.1947342403208021,0.23811195861695253,0.7377580366634058,['parstriangularis'],"['Broca', 'IFSFP', 'PMvh', 'S2F']",44481,0.1136289823057008
+39,communication,162,communication with family and friends,UTS01,0.4178941032006967,0.17487768353190278,2.5122819319975536,"['inferiorparietal', 'supramarginal']",--,38445,0.02196585068863719
+1459,repeated words,484,repetition of words or phrases,UTS01,0.5070131872593936,0.17906968473951893,0.8155520363847738,['bankssts'],"['PMvh', 'S2F']",32485,-0.006653013528144995
+580,food,473,food,UTS01,0.3263820509626581,0.35116807925779797,1.2367838756291525,['rostralmiddlefrontal'],--,47159,0.2475056283447947
+1238,locations,100,locations,UTS01,0.22701267000712208,0.21455092862269698,0.3391686804744958,['fusiform'],['PPA'],13855,0.09148679519853473
