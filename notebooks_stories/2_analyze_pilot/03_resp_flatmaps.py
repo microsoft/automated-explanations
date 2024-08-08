@@ -81,11 +81,11 @@ if __name__ == "__main__":
             if len(resp_chunks) == len(args) - 1:
                 resp_chunks.append(np.full(resp_chunks[0].shape, np.nan))
             resp_chunks_list.append(
-                [resp_chunks[i].mean(axis=1) for i in args])
+                [np.nanmean(resp_chunks[i], axis=1) for i in args])
 
         # print(resp_chunks_list)
         # resp_chunks_arr = np.array([x[0] for x in resp_chunks_list])
-        resp_chunks_arr = np.array(resp_chunks_list).mean(axis=0)
+        resp_chunks_arr = np.nanmean(np.array(resp_chunks_list), axis=0)
         # rw = rw.sort_values(by="expl")
         rows = rows.sort_values(by="expl")
         expls = rows["expl"].values
