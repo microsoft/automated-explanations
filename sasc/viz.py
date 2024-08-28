@@ -9,6 +9,8 @@ import matplotlib.pyplot as plt
 import adjustText
 import sasc.config
 from os.path import join
+import os
+import os.path
 # import matplotlib.colormaps
 
 # default matplotlib colors
@@ -155,7 +157,7 @@ def heatmap(
     # plt.show()
 
 
-def quickshow(X: np.ndarray, subject="UTS03", fname_save=None, title=None):
+def quickshow(X: np.ndarray, subject="UTS03", fname_save=None, title=None, cmap='RdBu_r'):
     import cortex
 
     """
@@ -163,18 +165,19 @@ def quickshow(X: np.ndarray, subject="UTS03", fname_save=None, title=None):
     Note: for this to work, need to point the cortex config filestore to the `ds003020/derivative/pycortex-db` directory.
     This might look something like `/home/chansingh/mntv1/deep-fMRI/data/ds003020/derivative/pycortex-db/UTS03/anatomicals/`
     """
-    vol = cortex.Volume(X, subject, xfmname=f"{subject}_auto")
+    vol = cortex.Volume(X, subject, xfmname=f"{subject}_auto", cmap=cmap)
     # , with_curvature=True, with_sulci=True)
-    vabs = max(abs(vol.data.min()), abs(vol.data.max()))
+    vabs = np.nanmax(np.abs(X))
     vol.vmin = -vabs
     vol.vmax = vabs
     # fig = plt.figure()
     # , vmin=-vabs, vmax=vabs)
-    cortex.quickshow(vol, with_rois=True, cmap="PuBu")
+    cortex.quickshow(vol, with_rois=True)
     # fig = plt.gcf()
     # add title
     # fig.axes[0].set_title(title, fontsize='xx-small')
     if fname_save is not None:
+        os.makedirs(os.path.dirname(fname_save), exist_ok=True)
         plt.savefig(fname_save)
         plt.savefig(fname_save.replace(".pdf", ".png"))
         plt.close()

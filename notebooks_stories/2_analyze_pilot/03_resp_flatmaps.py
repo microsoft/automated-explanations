@@ -12,11 +12,11 @@ from sasc import config
 if __name__ == "__main__":
     FULL_SETTINGS = [
         ('UTS02', 'default', 'pilot_story_data.pkl'),
-        ('UTS03', 'default', 'pilot3_story_data.pkl'),
-        ('UTS01', 'default', 'pilot4_story_data.pkl'),
+        # ('UTS03', 'default', 'pilot3_story_data.pkl'),
+        # ('UTS01', 'default', 'pilot4_story_data.pkl'),
 
         ('UTS02', 'qa', 'pilot5_story_data.pkl'),
-        ('UTS02', 'roi', 'pilot5_story_data.pkl'),
+        # ('UTS02', 'roi', 'pilot5_story_data.pkl'),
     ]
     for idx in range(len(FULL_SETTINGS)):
 
