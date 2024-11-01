@@ -1,4 +1,6 @@
 import matplotlib
+from matplotlib.cm import ScalarMappable
+from matplotlib.colors import Normalize
 import numpy as np
 import matplotlib.pyplot as plt
 from typing import List
@@ -6,11 +8,13 @@ import seaborn as sns
 import numpy as np
 from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib.pyplot as plt
-import adjustText
+# import adjustText
 import sasc.config
 from os.path import join
 import os
+from os.path import dirname
 import os.path
+import cortex
 # import matplotlib.colormaps
 
 # default matplotlib colors
@@ -275,8 +279,8 @@ def plot_annotated_resp(
                            voxel_resp[resp_position]), fontsize="x-small"
                 )
             )
-        adjustText.adjust_text(texts, arrowprops=dict(
-            arrowstyle="->", color="gray"))
+        # adjustText.adjust_text(texts, arrowprops=dict(
+            # arrowstyle="->", color="gray"))
 
     # plot key ngrams
     if plot_key_ngrams:
@@ -542,3 +546,36 @@ def stories_barplot(story_scores_df):
     story_scores_df = story_scores_df.sort_values(by='story')
     sns.barplot(data=story_scores_df, x='story', y='mean', hue='condition')
     plt.ylabel('Mean voxel response ($\sigma_f$)')
+
+
+def _save_flatmap(vals, subject, fname_save, clab=None, with_rois=True, cmap='RdBu', with_borders=False):
+    vabs = max(np.abs(vals))
+
+    # cmap = sns.diverging_palette(12, 210, as_cmap=True)
+    # cmap = sns.diverging_palette(16, 240, as_cmap=True)
+
+    vol = cortex.Volume(
+        vals, 'UT' + subject, xfmname=f'UT{subject}_auto', vmin=-vabs, vmax=vabs, cmap=cmap)
+
+    cortex.quickshow(vol,
+                     with_rois=with_rois,
+                     with_labels=False,
+                     with_borders=with_borders,
+                     with_colorbar=clab == None,  # if not None, save separate cbar
+                     )
+    os.makedirs(dirname(fname_save), exist_ok=True)
+    plt.savefig(fname_save)
+    plt.close()
+
+    # save cbar
+    norm = Normalize(vmin=-vabs, vmax=vabs)
+    # need to invert this to match above
+    sm = ScalarMappable(norm=norm, cmap=cmap)
+    sm.set_array([])
+    fig, ax = plt.subplots(figsize=(5, 0.35))
+    cbar = plt.colorbar(sm, cax=ax, orientation='horizontal')
+    if clab:
+        cbar.set_label(clab, fontsize='x-large')
+        plt.savefig(fname_save.replace('flatmap.pdf',
+                    'cbar.pdf'), bbox_inches='tight')
+    plt.close()
