@@ -1,8 +1,11 @@
 <h1 align="center">   <img src="https://microsoft.github.io/augmented-interpretable-models/auggam_gif.gif" width="25%"> Automated explanations <img src="https://microsoft.github.io/augmented-interpretable-models/auggam_gif.gif" width="25%"></h1>
+
+<p align="center"> A generative framework to bridge data-driven models and scientific theories in language neuroscience (<a href="https://arxiv.org/abs/2305.09863">arXiv 2024</a>)
+</p>
 <p align="center"> Explaining black box text modules in natural language with language models (<a href="https://arxiv.org/abs/2305.09863">arXiv 2023</a>)
 </p>
 
-This repo contains code to reproduce the experiments in [the SASC paper]([https://arxiv.org/abs/2209.11799](https://arxiv.org/abs/2305.09863)). SASC takes in a text module and produces a natural explanation for it that describes what it types of inputs elicit the largest response from the module (see Fig below).
+This repo contains code to reproduce the experiments in the [GEM-V paper](https://arxiv.org/abs/2305.09863) and [the SASC paper](https://arxiv.org/abs/2305.09863). SASC takes in a text module and produces a natural explanation for it that describes what it types of inputs elicit the largest response from the module (see Fig below). GEM-V tests tests this in detail in an fMRI setting.
 
 <img src="https://microsoft.github.io/automated-explanations/fig.svg?sanitize=True&kill_cache=1" width="90%">
 
@@ -30,6 +33,16 @@ explanation_dict = explain_module_sasc(
 - Built from [this template](https://github.com/csinva/cookiecutter-ml-research)
 
 ```r
+@misc{antonello2024generativeframeworkbridgedatadriven,
+      title={A generative framework to bridge data-driven models and scientific theories in language neuroscience}, 
+      author={Richard Antonello and Chandan Singh and Shailee Jain and Aliyah Hsu and Jianfeng Gao and Bin Yu and Alexander Huth},
+      year={2024},
+      eprint={2410.00812},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2410.00812}, 
+}
+
 @misc{singh2023explaining,
       title={Explaining black box text modules in natural language with language models}, 
       author={Chandan Singh and Aliyah R. Hsu and Richard Antonello and Shailee Jain and Alexander G. Huth and Bin Yu and Jianfeng Gao},
