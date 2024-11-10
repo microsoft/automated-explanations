@@ -3,11 +3,13 @@ import pandas as pd
 import joblib
 
 subject = 'S02'
-d_selected = pd.read_pickle(f'top_clusters_by_pfc_cluster_{subject}.pkl')
+suffix_setting = '_filt=0.15'
+
+
+d_selected = pd.read_pickle(
+    f'top_clusters_by_pfc_cluster_{subject}{suffix_setting}.pkl')
 gpt4 = imodelsx.llm.get_llm('gpt-4')
 explanations = []
-
-
 prompt_template = '''Here is a list of phrases:
 {s}
 
@@ -19,4 +21,5 @@ for i, row in d_selected.iterrows():
     # print(prompt)
     explanations.append(gpt4(prompt, use_cache=True))
     print(explanations)
-joblib.dump(explanations, f'explanations_by_pfc_cluster_{subject}.jbl')
+joblib.dump(
+    explanations, f'explanations_by_pfc_cluster_{subject}{suffix_setting}.jbl')
