@@ -548,7 +548,7 @@ def stories_barplot(story_scores_df):
     plt.ylabel('Mean voxel response ($\sigma_f$)')
 
 
-def _save_flatmap(vals, subject, fname_save, clab=None, with_rois=True, cmap='RdBu', with_borders=False):
+def _save_flatmap(vals, subject, fname_save, clab=None, with_rois=True, cmap='RdBu_r', with_borders=False, show=False):
     vabs = max(np.abs(vals))
 
     # cmap = sns.diverging_palette(12, 210, as_cmap=True)
@@ -565,7 +565,8 @@ def _save_flatmap(vals, subject, fname_save, clab=None, with_rois=True, cmap='Rd
                      )
     os.makedirs(dirname(fname_save), exist_ok=True)
     plt.savefig(fname_save)
-    plt.close()
+    if not show:
+        plt.close()
 
     # save cbar
     norm = Normalize(vmin=-vabs, vmax=vabs)
@@ -578,4 +579,5 @@ def _save_flatmap(vals, subject, fname_save, clab=None, with_rois=True, cmap='Rd
         cbar.set_label(clab, fontsize='x-large')
         plt.savefig(fname_save.replace('flatmap.pdf',
                     'cbar.pdf'), bbox_inches='tight')
-    plt.close()
+    if not show:
+        plt.close()

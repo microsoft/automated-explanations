@@ -29,7 +29,8 @@ subject = 'S03'
 # subject = 'S03'
 # rois_dict = joblib.load(join(regions_idxs_dir, f'rois_{subject}.jbl'))
 # rois = joblib.load(join(FMRI_DIR, 'brain_tune/voxel_neighbors_and_pcs/', 'communication_rois_UTS02.jbl'))
-rois = joblib.load(f'communication_rois_v2_UT{subject}.jbl')
+rois = joblib.load(join(FMRI_DIR, 'brain_tune/voxel_neighbors_and_pcs/',
+                   f'communication_rois_v2_UT{subject}.jbl'))
 rois_dict_raw = {i: rois[i] for i in range(len(rois))}
 
 # custom merge contralateral regions
