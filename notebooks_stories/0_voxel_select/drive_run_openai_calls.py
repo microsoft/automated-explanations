@@ -9,8 +9,8 @@ prompt_template = '''Here is a list of phrases:
 
 What is a common theme among these phrases (especially the top ones)? Return only a concise phrase.'''
 
-subject = 'S02'
-suffix_setting = '_filt=0.15'
+# subject = 'S02'
+# suffix_setting = '_filt=0.15'
 # suffix_setting = '_rj_custom'
 
 
@@ -35,6 +35,7 @@ suffix_setting = '_filt=0.15'
 #     explanations, f'explanations_by_pfc_cluster_{subject}{suffix_setting}.jbl')
 
 
+subject = 'S03'
 explanations = {}
 top_ngrams_df = pd.read_pickle(
     f'top_ngrams_custom_communication_{subject}.pkl')

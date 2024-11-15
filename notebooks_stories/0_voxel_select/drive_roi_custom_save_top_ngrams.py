@@ -25,7 +25,7 @@ import os
 # ngrams are same for both models
 ngrams_list = joblib.load(join(cache_ngrams_dir, 'fmri_UTS02_ngrams.pkl'))
 
-subject = 'S03'
+subject = 'S02'
 # subject = 'S03'
 # rois_dict = joblib.load(join(regions_idxs_dir, f'rois_{subject}.jbl'))
 # rois = joblib.load(join(FMRI_DIR, 'brain_tune/voxel_neighbors_and_pcs/', 'communication_rois_UTS02.jbl'))
@@ -83,3 +83,11 @@ for embs_fname, checkpoint, out_suffix in tqdm(zip(
 
     joblib.dump(outputs_dict, join(
         cache_ngrams_dir, f'rois_communication_ngram_outputs_dict_{subject}{out_suffix}.pkl'))
+
+    outputs_dict_voxels = {
+        k: [voxel_preds[:, i] for i in np.where(rois_dict[k])[0]]
+        for k in rois_dict
+    }
+
+    joblib.dump(outputs_dict_voxels, join(
+        cache_ngrams_dir, f'rois_communication_ngram_outputs_dict_voxels_{subject}{out_suffix}.pkl'))
