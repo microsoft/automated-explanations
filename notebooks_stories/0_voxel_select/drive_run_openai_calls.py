@@ -1,3 +1,4 @@
+from tqdm import tqdm
 import imodelsx.llm
 import pandas as pd
 import joblib
@@ -35,12 +36,13 @@ What is a common theme among these phrases (especially the top ones)? Return onl
 #     explanations, f'explanations_by_pfc_cluster_{subject}{suffix_setting}.jbl')
 
 
+# subject = 'S02'
 subject = 'S03'
 explanations = {}
 top_ngrams_df = pd.read_pickle(
     f'top_ngrams_custom_communication_{subject}.pkl')
 gpt4 = imodelsx.llm.get_llm('gpt-4')
-for k in top_ngrams_df.columns:
+for k in tqdm(top_ngrams_df.columns):
 
     s = '- ' + '\n- '.join(top_ngrams_df[k].iloc[:100])
     prompt = prompt_template.format(s=s)
