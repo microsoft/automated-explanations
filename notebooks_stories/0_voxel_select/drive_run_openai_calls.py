@@ -50,5 +50,6 @@ for k in tqdm(top_ngrams_df.columns):
         # print(prompt)
         explanations[k] = gpt4(prompt)
     print(explanations)
+
 json.dump(explanations, open(
     f'explanations_by_roi_communication_{subject}.json', 'w'), indent=4)
