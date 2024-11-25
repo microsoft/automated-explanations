@@ -24,36 +24,41 @@ import os
 
 # ngrams are same for both models
 ngrams_list = joblib.load(join(cache_ngrams_dir, 'fmri_UTS02_ngrams.pkl'))
+suffix_setting = '_fedorenko'
+# subject = 'S02'
+subject = 'S03'
 
-subject = 'S02'
-# subject = 'S03'
-# rois_dict = joblib.load(join(regions_idxs_dir, f'rois_{subject}.jbl'))
-# rois = joblib.load(join(FMRI_DIR, 'brain_tune/voxel_neighbors_and_pcs/', 'communication_rois_UTS02.jbl'))
-rois = joblib.load(join(FMRI_DIR, 'brain_tune/voxel_neighbors_and_pcs/',
-                   f'communication_rois_v2_UT{subject}.jbl'))
-rois_dict_raw = {i: rois[i] for i in range(len(rois))}
 
-# custom merge contralateral regions
-if subject == 'S02':
-    raw_idxs = [
-        [0, 7],
-        [3, 4],
-        [1, 5],
-        [2, 6],
-    ]
-elif subject == 'S03':
-    raw_idxs = [
-        [0, 7],
-        [3, 4],
-        [2, 5],
-        [1, 6],
-    ]
-
-rois_dict = {
-    i: np.vstack([rois_dict_raw[j] for j in idxs]).sum(axis=0)
-    for i, idxs in enumerate(raw_idxs)
-}
-# rois_dict = rois_dict_raw
+if suffix_setting == '':
+    # rois_dict = joblib.load(join(regions_idxs_dir, f'rois_{subject}.jbl'))
+    # rois = joblib.load(join(FMRI_DIR, 'brain_tune/voxel_neighbors_and_pcs/', 'communication_rois_UTS02.jbl'))
+    rois = joblib.load(join(FMRI_DIR, 'brain_tune/voxel_neighbors_and_pcs/',
+                            f'communication_rois_v2_UT{subject}.jbl'))
+    rois_dict_raw = {i: rois[i] for i in range(len(rois))}
+    if subject == 'S02':
+        raw_idxs = [
+            [0, 7],
+            [3, 4],
+            [1, 5],
+            [2, 6],
+        ]
+    elif subject == 'S03':
+        raw_idxs = [
+            [0, 7],
+            [3, 4],
+            [2, 5],
+            [1, 6],
+        ]
+    rois_dict = {
+        i: np.vstack([rois_dict_raw[j] for j in idxs]).sum(axis=0)
+        for i, idxs in enumerate(raw_idxs)
+    }
+if suffix_setting == '_fedorenko' and subject == 'S03':
+    rois_fedorenko = joblib.load('lang_localizer_UTS03.jbl')
+    rois_dict = {
+        i: rois_fedorenko[i] for i in range(len(rois_fedorenko))
+    }
+    # rois_dict = rois_dict_raw
 
 
 for embs_fname, checkpoint, out_suffix in tqdm(zip(
@@ -82,7 +87,7 @@ for embs_fname, checkpoint, out_suffix in tqdm(zip(
     }
 
     joblib.dump(outputs_dict, join(
-        cache_ngrams_dir, f'rois_communication_ngram_outputs_dict_{subject}{out_suffix}.pkl'))
+        cache_ngrams_dir, f'rois_communication_ngram_outputs_dict_{subject}{suffix_setting}{out_suffix}.pkl'))
 
     outputs_dict_voxels = {
         k: [voxel_preds[:, i] for i in np.where(rois_dict[k])[0]]
@@ -90,4 +95,4 @@ for embs_fname, checkpoint, out_suffix in tqdm(zip(
     }
 
     joblib.dump(outputs_dict_voxels, join(
-        cache_ngrams_dir, f'rois_communication_ngram_outputs_dict_voxels_{subject}{out_suffix}.pkl'))
+        cache_ngrams_dir, f'rois_communication_ngram_outputs_dict_voxels_{subject}{suffix_setting}{out_suffix}.pkl'))
