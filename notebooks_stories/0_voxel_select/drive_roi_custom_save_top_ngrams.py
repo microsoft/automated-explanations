@@ -22,12 +22,9 @@ import matplotlib.pyplot as plt
 import os
 
 
-# ngrams are same for both models
-ngrams_list = joblib.load(join(cache_ngrams_dir, 'fmri_UTS02_ngrams.pkl'))
-suffix_setting = '_fedorenko'
-# subject = 'S02'
 subject = 'S03'
-
+# suffix_setting = '_fedorenko'
+suffix_setting = '_spotlights'
 
 if suffix_setting == '':
     # rois_dict = joblib.load(join(regions_idxs_dir, f'rois_{subject}.jbl'))
@@ -53,14 +50,21 @@ if suffix_setting == '':
         i: np.vstack([rois_dict_raw[j] for j in idxs]).sum(axis=0)
         for i, idxs in enumerate(raw_idxs)
     }
-if suffix_setting == '_fedorenko' and subject == 'S03':
-    rois_fedorenko = joblib.load('lang_localizer_UTS03.jbl')
+elif suffix_setting == '_fedorenko':
+    if subject == 'S03':
+        rois_fedorenko = joblib.load('lang_localizer_UTS03.jbl')
     rois_dict = {
         i: rois_fedorenko[i] for i in range(len(rois_fedorenko))
     }
     # rois_dict = rois_dict_raw
+elif suffix_setting == '_spotlights':
+    rois_spotlights = joblib.load('all_spotlights_UTS03.jbl')
+    rois_dict = {i: rois_spotlights[i][-1]
+                 for i in range(len(rois_spotlights))}
 
 
+# ngrams are same for both models
+ngrams_list = joblib.load(join(cache_ngrams_dir, 'fmri_UTS02_ngrams.pkl'))
 for embs_fname, checkpoint, out_suffix in tqdm(zip(
     ['fmri_embs.pkl', 'fmri_embs_llama.pkl'],
     ['facebook/opt-30b', 'huggyllama/llama-30b'],
