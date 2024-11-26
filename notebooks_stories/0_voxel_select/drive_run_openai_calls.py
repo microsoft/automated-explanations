@@ -36,10 +36,10 @@ What is a common theme among these phrases (especially the top ones)? Return onl
 #     explanations, f'explanations_by_pfc_cluster_{subject}{suffix_setting}.jbl')
 
 
-subject = 'S02'
-# subject = 'S03'
-# suffix_setting = '_fedorenko'
-suffix_setting = '_spotlights'
+# subject = 'S02'
+subject = 'S03'
+suffix_setting = '_fedorenko'
+# suffix_setting = '_spotlights'
 
 explanations = {}
 if suffix_setting == '_spotlights':
