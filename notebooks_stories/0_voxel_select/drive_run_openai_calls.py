@@ -36,8 +36,8 @@ What is a common theme among these phrases (especially the top ones)? Return onl
 #     explanations, f'explanations_by_pfc_cluster_{subject}{suffix_setting}.jbl')
 
 
-# subject = 'S02'
-subject = 'S03'
+subject = 'S02'
+# subject = 'S03'
 # suffix_setting = '_fedorenko'
 suffix_setting = '_spotlights'
 
@@ -58,5 +58,6 @@ for k in tqdm(top_ngrams_df.columns):
         explanations[k] = gpt4(prompt)
     print(explanations)
 
-json.dump(explanations, open(
-    f'explanations_by_roi_communication_{subject}{suffix_setting}.json', 'w'), indent=4)
+out_name = f'explanations_by_roi_communication_{subject}{suffix_setting}.json'
+print('saved to ', out_name)
+json.dump(explanations, open(out_name, 'w'), indent=4)

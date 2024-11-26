@@ -22,7 +22,8 @@ import matplotlib.pyplot as plt
 import os
 
 
-subject = 'S03'
+subject = 'S02'
+# subject = 'S03'
 # suffix_setting = '_fedorenko'
 suffix_setting = '_spotlights'
 
@@ -58,7 +59,7 @@ elif suffix_setting == '_fedorenko':
     }
     # rois_dict = rois_dict_raw
 elif suffix_setting == '_spotlights':
-    rois_spotlights = joblib.load('all_spotlights_UTS03.jbl')
+    rois_spotlights = joblib.load(f'all_spotlights_UT{subject}.jbl')
     rois_dict = {i: rois_spotlights[i][-1]
                  for i in range(len(rois_spotlights))}
 
