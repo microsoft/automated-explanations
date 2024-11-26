@@ -38,11 +38,16 @@ What is a common theme among these phrases (especially the top ones)? Return onl
 
 # subject = 'S02'
 subject = 'S03'
-suffix_setting = '_fedorenko'
+# suffix_setting = '_fedorenko'
+suffix_setting = '_spotlights'
 
 explanations = {}
-top_ngrams_df = pd.read_pickle(
-    f'top_ngrams_custom_communication_{subject}{suffix_setting}.pkl')
+if suffix_setting == '_spotlights':
+    top_ngrams_df = pd.read_pickle(
+        f'top_ngrams_custom_communication_{subject}{suffix_setting}_filtered.pkl')
+else:
+    top_ngrams_df = pd.read_pickle(
+        f'top_ngrams_custom_communication_{subject}{suffix_setting}.pkl')
 gpt4 = imodelsx.llm.get_llm('gpt-4')
 for k in tqdm(top_ngrams_df.columns):
 
