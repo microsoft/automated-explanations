@@ -22,7 +22,8 @@ import matplotlib.pyplot as plt
 import os
 
 
-subject = 'S02'
+subject = 'S01'
+# subject = 'S02'
 # subject = 'S03'
 # suffix_setting = '_fedorenko'
 suffix_setting = '_spotlights'

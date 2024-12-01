@@ -1,3 +1,5 @@
+import torch
+from transformers import AutoTokenizer, AutoModelForCausalLM
 from tqdm import tqdm
 import imodelsx.llm
 import imodelsx.util
@@ -16,6 +18,44 @@ import time
 from sasc.modules.fmri_module import fMRIModule
 
 repo_dir = dirname(dirname(os.path.abspath(__file__)))
+
+
+def get_scandalous_paragraph(messages):
+    model_id = "meta-llama/Meta-Llama-3-8B-Instruct"
+
+    tokenizer = AutoTokenizer.from_pretrained(model_id)
+    model = AutoModelForCausalLM.from_pretrained(
+        model_id,
+        torch_dtype=torch.bfloat16,
+        device_map="auto",
+    )
+
+    messages = messages + [{"role": 'asssistant',
+                            'content': 'Sure, here is the paragraph:\n'}]
+
+    input_ids = tokenizer.apply_chat_template(
+        messages,
+        # add_generation_prompt=True,
+        return_tensors="pt"
+    )[:, :-2].to(model.device)
+
+    terminators = [
+        tokenizer.eos_token_id,
+        tokenizer.convert_tokens_to_ids("<|eot_id|>")
+    ]
+
+    outputs = model.generate(
+        input_ids,
+        max_new_tokens=256,
+        eos_token_id=terminators,
+        do_sample=True,
+        temperature=0.6,
+        top_p=0.9,
+    )
+    response = outputs[0][input_ids.shape[-1]:]
+    paragraph_scandalous = tokenizer.decode(
+        response, skip_special_tokens=True)[2:].strip()
+    return paragraph_scandalous
 
 
 def get_paragraphs(
@@ -75,16 +115,26 @@ def get_paragraphs(
         all_content.append(messages[-1])
         response = llm(messages, return_str=False, use_cache=True)
         # print('resp', response)
-        if response is not None:
-            # response_text = response["choices"][0]["message"]["content"]
-            response_text = response.choices[0].message.content
-            messages.append({"role": "assistant", "content": response_text})
-            all_content.append(messages[-1])
+        # if response is not None:
+        # response_text = response["choices"][0]["message"]["content"]
 
         # need to drop beginning of story whenever we approach the tok limit
         # gpt-3.5.turbo has a limit of 4096, and it cant generate beyond that
         # num_tokens = response["usage"]["total_tokens"]
-        num_tokens = response.usage.total_tokens
+        try:
+            # tests whether call was successfull
+            num_tokens = response.usage.total_tokens
+            response_text = response.choices[0].message.content
+        except Exception as e:
+            print(e)
+            print('Failed on prompt',
+                  prompts[i], 'relying on backup scandalous paragraph')
+            response_text = get_scandalous_paragraph(messages)
+            print('scandalous paragraph', response_text)
+
+        messages.append({"role": "assistant", "content": response_text})
+        all_content.append(messages[-1])
+
         # print('num_tokens', num_tokens)
         if num_tokens >= token_limit:
             # drop the first (assistant, user) pair in messages
@@ -124,7 +174,8 @@ def select_top_examples_randomly(
                 f'"{x}"'
                 for x in rng.choice(
                     examples[:n_examples_per_prompt_to_consider],
-                    n_examples_per_prompt,
+                    min(n_examples_per_prompt, len(
+                        examples[:n_examples_per_prompt_to_consider])),
                     replace=False,
                 ).tolist()
             ]

@@ -118,7 +118,8 @@ if __name__ == "__main__":
         'roi': 'v6_noun',
     }
     # iterate over seeds
-    seeds = range(1, 10)
+    seeds = range(1, 7)
+    # seeds = range(1, 10)
     # seeds = range(2, 3)
     # random.shuffle(seeds)
 
@@ -136,14 +137,15 @@ if __name__ == "__main__":
         # 'qa',
         'roi',
     ]:  # default, interactions, polysemantic
-        for subject in ["UTS03"]:  # , "UTS03"]:  # ["UTS01", "UTS03"]:
+        for subject in ["UTS02"]:  # , "UTS03"]:  # ["UTS01", "UTS03"]:
             for seed in seeds:
                 # for version in ["v5_noun"]:
                 version = VERSIONS[setting]
                 STORIES_DIR = join(RESULTS_DIR, "stories")
 
                 # EXPT_NAME = f"{subject.lower()}___qa_may31___seed={seed}"
-                EXPT_NAME = f"{subject.lower()}___roi_may31___seed={seed}"
+                # EXPT_NAME = f"{subject.lower()}___roi_may31___seed={seed}"
+                EXPT_NAME = f"{subject.lower()}___roi_nov30___seed={seed}"
                 EXPT_DIR = join(STORIES_DIR, setting, EXPT_NAME)
                 os.makedirs(EXPT_DIR, exist_ok=True)
 
@@ -191,13 +193,15 @@ if __name__ == "__main__":
                 # generate paragraphs
                 for p in prompts:
                     print('\n' + p)
+                # print('IN TOTAL HAS', len(prompts), 'paragraphs')
+                # exit(0)
                 paragraphs = sasc.generate_helper.get_paragraphs(
                     prompts,
-                    # checkpoint="gpt-4",
+                    checkpoint="gpt-4",
                     # checkpoint='gpt-4-turbo',
                     # checkpoint='gpt-4-1106-preview',
                     # checkpoint='gpt-4-32k',
-                    checkpoint='gpt-4-turbo-0125-spot',
+                    # checkpoint='gpt-4-turbo-0125-spot',
                     prefix_first=PV["prefix_first"] if "prefix_first" in PV else None,
                     prefix_next=PV["prefix_next"] if "prefix_next" in PV else None,
                     cache_dir="/home/chansingh/cache/llm_stories_may8",

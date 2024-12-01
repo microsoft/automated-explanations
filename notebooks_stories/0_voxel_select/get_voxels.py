@@ -196,8 +196,10 @@ def get_rows_voxels(subject: str, setting="default"):
         return joblib.load(join(REPO_DIR, "notebooks_stories/0_voxel_select/rows_qa_may31.pkl"))
 
     elif setting == 'roi':
+        # roi_rows_file = join(
+        # REPO_DIR, f"notebooks_stories/0_voxel_select/rows_roi_{subject.lower()}_may31.pkl")
         roi_rows_file = join(
-            REPO_DIR, f"notebooks_stories/0_voxel_select/rows_roi_{subject.lower()}_may31.pkl")
+            REPO_DIR, f"notebooks_stories/0_voxel_select/rows_roi_{subject.lower()}_nov30.pkl")
         return joblib.load(roi_rows_file)
 
     # UTS02 - Pilot voxels
