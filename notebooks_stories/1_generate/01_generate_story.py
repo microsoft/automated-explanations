@@ -119,6 +119,7 @@ if __name__ == "__main__":
     }
     # iterate over seeds
     seeds = range(1, 7)
+    # seeds = range(7, 12)
     # seeds = range(1, 10)
     # seeds = range(2, 3)
     # random.shuffle(seeds)

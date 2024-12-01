@@ -196,10 +196,10 @@ def process_timings(df: pd.DataFrame, min_timing=0.16, target_mean=0.32) -> pd.D
 if __name__ == "__main__":
     # "polysemantic", "interactions"]:
     # filter = 'may9'
-    filter = ''
+    filter = 'nov30'
     for setting in ['roi']:
         # for setting in ["interactions", "default"]:
-        for subject in ["UTS03"]:  # "UTS03"]:
+        for subject in ["UTS02"]:  # "UTS03"]:
             EXPT_NAMES = sorted(
                 [
                     k

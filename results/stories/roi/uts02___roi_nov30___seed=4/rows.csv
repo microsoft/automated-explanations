@@ -1,0 +1,18 @@
+expl,top_ngrams_module_correct,subject,prompt_suffix
+Sexual and Romantic Interactions,"['tried to flirt', 'me a blowjob', 'to get laid', 'satisfy me sexually', 'that my flirting', 'hitting on me', 'have sex so', 'grand romantic gesture', 'lost my virginity', 'have fucking groupies', 'a housewarming gift', 'had masturbated to', 'for hitting on', 'even had sex']",UTS02,
+Measurements,"['two mile thick', 'eighty milligrams', 'two hundred gallons', 'several hundred cubic', 'eight thousand square', 'to fifty feet']",UTS02," Avoid mentioning any numbers or times. (like ""three o'clock"" or ""hours"" or ""fifty"")"
+Colors,"['black chevy', 'a bumpy orange', 'and frosty pink', 'of cornfields amber', 'bands of lavender', 'green', 'red', 'purple']",UTS02,
+Relationships,"['brother and sister', 'he was a good friend', 'a wonderful mother', 'just like her father', 'boyfriend', 'wife', 'aunt']",UTS02, Avoid mentioning conversations or dialogue interactions between people.
+Numbers,"['five', 'twenty', 'three hundred', 'a million', 'forty six', 'ninety one', 'four', 'eight']",UTS02, Avoid mentioning any measurements or times.
+Positive Emotional Reactions,"['she started laughing', 'smiled and said', 'he giggled', 'they were happy to see it', 'she was relieved']",UTS02,
+Introspection,"['he reflected', 'she thought back', 'they thought hard', ""hm that's interesting"", 'ah yes', 'thought carefully', 'full of introspection']",UTS02,Avoid mentioning conversations or dialogue interactions between people.
+Fear and Avoidance,"['he screamed', 'always too scared', 'she steered clear', 'they ran away', 'constant fear', 'always afraid']",UTS02,
+Secretive Or Covert Actions,"['sneak out when', 'bribe the guards', 'of getting caught', 'to sneak out', 'sped off before', 'locked the door', 'she hung up', 'kept it hidden', 'she hanged up', ""'m not invited"", 'leaves the room', 'not tell anyone', 'could escape quietly']",UTS02,
+Years,"['of nineteen sixty', 'until nineteen sixty', 'until nineteen seventy', 'of nineteen ninety']",UTS02," Avoid mentioning any numbers, measurements, or times of day. (like ""three o'clock"" or ""hours"" or ""fifty"")"
+Recognition,"['neighbor had recognized', 'officer heard me', 'friends saw me', 'knew exactly who', 'i provoked gasps', 'she recognized me', 'guard spotted us']",UTS02,
+Professions and Personal Backgrounds,"['his cop training', 'other egghead phds', 'parents were doctors', 'a gay speechwriter', 'a cambridge educated', 'i played college', 'been my accountant', 'my indian heritage', 'taught them japanese']",UTS02,
+Clothing and Physical Appearance,"['in his beret', 'in a bathrobe', 'a red hoodie', 'blonde hair dangling', 'his flannel shirt', 'ancient blue hatchback', 'his tan uniform', 'was wearing black', 'wore flannel']",UTS02,
+Times,"[""one o'clock"", 'hours and hours', 'pocketwatch ticked', 'hourglass', 'from dusk till dawn', 'he was early', 'she was late', 'months later', 'minutes later', 'seconds later', 'just before']",UTS02," Avoid mentioning any numbers, measurements, or years. "
+Dialogue,"['he said', 'she said', 'they whispered', 'he chimed in', '""wow!""', '""hello""', 'he shouted', 'she responded']",UTS02, Avoid mentioning the people involved in the conversation.
+Gruesome body imagery,"['my scalp peeled', 'soaked with sweat', 'eyes were swollen', 'of skin peeled', 'legs were swollen', 'swollen and red', 'burned the skin', 'blood was trickling', 'skin was bubbling']",UTS02,
+Negative Emotional Reactions,"['mom started crying', 'started to cry', 'eyed her suspiciously', 'annoyed him', 'they were upset']",UTS02,

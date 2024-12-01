@@ -1,0 +1,33 @@
+Write the first paragraph of an interesting story told in first person. The story should have a plot and characters. The first paragraph of the story should contain many examples of "Recognition". Make sure it contains many examples of "Recognition", such as "i provoked gasps", "officer heard me", "knew exactly who", "friends saw me", "guard spotted us".
+
+Write the next paragraph of the story, but now make it contain several examples of "Relationships". Make sure it contains many examples of "Relationships", such as "aunt", "wife", "boyfriend", "just like her father", "he was a good friend". Avoid mentioning conversations or dialogue interactions between people.
+
+Write the next paragraph of the story, but now make it contain several examples of "Dialogue". Make sure it contains many examples of "Dialogue", such as "he chimed in", "he shouted", "she said", "he said", ""hello"". Avoid mentioning the people involved in the conversation.
+
+Write the next paragraph of the story, but now make it contain several examples of "Numbers". Make sure it contains many examples of "Numbers", such as "twenty", "five", "ninety one", "eight", "three hundred". Avoid mentioning any measurements or times.
+
+Write the next paragraph of the story, but now make it contain several examples of "Colors". Make sure it contains many examples of "Colors", such as "green", "red", "black chevy", "purple", "of cornfields amber".
+
+Write the next paragraph of the story, but now make it contain several examples of "Measurements". Make sure it contains many examples of "Measurements", such as "eight thousand square", "two mile thick", "two hundred gallons", "to fifty feet", "eighty milligrams". Avoid mentioning any numbers or times. (like "three o'clock" or "hours" or "fifty")
+
+Write the next paragraph of the story, but now make it contain several examples of "Times". Make sure it contains many examples of "Times", such as "one o'clock", "hourglass", "hours and hours", "he was early", "months later". Avoid mentioning any numbers, measurements, or years. 
+
+Write the next paragraph of the story, but now make it contain several examples of "Sexual and Romantic Interactions". Make sure it contains many examples of "Sexual and Romantic Interactions", such as "have sex so", "satisfy me sexually", "tried to flirt", "that my flirting", "me a blowjob".
+
+Write the next paragraph of the story, but now make it contain several examples of "Gruesome body imagery". Make sure it contains many examples of "Gruesome body imagery", such as "swollen and red", "blood was trickling", "of skin peeled", "legs were swollen", "skin was bubbling".
+
+Write the next paragraph of the story, but now make it contain several examples of "Negative Emotional Reactions". Make sure it contains many examples of "Negative Emotional Reactions", such as "mom started crying", "started to cry", "annoyed him", "eyed her suspiciously", "they were upset".
+
+Write the next paragraph of the story, but now make it contain several examples of "Years". Make sure it contains many examples of "Years", such as "until nineteen sixty", "until nineteen seventy", "of nineteen ninety", "of nineteen sixty". Avoid mentioning any numbers, measurements, or times of day. (like "three o'clock" or "hours" or "fifty")
+
+Write the next paragraph of the story, but now make it contain several examples of "Secretive Or Covert Actions". Make sure it contains many examples of "Secretive Or Covert Actions", such as "to sneak out", "bribe the guards", "she hung up", "locked the door", "kept it hidden".
+
+Write the next paragraph of the story, but now make it contain several examples of "Introspection". Make sure it contains many examples of "Introspection", such as "ah yes", "she thought back", "they thought hard", "he reflected", "hm that's interesting".Avoid mentioning conversations or dialogue interactions between people.
+
+Write the next paragraph of the story, but now make it contain several examples of "Fear and Avoidance". Make sure it contains many examples of "Fear and Avoidance", such as "she steered clear", "always afraid", "they ran away", "always too scared", "he screamed".
+
+Write the next paragraph of the story, but now make it contain several examples of "Positive Emotional Reactions". Make sure it contains many examples of "Positive Emotional Reactions", such as "she started laughing", "he giggled", "they were happy to see it", "she was relieved", "smiled and said".
+
+Write the next paragraph of the story, but now make it contain several examples of "Professions and Personal Backgrounds". Make sure it contains many examples of "Professions and Personal Backgrounds", such as "i played college", "his cop training", "been my accountant", "other egghead phds", "my indian heritage".
+
+Write the next paragraph of the story, but now make it contain several examples of "Clothing and Physical Appearance". Make sure it contains many examples of "Clothing and Physical Appearance", such as "a red hoodie", "ancient blue hatchback", "his flannel shirt", "in a bathrobe", "was wearing black".
