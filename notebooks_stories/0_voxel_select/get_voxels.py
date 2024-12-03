@@ -181,7 +181,7 @@ def _voxels_to_rows(
     return rows
 
 
-def get_rows_voxels(subject: str, setting="default"):
+def get_rows_voxels(subject: str, setting="default", fname_suffix=''):
     """Select rows from fitted voxels
 
     Params
@@ -199,7 +199,7 @@ def get_rows_voxels(subject: str, setting="default"):
         # roi_rows_file = join(
         # REPO_DIR, f"notebooks_stories/0_voxel_select/rows_roi_{subject.lower()}_may31.pkl")
         roi_rows_file = join(
-            REPO_DIR, f"notebooks_stories/0_voxel_select/rows_roi_{subject.lower()}_nov30.pkl")
+            REPO_DIR, f"notebooks_stories/0_voxel_select/rows_roi_{subject.lower()}_nov30{fname_suffix}.pkl")
         return joblib.load(roi_rows_file)
 
     # UTS02 - Pilot voxels

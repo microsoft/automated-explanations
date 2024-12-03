@@ -28,9 +28,11 @@ def get_rows_and_prompts_default(
     n_examples_per_prompt_to_consider,
     n_examples_per_prompt,
     version,
+    fname_suffix,
 ):
     # get voxels
-    rows = get_voxels.get_rows_voxels(subject=subject, setting=setting)
+    rows = get_voxels.get_rows_voxels(
+        subject=subject, setting=setting, fname_suffix=fname_suffix)
 
     # shuffle order (this is the 1st place randomness is applied)
     rows = rows.sample(frac=1, random_state=seed, replace=False)
@@ -131,6 +133,7 @@ if __name__ == "__main__":
     # increased for roi stories
     n_examples_per_prompt = 5
     n_examples_per_prompt_to_consider = 9
+    fname_suffix = '_v2'
     for setting in [
         # "interactions",
         # "default",
@@ -138,7 +141,10 @@ if __name__ == "__main__":
         # 'qa',
         'roi',
     ]:  # default, interactions, polysemantic
-        for subject in ["UTS02"]:  # , "UTS03"]:  # ["UTS01", "UTS03"]:
+        for subject in [
+            # "UTS02",
+            "UTS03",
+        ]:  # , "UTS03"]:  # ["UTS01", "UTS03"]:
             for seed in seeds:
                 # for version in ["v5_noun"]:
                 version = VERSIONS[setting]
@@ -146,7 +152,7 @@ if __name__ == "__main__":
 
                 # EXPT_NAME = f"{subject.lower()}___qa_may31___seed={seed}"
                 # EXPT_NAME = f"{subject.lower()}___roi_may31___seed={seed}"
-                EXPT_NAME = f"{subject.lower()}___roi_nov30___seed={seed}"
+                EXPT_NAME = f"{subject.lower()}___roi_nov30___seed={seed}{fname_suffix}"
                 EXPT_DIR = join(STORIES_DIR, setting, EXPT_NAME)
                 os.makedirs(EXPT_DIR, exist_ok=True)
 
@@ -158,6 +164,7 @@ if __name__ == "__main__":
                         n_examples_per_prompt_to_consider,
                         n_examples_per_prompt,
                         version,
+                        fname_suffix,
                     )
                     rows.to_csv(join(EXPT_DIR, f"rows.csv"), index=False)
                     rows.to_pickle(join(EXPT_DIR, f"rows.pkl"))
@@ -191,34 +198,22 @@ if __name__ == "__main__":
                     rows2.to_pickle(join(EXPT_DIR, f"rows2.pkl"))
                     rows1_rep.to_pickle(join(EXPT_DIR, f"rows.pkl"))
 
-                # generate paragraphs
                 for p in prompts:
                     print('\n' + p)
-                # print('IN TOTAL HAS', len(prompts), 'paragraphs')
-                # exit(0)
+                with open(join(EXPT_DIR, "prompts.txt"), "w") as f:
+                    f.write("\n\n".join(prompts))
+
+                # save
+                continue
+                # generate paragraphs
                 paragraphs = sasc.generate_helper.get_paragraphs(
                     prompts,
                     checkpoint="gpt-4",
-                    # checkpoint='gpt-4-turbo',
-                    # checkpoint='gpt-4-1106-preview',
-                    # checkpoint='gpt-4-32k',
-                    # checkpoint='gpt-4-turbo-0125-spot',
                     prefix_first=PV["prefix_first"] if "prefix_first" in PV else None,
                     prefix_next=PV["prefix_next"] if "prefix_next" in PV else None,
                     cache_dir="/home/chansingh/cache/llm_stories_may8",
                 )
 
-                for i in tqdm(range(len(paragraphs))):
-                    para = paragraphs[i]
-                    print(para)
-                    # pprint(para)
-
-                # save
-                # rows["prompt"] = prompts
-                # rows["paragraph"] = paragraphs
-                # joblib.dump(rows, join(EXPT_DIR, "rows.pkl"))
-                with open(join(EXPT_DIR, "prompts.txt"), "w") as f:
-                    f.write("\n\n".join(prompts))
                 with open(join(EXPT_DIR, "story.txt"), "w") as f:
                     f.write("\n\n".join(paragraphs))
                 joblib.dump(

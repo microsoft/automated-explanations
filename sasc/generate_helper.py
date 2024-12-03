@@ -15,12 +15,15 @@ import os.path
 from os.path import dirname, join
 from typing import List
 import time
+from functools import cache
+import joblib
 from sasc.modules.fmri_module import fMRIModule
 
 repo_dir = dirname(dirname(os.path.abspath(__file__)))
 
 
 def get_scandalous_paragraph(messages):
+
     model_id = "meta-llama/Meta-Llama-3-8B-Instruct"
 
     tokenizer = AutoTokenizer.from_pretrained(model_id)
@@ -55,6 +58,9 @@ def get_scandalous_paragraph(messages):
     response = outputs[0][input_ids.shape[-1]:]
     paragraph_scandalous = tokenizer.decode(
         response, skip_special_tokens=True)[2:].strip()
+
+    # cache based on input using dicthash
+    # joblib.dump(paragraph_scandalous, 'scandalous_paragraph.pkl')
     return paragraph_scandalous
 
 
@@ -131,6 +137,9 @@ def get_paragraphs(
                   prompts[i], 'relying on backup scandalous paragraph')
             response_text = get_scandalous_paragraph(messages)
             print('scandalous paragraph', response_text)
+
+        if "can't assist with that" in response_text:
+            raise ValueError('Failed on prompt', prompts[i])
 
         messages.append({"role": "assistant", "content": response_text})
         all_content.append(messages[-1])
