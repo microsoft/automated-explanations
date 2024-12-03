@@ -1,0 +1,25 @@
+Write the first paragraph of an interesting story told in first person. The story should have a plot and characters. The first paragraph of the story should contain many examples of "Years". Make sure it contains many examples of "Years", such as "of nineteen ninety", "until nineteen seventy", "of nineteen sixty", "until nineteen sixty". Avoid mentioning any numbers, measurements, or times of day. (like "three o'clock" or "hours" or "fifty")
+
+Write the next paragraph of the story, but now make it contain several examples of "Measurements". Make sure it contains many examples of "Measurements", such as "eight thousand square", "two hundred gallons", "two mile thick", "to fifty feet", "several hundred cubic". Avoid mentioning any numbers or times. (like "three o'clock" or "hours" or "fifty")
+
+Write the next paragraph of the story, but now make it contain several examples of "Relationships". Make sure it contains many examples of "Relationships", such as "just like her father", "brother and sister", "aunt", "a wonderful uncle", "wife". Avoid mentioning conversations or dialogue interactions between people.
+
+Write the next paragraph of the story, but now make it contain several examples of "Direction and location descriptions". Make sure it contains many examples of "Direction and location descriptions", such as "across a plateau", "outside the windows", "railing looking out", "against the railing", "long hallway toward". Avoid mentioning any specific location names (like "New York" or "Europe").
+
+Write the next paragraph of the story, but now make it contain several examples of "Times". Make sure it contains many examples of "Times", such as "one o'clock". Avoid mentioning any numbers, measurements, or years. 
+
+Write the next paragraph of the story, but now make it contain several examples of "Introspection". Make sure it contains many examples of "Introspection", such as "hm that's interesting", "full of introspection", "she thought back", "he reflected", "they thought hard".Avoid mentioning conversations or dialogue interactions between people.
+
+Write the next paragraph of the story, but now make it contain several examples of "Numbers". Make sure it contains many examples of "Numbers", such as "three hundred", "ninety one", "a million", "forty six", "twenty". Avoid mentioning any measurements or times.
+
+Write the next paragraph of the story, but now make it contain several examples of "Gruesome body imagery". Make sure it contains many examples of "Gruesome body imagery", such as "of skin peeled", "eyes were swollen", "swollen and red", "burned the skin", "blood was trickling".
+
+Write the next paragraph of the story, but now make it contain several examples of "Travel and location names". Make sure it contains many examples of "Travel and location names", such as "long hallway toward", "to the hallway", "was led upstairs", "back through london", "onto the subway".
+
+Write the next paragraph of the story, but now make it contain several examples of "Colors". Make sure it contains many examples of "Colors", such as "bands of lavender", "and frosty pink", "my black chevy", "of cornfields amber", "a bumpy orange".
+
+Write the next paragraph of the story, but now make it contain several examples of "Clothing and Physical Appearance". Make sure it contains many examples of "Clothing and Physical Appearance", such as "wore flannel", "his tan uniform", "was wearing black", "a red hoodie", "in a bathrobe".
+
+Write the next paragraph of the story, but now make it contain several examples of "Scenes and settings". Make sure it contains many examples of "Scenes and settings", such as "on the windowsill", "against the railing", "in the alley", "to a courtyard", "in an alcove". Avoid mentioning any specific location names (like "New York" or "Europe").
+
+Write the next paragraph of the story, but now make it contain several examples of "Dialogue". Make sure it contains many examples of "Dialogue", such as "he said", "they whispered", "she said", "he chimed in", ""wow!"". Avoid mentioning the people involved in the conversation.

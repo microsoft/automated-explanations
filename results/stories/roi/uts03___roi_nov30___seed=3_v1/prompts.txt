@@ -1,0 +1,25 @@
+Write the first paragraph of an interesting story told in first person. The story should have a plot and characters. The first paragraph of the story should contain many examples of "Introspection". Make sure it contains many examples of "Introspection", such as "ah yes", "full of introspection", "thought carefully", "hm that's interesting", "she thought back".Avoid mentioning conversations or dialogue interactions between people.
+
+Write the next paragraph of the story, but now make it contain several examples of "Relationships". Make sure it contains many examples of "Relationships", such as "aunt", "boyfriend", "he was a good friend", "a wonderful uncle", "just like her father". Avoid mentioning conversations or dialogue interactions between people.
+
+Write the next paragraph of the story, but now make it contain several examples of "Times". Make sure it contains many examples of "Times", such as "one o'clock". Avoid mentioning any numbers, measurements, or years. 
+
+Write the next paragraph of the story, but now make it contain several examples of "Years". Make sure it contains many examples of "Years", such as "of nineteen sixty", "of nineteen ninety", "until nineteen sixty", "until nineteen seventy". Avoid mentioning any numbers, measurements, or times of day. (like "three o'clock" or "hours" or "fifty")
+
+Write the next paragraph of the story, but now make it contain several examples of "Travel and location names". Make sure it contains many examples of "Travel and location names", such as "drove to washington", "and darted downstairs", "onto the subway", "to the hallway", "long hallway toward".
+
+Write the next paragraph of the story, but now make it contain several examples of "Dialogue". Make sure it contains many examples of "Dialogue", such as "he said", "he chimed in", ""hello"", "she said", ""wow!"". Avoid mentioning the people involved in the conversation.
+
+Write the next paragraph of the story, but now make it contain several examples of "Gruesome body imagery". Make sure it contains many examples of "Gruesome body imagery", such as "of skin peeled", "blood was trickling", "legs were swollen", "my scalp peeled", "eyes were swollen".
+
+Write the next paragraph of the story, but now make it contain several examples of "Numbers". Make sure it contains many examples of "Numbers", such as "three hundred", "forty six", "ninety one", "twenty", "a million". Avoid mentioning any measurements or times.
+
+Write the next paragraph of the story, but now make it contain several examples of "Scenes and settings". Make sure it contains many examples of "Scenes and settings", such as "the copier room", "against the railing", "past the offices", "in an alcove", "in the courtyard". Avoid mentioning any specific location names (like "New York" or "Europe").
+
+Write the next paragraph of the story, but now make it contain several examples of "Measurements". Make sure it contains many examples of "Measurements", such as "several hundred cubic", "eight thousand square", "to fifty feet", "two hundred gallons", "eighty milligrams". Avoid mentioning any numbers or times. (like "three o'clock" or "hours" or "fifty")
+
+Write the next paragraph of the story, but now make it contain several examples of "Colors". Make sure it contains many examples of "Colors", such as "of cornfields amber", "and frosty pink", "a bumpy orange", "bands of lavender", "my black chevy".
+
+Write the next paragraph of the story, but now make it contain several examples of "Clothing and Physical Appearance". Make sure it contains many examples of "Clothing and Physical Appearance", such as "his tan uniform", "his flannel shirt", "in his beret", "blonde hair dangling", "a red hoodie".
+
+Write the next paragraph of the story, but now make it contain several examples of "Direction and location descriptions". Make sure it contains many examples of "Direction and location descriptions", such as "across a plateau", "outside the windows", "up the coast", "in the courtyard", "up the hill". Avoid mentioning any specific location names (like "New York" or "Europe").

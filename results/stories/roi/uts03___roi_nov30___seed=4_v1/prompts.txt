@@ -1,0 +1,25 @@
+Write the first paragraph of an interesting story told in first person. The story should have a plot and characters. The first paragraph of the story should contain many examples of "Measurements". Make sure it contains many examples of "Measurements", such as "eight thousand square", "to fifty feet", "several hundred cubic", "two mile thick", "eighty milligrams". Avoid mentioning any numbers or times. (like "three o'clock" or "hours" or "fifty")
+
+Write the next paragraph of the story, but now make it contain several examples of "Relationships". Make sure it contains many examples of "Relationships", such as "wife", "brother and sister", "aunt", "just like her father", "boyfriend". Avoid mentioning conversations or dialogue interactions between people.
+
+Write the next paragraph of the story, but now make it contain several examples of "Introspection". Make sure it contains many examples of "Introspection", such as "full of introspection", "hm that's interesting", "thought carefully", "they thought hard", "ah yes".Avoid mentioning conversations or dialogue interactions between people.
+
+Write the next paragraph of the story, but now make it contain several examples of "Travel and location names". Make sure it contains many examples of "Travel and location names", such as "long hallway toward", "past the offices", "down the sidewalk", "to the hallway", "onto the subway".
+
+Write the next paragraph of the story, but now make it contain several examples of "Colors". Make sure it contains many examples of "Colors", such as "bands of lavender", "a bumpy orange", "of cornfields amber", "and frosty pink", "my black chevy".
+
+Write the next paragraph of the story, but now make it contain several examples of "Years". Make sure it contains many examples of "Years", such as "of nineteen ninety", "until nineteen sixty", "of nineteen sixty", "until nineteen seventy". Avoid mentioning any numbers, measurements, or times of day. (like "three o'clock" or "hours" or "fifty")
+
+Write the next paragraph of the story, but now make it contain several examples of "Numbers". Make sure it contains many examples of "Numbers", such as "twenty", "forty six", "five", "a million", "ninety one". Avoid mentioning any measurements or times.
+
+Write the next paragraph of the story, but now make it contain several examples of "Scenes and settings". Make sure it contains many examples of "Scenes and settings", such as "in the courtyard", "on the windowsill", "to a courtyard", "the copier room", "in an alcove". Avoid mentioning any specific location names (like "New York" or "Europe").
+
+Write the next paragraph of the story, but now make it contain several examples of "Clothing and Physical Appearance". Make sure it contains many examples of "Clothing and Physical Appearance", such as "in his beret", "his flannel shirt", "ancient blue hatchback", "his tan uniform", "in a bathrobe".
+
+Write the next paragraph of the story, but now make it contain several examples of "Times". Make sure it contains many examples of "Times", such as "one o'clock". Avoid mentioning any numbers, measurements, or years. 
+
+Write the next paragraph of the story, but now make it contain several examples of "Dialogue". Make sure it contains many examples of "Dialogue", such as ""wow!"", "they whispered", "she responded", "he chimed in", ""hello"". Avoid mentioning the people involved in the conversation.
+
+Write the next paragraph of the story, but now make it contain several examples of "Gruesome body imagery". Make sure it contains many examples of "Gruesome body imagery", such as "soaked with sweat", "skin was bubbling", "my scalp peeled", "legs were swollen", "swollen and red".
+
+Write the next paragraph of the story, but now make it contain several examples of "Direction and location descriptions". Make sure it contains many examples of "Direction and location descriptions", such as "railing looking out", "against the railing", "in the courtyard", "long hallway toward", "across a plateau". Avoid mentioning any specific location names (like "New York" or "Europe").
