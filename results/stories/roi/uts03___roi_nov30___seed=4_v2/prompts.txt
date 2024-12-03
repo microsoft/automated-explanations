@@ -2,7 +2,7 @@ Write the first paragraph of an interesting story told in first person. The stor
 
 Write the next paragraph of the story, but now make it contain several examples of "Positive Emotional Reactions". Make sure it contains many examples of "Positive Emotional Reactions", such as "smiled and said", "he giggled", "she was relieved", "they were happy to see it", "she started laughing".
 
-Write the next paragraph of the story, but now make it contain several examples of "Unappetizing foods". Make sure it contains many examples of "Unappetizing foods", such as "skivvies toothbrush floss", "box of discarded", "'re throwing napkins", "in sugar jars", "a garbage bag". Avoid mentioning any specific location names (like "New York" or "Europe").
+Write the next paragraph of the story, but now make it contain several examples of "Garbage, food, and household items". Make sure it contains many examples of "Garbage, food, and household items", such as "skivvies toothbrush floss", "box of discarded", "'re throwing napkins", "in sugar jars", "a garbage bag". Avoid mentioning any specific location names (like "New York" or "Europe").
 
 Write the next paragraph of the story, but now make it contain several examples of "Conversational transitions". Make sure it contains many examples of "Conversational transitions", such as "anyway the point", "weeks passed and", "i even met", "and we talked", "one night my". Avoid mentioning any locations.
 
