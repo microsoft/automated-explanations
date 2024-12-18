@@ -9,6 +9,7 @@ import sasc.viz
 from sasc.config import RESULTS_DIR
 from sasc import config
 
+
 if __name__ == "__main__":
     FULL_SETTINGS = [
         # ('UTS02', 'default', 'pilot_story_data.pkl'),
@@ -17,7 +18,9 @@ if __name__ == "__main__":
         # ('UTS01', 'default', 'pilot4_story_data.pkl'),
 
         # ('UTS02', 'qa', 'pilot5_story_data.pkl'),
-        ('UTS02', 'roi', 'pilot6_story_data.pkl'),
+        # ('UTS02', 'roi', 'pilot6_story_data.pkl'),
+        # ('UTS03', 'roi', 'pilot7_story_data.pkl'),
+        ('UTS03', 'roi', 'pilot8_story_data.pkl'),
     ]
     for idx in range(len(FULL_SETTINGS)):
 
@@ -26,7 +29,7 @@ if __name__ == "__main__":
         # pilot_name = 'pilot5_story_data.pkl'
         pilot_name_abbrev = pilot_name.split("_")[0]
         out_dir = join(
-            RESULTS_DIR, "processed", "flatmaps_all", subject, setting)
+            RESULTS_DIR, "processed", "flatmaps_all", subject, setting + '_' + pilot_name_abbrev)
 
         stories_data_dict = joblib.load(
             join(config.RESULTS_DIR, 'processed', pilot_name))
@@ -40,6 +43,10 @@ if __name__ == "__main__":
             pilot_data_dir = join(config.PILOT_STORY_DATA_DIR, '20240604')
         elif pilot_name == 'pilot6_story_data.pkl':
             pilot_data_dir = join(config.PILOT_STORY_DATA_DIR, '20241202')
+        elif pilot_name == 'pilot7_story_data.pkl':
+            pilot_data_dir = join(config.PILOT_STORY_DATA_DIR, '20241204')
+        elif pilot_name == 'pilot8_story_data.pkl':
+            pilot_data_dir = join(config.PILOT_STORY_DATA_DIR, '20241204')
 
         default_story_idxs = np.where(
             (np.array(stories_data_dict['story_setting']) == setting)
@@ -79,7 +86,7 @@ if __name__ == "__main__":
                 rows), f"{len(paragraphs)} != {len(rows)}"
             resp_chunks = analyze_helper.get_resps_for_paragraphs(
                 timing, paragraphs, resp_story, offset=2, validate=True,
-                split_hyphens=pilot_name == "pilot6_story_data.pkl")
+                split_hyphens=pilot_name in ["pilot6_story_data.pkl", "pilot7_story_data.pkl", "pilot8_story_data.pkl"])
             assert len(resp_chunks) <= len(paragraphs)
             args = np.argsort(rows["expl"].values)
             if len(resp_chunks) == len(args) - 1:
