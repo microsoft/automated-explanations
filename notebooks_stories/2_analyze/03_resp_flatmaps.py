@@ -11,12 +11,13 @@ from sasc import config
 
 if __name__ == "__main__":
     FULL_SETTINGS = [
-        ('UTS02', 'default', 'pilot_story_data.pkl'),
+        # ('UTS02', 'default', 'pilot_story_data.pkl'),
+        # ('UTS03', 'default', 'pilot3_story_data.pkl'),
         # ('UTS03', 'default', 'pilot3_story_data.pkl'),
         # ('UTS01', 'default', 'pilot4_story_data.pkl'),
 
-        ('UTS02', 'qa', 'pilot5_story_data.pkl'),
-        # ('UTS02', 'roi', 'pilot5_story_data.pkl'),
+        # ('UTS02', 'qa', 'pilot5_story_data.pkl'),
+        ('UTS02', 'roi', 'pilot6_story_data.pkl'),
     ]
     for idx in range(len(FULL_SETTINGS)):
 
@@ -37,6 +38,8 @@ if __name__ == "__main__":
             pilot_data_dir = join(config.PILOT_STORY_DATA_DIR, '20240509')
         elif pilot_name == 'pilot5_story_data.pkl':
             pilot_data_dir = join(config.PILOT_STORY_DATA_DIR, '20240604')
+        elif pilot_name == 'pilot6_story_data.pkl':
+            pilot_data_dir = join(config.PILOT_STORY_DATA_DIR, '20241202')
 
         default_story_idxs = np.where(
             (np.array(stories_data_dict['story_setting']) == setting)
@@ -75,7 +78,8 @@ if __name__ == "__main__":
             assert len(paragraphs) == len(
                 rows), f"{len(paragraphs)} != {len(rows)}"
             resp_chunks = analyze_helper.get_resps_for_paragraphs(
-                timing, paragraphs, resp_story, offset=2, validate=True)
+                timing, paragraphs, resp_story, offset=2, validate=True,
+                split_hyphens=pilot_name == "pilot6_story_data.pkl")
             assert len(resp_chunks) <= len(paragraphs)
             args = np.argsort(rows["expl"].values)
             if len(resp_chunks) == len(args) - 1:
@@ -91,6 +95,17 @@ if __name__ == "__main__":
         expls = rows["expl"].values
         rows['resp_chunks'] = [resp_chunks_arr[i]
                                for i in range(len(resp_chunks_arr))]
+
+        # save average responses
+        if 'module_num' not in rows.columns:
+            rows['module_num'] = None
+        resp_avg_dict = {
+            (rows.iloc[i]['expl'], rows.iloc[i]['module_num']): resp_chunks_arr[i] for i in range(len(resp_chunks_arr))
+        }
+        # rw['resp_chunks'] = resp_chunks_arr
+        os.makedirs(out_dir, exist_ok=True)
+        joblib.dump(resp_avg_dict, join(
+            out_dir, f'resps_avg_dict_{pilot_name_abbrev}.pkl'))
 
         for i in tqdm(range(resp_chunks_arr.shape[0])):
             # joblib.dump(
@@ -108,14 +123,3 @@ if __name__ == "__main__":
             plt.cla()
             plt.close()
         print('Finished saving flatmaps')
-
-        # save average responses
-        if 'module_num' not in rows.columns:
-            rows['module_num'] = None
-        resp_avg_dict = {
-            (rows.iloc[i]['expl'], rows.iloc[i]['module_num']): resp_chunks_arr[i] for i in range(len(resp_chunks_arr))
-        }
-        # rw['resp_chunks'] = resp_chunks_arr
-        os.makedirs(out_dir, exist_ok=True)
-        joblib.dump(resp_avg_dict, join(
-            out_dir, f'resps_avg_dict_{pilot_name_abbrev}.pkl'))

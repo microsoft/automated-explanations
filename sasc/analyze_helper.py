@@ -14,7 +14,7 @@ def _remove_punc(s):
     return s.translate(str.maketrans("", "", string.punctuation))
 
 
-def get_start_end_indexes_for_paragraphs(timing: pd.DataFrame, paragraphs: List[str], validate=False):
+def get_start_end_indexes_for_paragraphs(timing: pd.DataFrame, paragraphs: List[str], validate=False, split_hyphens=False):
     """Returns start/end indexes for each paragraph in the story.
     If the entire story was not played, the number of start/end times will be less than the number of paragraphs.
     """
@@ -23,12 +23,17 @@ def get_start_end_indexes_for_paragraphs(timing: pd.DataFrame, paragraphs: List[
     end_times = []
     # display(timing['word'][5])
     for para in paragraphs:
-        words = para.split()
+        if split_hyphens:
+            words = re.split(r'\s|-|—', para)
+        else:
+            words = para.split()
         start_times.append(timing["time_running"][idx])
         for word in words:
             if validate:
+                word_in_timings = timing["word"][idx]
+                word_in_story = word
                 # print(timing['word'][idx])
-                assert _remove_punc(timing["word"][idx]) == _remove_punc(word), (
+                assert _remove_punc(word_in_timings) == _remove_punc(word_in_story), (
                     idx,
                     word,
                     str(timing["word"][idx]),
@@ -51,7 +56,11 @@ def get_start_end_indexes_for_paragraphs(timing: pd.DataFrame, paragraphs: List[
     return start_indexes, end_indexes
 
 
-def get_resps_for_paragraphs(timing, paragraphs, resp_story, offset=2, apply_offset=True, trim=5, validate=False) -> List[np.ndarray]:
+def get_resps_for_paragraphs(
+        timing, paragraphs, resp_story, offset=2,
+        apply_offset=True, trim=5, validate=False,
+        split_hyphens=False,
+) -> List[np.ndarray]:
     '''Return responses for each paragraph (after applying offset)
 
     Params
@@ -68,7 +77,7 @@ def get_resps_for_paragraphs(timing, paragraphs, resp_story, offset=2, apply_off
     '''
     resp_chunks = []
     start_indexes, end_indexes = get_start_end_indexes_for_paragraphs(
-        timing, paragraphs, validate=validate)
+        timing, paragraphs, validate=validate, split_hyphens=split_hyphens)
 
     for i in range(len(start_indexes)):
         # get paragraph

@@ -19,7 +19,6 @@ if __name__ == "__main__":
 
     # load responses
     default_story_idxs = np.where(
-        (np.array(stories_data_dict['story_setting']) == 'default') |
         (np.array(stories_data_dict['story_setting']) == 'roi')
     )[0]
     resp_np_files = [stories_data_dict['story_name_new'][i].replace('_resps', '')
