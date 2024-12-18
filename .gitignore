@@ -151,3 +151,6 @@ sasc/config.py
 
 **.julia
 **.wav
+**.json
+**.jbl
+**.csv
