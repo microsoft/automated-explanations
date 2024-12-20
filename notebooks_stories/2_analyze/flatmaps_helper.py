@@ -24,6 +24,19 @@ VOX_COUNTS = {
     'S03': 95556,
 }
 
+ROI_EXPLANATIONS_S03 = {
+    'EBA': 'Body parts',
+    'IPS': 'Descriptive elements of scenes or objects',
+    'OFA': 'Conversational transitions',
+    'OPA': 'Direction and location descriptions',
+    'OPA_only': 'Self-reflection and growth',
+    'PPA': 'Scenes and settings',
+    'PPA_only': 'Garbage, food, and household items',
+    'RSC': 'Travel and location names',
+    'RSC_only': 'Location names',
+    'sPMv': 'Dialogue and responses',
+}
+
 
 def load_flatmaps():
     # S02
@@ -92,7 +105,8 @@ def load_custom_rois(subject, suffix_setting='_fedorenko'):
         }
         # rois_dict = rois_dict_raw
     elif suffix_setting == '_spotlights':
-        rois_spotlights = joblib.load(f'all_spotlights_UT{subject}.jbl')
+        rois_spotlights = joblib.load(join(
+            FMRI_DIR, 'brain_tune/voxel_neighbors_and_pcs/', f'all_spotlights_UT{subject}.jbl'))
         return {'spot' + str(i): rois_spotlights[i][-1]
                 for i in range(len(rois_spotlights))}
 
