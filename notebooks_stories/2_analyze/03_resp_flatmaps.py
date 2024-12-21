@@ -42,11 +42,14 @@ if __name__ == "__main__":
         elif pilot_name == 'pilot5_story_data.pkl':
             pilot_data_dir = join(config.PILOT_STORY_DATA_DIR, '20240604')
         elif pilot_name == 'pilot6_story_data.pkl':
+            # pilot_data_dir = 'out'
             pilot_data_dir = join(config.PILOT_STORY_DATA_DIR, '20241202')
         elif pilot_name == 'pilot7_story_data.pkl':
             pilot_data_dir = join(config.PILOT_STORY_DATA_DIR, '20241204')
+            # pilot_data_dir = join('out')
         elif pilot_name == 'pilot8_story_data.pkl':
             pilot_data_dir = join(config.PILOT_STORY_DATA_DIR, '20241204')
+            # pilot_data_dir = join('out')
 
         default_story_idxs = np.where(
             (np.array(stories_data_dict['story_setting']) == setting)
@@ -114,19 +117,19 @@ if __name__ == "__main__":
         joblib.dump(resp_avg_dict, join(
             out_dir, f'resps_avg_dict_{pilot_name_abbrev}.pkl'))
 
-        for i in tqdm(range(resp_chunks_arr.shape[0])):
-            # joblib.dump(
-            #     resp_chunks_arr[i],
-            #     join(out_dir, f"avg_resp_{i}_{expls[i]}.jl"))
-            os.makedirs(out_dir, exist_ok=True)
-            sasc.viz.quickshow(
-                resp_chunks_arr[i],
-                subject=subject,
-                fname_save=join(
-                    out_dir, f"flatmap_{i}_{expls[i]}.pdf"
-                ),
-                title=expls[i],
-            )
-            plt.cla()
-            plt.close()
-        print('Finished saving flatmaps')
+        # for i in tqdm(range(resp_chunks_arr.shape[0])):
+        #     # joblib.dump(
+        #     #     resp_chunks_arr[i],
+        #     #     join(out_dir, f"avg_resp_{i}_{expls[i]}.jl"))
+        #     os.makedirs(out_dir, exist_ok=True)
+        #     sasc.viz.quickshow(
+        #         resp_chunks_arr[i],
+        #         subject=subject,
+        #         fname_save=join(
+        #             out_dir, f"flatmap_{i}_{expls[i]}.pdf"
+        #         ),
+        #         title=expls[i],
+        #     )
+        #     plt.cla()
+        #     plt.close()
+        # print('Finished saving flatmaps')

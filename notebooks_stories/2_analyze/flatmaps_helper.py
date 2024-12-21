@@ -38,14 +38,14 @@ ROI_EXPLANATIONS_S03 = {
 }
 
 
-def load_flatmaps():
+def load_flatmaps(normalize_flatmaps):
     # S02
     gemv_flatmaps_default = joblib.load(join(
         RESULTS_DIR, "processed", "flatmaps", 'resps_avg_dict_pilot.pkl'))
     gemv_flatmaps_roi_qa = joblib.load(join(
         RESULTS_DIR, "processed", "flatmaps", 'resps_avg_dict_pilot5.pkl'))
     gemv_flatmaps_roi_custom = joblib.load(join(
-        RESULTS_DIR, "processed", "flatmaps_all", 'UTS02', 'roi', 'resps_avg_dict_pilot6.pkl'))
+        RESULTS_DIR, "processed", "flatmaps_all", 'UTS02', 'roi_pilot6', 'resps_avg_dict_pilot6.pkl'))
     # gemv_flatmaps_dict = gemv_flatmaps_default | gemv_flatmaps_roi_qa | gemv_flatmaps_roi_custom
     gemv_flatmaps_dict_S02 = gemv_flatmaps_roi_custom
 
@@ -57,7 +57,20 @@ def load_flatmaps():
     gemv_flatmaps_roi_custom2 = joblib.load(join(
         RESULTS_DIR, "processed", "flatmaps_all", 'UTS03', 'roi_pilot8', 'resps_avg_dict_pilot8.pkl'))
     # gemv_flatmaps_dict = gemv_flatmaps_default | gemv_flatmaps_roi_custom1 | gemv_flatmaps_roi_custom2
+
     gemv_flatmaps_dict_S03 = gemv_flatmaps_roi_custom1 | gemv_flatmaps_roi_custom2
+
+    # normalize flatmaps
+    if normalize_flatmaps:
+        for k, v in gemv_flatmaps_dict_S03.items():
+            flatmap_unnormalized = gemv_flatmaps_dict_S03[k]
+            gemv_flatmaps_dict_S03[k] = (
+                flatmap_unnormalized - flatmap_unnormalized.mean()) / flatmap_unnormalized.std()
+        for k, v in gemv_flatmaps_dict_S02.items():
+            flatmap_unnormalized = gemv_flatmaps_dict_S02[k]
+            gemv_flatmaps_dict_S02[k] = (
+                flatmap_unnormalized - flatmap_unnormalized.mean()) / flatmap_unnormalized.std()
+
     return gemv_flatmaps_dict_S02, gemv_flatmaps_dict_S03
 
 
