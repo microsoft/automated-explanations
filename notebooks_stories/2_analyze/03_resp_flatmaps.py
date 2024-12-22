@@ -18,8 +18,8 @@ if __name__ == "__main__":
         # ('UTS01', 'default', 'pilot4_story_data.pkl'),
 
         # ('UTS02', 'qa', 'pilot5_story_data.pkl'),
-        # ('UTS02', 'roi', 'pilot6_story_data.pkl'),
-        # ('UTS03', 'roi', 'pilot7_story_data.pkl'),
+        ('UTS02', 'roi', 'pilot6_story_data.pkl'),
+        ('UTS03', 'roi', 'pilot7_story_data.pkl'),
         ('UTS03', 'roi', 'pilot8_story_data.pkl'),
     ]
     for idx in range(len(FULL_SETTINGS)):
@@ -68,6 +68,7 @@ if __name__ == "__main__":
 
         # get chunked resps
         resp_chunks_list = []
+        resp_chunks_list_full = []
         for story_num in default_story_idxs:
             rows = stories_data_dict["rows"][story_num]
             # get resp_chunks
@@ -96,10 +97,24 @@ if __name__ == "__main__":
                 resp_chunks.append(np.full(resp_chunks[0].shape, np.nan))
             resp_chunks_list.append(
                 [np.nanmean(resp_chunks[i], axis=1) for i in args])
+            resp_chunks_list_full.append(
+                [resp_chunks[i] for i in args])
+            # print(resp_chunks[0].shape)
 
-        # print(resp_chunks_list)
-        # resp_chunks_arr = np.array([x[0] for x in resp_chunks_list])
+        # resp_chunks_list: (num_stories, num_paragraphs, num_voxels, num_trs)
+        # want resp_chunks_concat averaged over num_stories and concatenated over num_trs (num_paragraphs, num_voxels, num_trs)
+        resp_chunks_concat = []
+        num_paragraphs = len(resp_chunks_list[0])
+        for i in range(num_paragraphs):
+            resp_chunks_concat.append(
+                np.concatenate([resp_chunks_list_full[j][i] for j in range(len(resp_chunks_list_full))], axis=-1))
+        # resp_chunks_concat: (num_paragraphs, num_voxels, num_stories*num_trs)
+        # print(resp_chunks_concat)
+
+        # print('shape', np.concatenate(resp_chunks_list).shape)
         resp_chunks_arr = np.nanmean(np.array(resp_chunks_list), axis=0)
+        # resp_chunks_arr = np.array([np.nanmean(x, axis=-1)
+        #    for x in resp_chunks_concat])
         # rw = rw.sort_values(by="expl")
         rows = rows.sort_values(by="expl")
         expls = rows["expl"].values
@@ -112,10 +127,15 @@ if __name__ == "__main__":
         resp_avg_dict = {
             (rows.iloc[i]['expl'], rows.iloc[i]['module_num']): resp_chunks_arr[i] for i in range(len(resp_chunks_arr))
         }
+        resp_concat_dict = {
+            (rows.iloc[i]['expl'], rows.iloc[i]['module_num']): resp_chunks_concat[i] for i in range(len(resp_chunks_concat))
+        }
         # rw['resp_chunks'] = resp_chunks_arr
         os.makedirs(out_dir, exist_ok=True)
         joblib.dump(resp_avg_dict, join(
             out_dir, f'resps_avg_dict_{pilot_name_abbrev}.pkl'))
+        joblib.dump(resp_concat_dict, join(
+            out_dir, f'resps_concat_dict_{pilot_name_abbrev}.pkl'))
 
         # for i in tqdm(range(resp_chunks_arr.shape[0])):
         #     # joblib.dump(

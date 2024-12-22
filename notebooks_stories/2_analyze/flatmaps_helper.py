@@ -38,7 +38,7 @@ ROI_EXPLANATIONS_S03 = {
 }
 
 
-def load_flatmaps(normalize_flatmaps):
+def load_flatmaps(normalize_flatmaps, load_timecourse=False):
     # S02
     gemv_flatmaps_default = joblib.load(join(
         RESULTS_DIR, "processed", "flatmaps", 'resps_avg_dict_pilot.pkl'))
@@ -57,8 +57,21 @@ def load_flatmaps(normalize_flatmaps):
     gemv_flatmaps_roi_custom2 = joblib.load(join(
         RESULTS_DIR, "processed", "flatmaps_all", 'UTS03', 'roi_pilot8', 'resps_avg_dict_pilot8.pkl'))
     # gemv_flatmaps_dict = gemv_flatmaps_default | gemv_flatmaps_roi_custom1 | gemv_flatmaps_roi_custom2
-
     gemv_flatmaps_dict_S03 = gemv_flatmaps_roi_custom1 | gemv_flatmaps_roi_custom2
+
+    if load_timecourse:
+        gemv_flatmaps_roi_custom = joblib.load(join(
+            RESULTS_DIR, "processed", "flatmaps_all", 'UTS02', 'roi_pilot6', 'resps_concat_dict_pilot6.pkl'))
+
+        gemv_flatmaps_dict_S02_timecourse = gemv_flatmaps_roi_custom
+
+        gemv_flatmaps_roi_custom1 = joblib.load(join(
+            RESULTS_DIR, "processed", "flatmaps_all", 'UTS03', 'roi_pilot7', 'resps_concat_dict_pilot7.pkl'))
+        gemv_flatmaps_roi_custom2 = joblib.load(join(
+            RESULTS_DIR, "processed", "flatmaps_all", 'UTS03', 'roi_pilot8', 'resps_concat_dict_pilot8.pkl'))
+        gemv_flatmaps_dict_S03_timecourse = gemv_flatmaps_roi_custom1 | gemv_flatmaps_roi_custom2
+
+        return gemv_flatmaps_dict_S02, gemv_flatmaps_dict_S03, gemv_flatmaps_dict_S02_timecourse, gemv_flatmaps_dict_S03_timecourse
 
     # normalize flatmaps
     if normalize_flatmaps:
