@@ -1,23 +1,15 @@
-from sasc import config
-import sasc.viz
-from neuro.features.qa_questions import get_questions, get_merged_questions_v3_boostexamples
-from neuro.config import repo_dir, PROCESSED_DIR
-from sasc.config import FMRI_DIR, STORIES_DIR, RESULTS_DIR, CACHE_DIR, RESULTS_DIR, cache_ngrams_dir, regions_idxs_dir
-from tqdm import tqdm
-import sys
-import pandas as pd
-import os
-import matplotlib.pyplot as plt
-import cortex
-import seaborn as sns
-from os.path import join
-from collections import defaultdict
-import numpy as np
-from sklearn.preprocessing import StandardScaler
-import joblib
-import dvu
 from copy import deepcopy
+import joblib
+import numpy as np
 import sys
+import os
+from os.path import abspath, dirname, join
+# try:
+# from sasc.config import FMRI_DIR, STORIES_DIR, RESULTS_DIR, CACHE_DIR, cache_ngrams_dir, regions_idxs_dir
+# except ImportError:
+repo_path = dirname(dirname(dirname(abspath(__file__))))
+RESULTS_DIR = join(repo_path, 'results')
+
 sys.path.append('../notebooks')
 VOX_COUNTS = {
     'S02': 94251,
@@ -38,7 +30,7 @@ ROI_EXPLANATIONS_S03 = {
 }
 
 
-def load_flatmaps(normalize_flatmaps, load_timecourse=False):
+def load_flatmaps(normalize_flatmaps, load_timecourse=False, explanations_only=False):
     # S02
     gemv_flatmaps_default = joblib.load(join(
         RESULTS_DIR, "processed", "flatmaps", 'resps_avg_dict_pilot.pkl'))
