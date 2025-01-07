@@ -2,13 +2,12 @@ from copy import deepcopy
 import joblib
 import numpy as np
 import sys
-import os
 from os.path import abspath, dirname, join
-# try:
-# from sasc.config import FMRI_DIR, STORIES_DIR, RESULTS_DIR, CACHE_DIR, cache_ngrams_dir, regions_idxs_dir
-# except ImportError:
-repo_path = dirname(dirname(dirname(abspath(__file__))))
-RESULTS_DIR = join(repo_path, 'results')
+try:
+    from sasc.config import FMRI_DIR, STORIES_DIR, RESULTS_DIR, CACHE_DIR, cache_ngrams_dir, regions_idxs_dir
+except ImportError:
+    repo_path = dirname(dirname(dirname(abspath(__file__))))
+    RESULTS_DIR = join(repo_path, 'results')
 
 sys.path.append('../notebooks')
 VOX_COUNTS = {
