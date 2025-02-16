@@ -169,7 +169,11 @@ def quickshow(X: np.ndarray, subject="UTS03", fname_save=None, title=None, cmap=
     Note: for this to work, need to point the cortex config filestore to the `ds003020/derivative/pycortex-db` directory.
     This might look something like `/home/chansingh/mntv1/deep-fMRI/data/ds003020/derivative/pycortex-db/UTS03/anatomicals/`
     """
-    vol = cortex.Volume(X, subject, xfmname=f"{subject}_auto", cmap=cmap)
+    if isinstance(X, cortex.Volume):
+        vol = X
+        X = vol.data
+    else:
+        vol = cortex.Volume(X, subject, xfmname=f"{subject}_auto", cmap=cmap)
     # , with_curvature=True, with_sulci=True)
     vabs = np.nanmax(np.abs(X))
     vol.vmin = -vabs
@@ -548,8 +552,9 @@ def stories_barplot(story_scores_df):
     plt.ylabel('Mean voxel response ($\sigma_f$)')
 
 
-def _save_flatmap(vals, subject, fname_save, clab=None, with_rois=True, cmap='RdBu_r', with_borders=False, show=False):
-    vabs = max(np.abs(vals))
+def _save_flatmap(vals, subject, fname_save, clab=None, with_rois=True, cmap='RdBu_r', with_borders=False, show=False, vabs=None):
+    if vabs is None:
+        vabs = max(np.abs(vals))
 
     # cmap = sns.diverging_palette(12, 210, as_cmap=True)
     # cmap = sns.diverging_palette(16, 240, as_cmap=True)
@@ -574,10 +579,10 @@ def _save_flatmap(vals, subject, fname_save, clab=None, with_rois=True, cmap='Rd
     sm = ScalarMappable(norm=norm, cmap=cmap)
     sm.set_array([])
     fig, ax = plt.subplots(figsize=(5, 0.35))
-    cbar = plt.colorbar(sm, cax=ax, orientation='horizontal')
     if clab:
+        cbar = plt.colorbar(sm, cax=ax, orientation='horizontal')
         cbar.set_label(clab, fontsize='x-large')
-        plt.savefig(fname_save.replace('flatmap.pdf',
-                    'cbar.pdf'), bbox_inches='tight')
+        plt.savefig(fname_save.replace('flatmap', '').replace(
+            '.', 'cbar.').replace('.png', '.pdf'), bbox_inches='tight')
     if not show:
         plt.close()
