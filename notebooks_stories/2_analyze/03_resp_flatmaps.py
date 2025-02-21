@@ -18,9 +18,10 @@ if __name__ == "__main__":
         # ('UTS01', 'default', 'pilot4_story_data.pkl'),
 
         # ('UTS02', 'qa', 'pilot5_story_data.pkl'),
-        ('UTS02', 'roi', 'pilot6_story_data.pkl'),
-        ('UTS03', 'roi', 'pilot7_story_data.pkl'),
-        ('UTS03', 'roi', 'pilot8_story_data.pkl'),
+        ('UTS02', 'roi', 'pilot5_story_data.pkl'),
+        # ('UTS02', 'roi', 'pilot6_story_data.pkl'),
+        # ('UTS03', 'roi', 'pilot7_story_data.pkl'),
+        # ('UTS03', 'roi', 'pilot8_story_data.pkl'),
     ]
     for idx in range(len(FULL_SETTINGS)):
 
