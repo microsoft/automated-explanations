@@ -28,6 +28,20 @@ ROI_EXPLANATIONS_S03 = {
     'sPMv': 'Dialogue and responses',
 }
 
+FED_DRIVING_EXPLANATIONS_S03 = {
+    0: 'Relationships',
+    1: 'Positive Emotional Reactions',
+    2: 'Body parts',
+    3: 'Dialogue',
+}
+
+FED_DRIVING_EXPLANATIONS_S02 = {
+    0: 'Secretive Or Covert Actions',
+    1: 'Introspection',
+    2: 'Relationships',
+    3: 'Sexual and Romantic Interactions',
+}
+
 
 def load_custom_rois(subject, suffix_setting='_fedorenko'):
     '''
