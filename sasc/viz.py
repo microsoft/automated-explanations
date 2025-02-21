@@ -161,7 +161,9 @@ def heatmap(
     # plt.show()
 
 
-def quickshow(X: np.ndarray, subject="UTS03", fname_save=None, title=None, cmap='RdBu_r'):
+def quickshow(
+        X: np.ndarray, subject="UTS03", fname_save=None, cmap='RdBu_r',
+        with_colorbar=True, kwargs={'with_rois': True}):
     import cortex
 
     """
@@ -173,21 +175,29 @@ def quickshow(X: np.ndarray, subject="UTS03", fname_save=None, title=None, cmap=
         vol = X
         X = vol.data
     else:
-        vol = cortex.Volume(X, subject, xfmname=f"{subject}_auto", cmap=cmap)
+        if subject == 'fsaverage':
+            xfmname = 'atlas_2mm'
+        else:
+            if subject.startswith('S0'):
+                subject = 'UT' + subject
+            xfmname = f"{subject}_auto"
+        vol = cortex.Volume(X, subject, xfmname=xfmname, cmap=cmap)
     # , with_curvature=True, with_sulci=True)
     vabs = np.nanmax(np.abs(X))
     vol.vmin = -vabs
     vol.vmax = vabs
     # fig = plt.figure()
     # , vmin=-vabs, vmax=vabs)
-    cortex.quickshow(vol, with_rois=True)
+    cortex.quickshow(vol, with_colorbar=with_colorbar, **kwargs)
     # fig = plt.gcf()
     # add title
     # fig.axes[0].set_title(title, fontsize='xx-small')
     if fname_save is not None:
-        os.makedirs(os.path.dirname(fname_save), exist_ok=True)
+        if not os.path.dirname(fname_save) == '':
+            os.makedirs(os.path.dirname(fname_save), exist_ok=True)
         plt.savefig(fname_save)
-        plt.savefig(fname_save.replace(".pdf", ".png"))
+        plt.savefig(fname_save.replace(".pdf", ".png"),
+                    transparent=True, bbox_inches='tight')
         plt.close()
 
 
