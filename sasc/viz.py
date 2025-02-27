@@ -163,7 +163,7 @@ def heatmap(
 
 def quickshow(
         X: np.ndarray, subject="UTS03", fname_save=None, cmap='RdBu_r',
-        with_colorbar=True, kwargs={'with_rois': True}):
+        with_colorbar=True, kwargs={'with_rois': True}, cmap_perc_to_hide=None):
     import cortex
 
     """
@@ -171,21 +171,32 @@ def quickshow(
     Note: for this to work, need to point the cortex config filestore to the `ds003020/derivative/pycortex-db` directory.
     This might look something like `/home/chansingh/mntv1/deep-fMRI/data/ds003020/derivative/pycortex-db/UTS03/anatomicals/`
     """
-    if isinstance(X, cortex.Volume):
+    if isinstance(X, cortex.VolumeRGB):
         vol = X
-        X = vol.data
     else:
-        if subject == 'fsaverage':
-            xfmname = 'atlas_2mm'
+        if isinstance(X, cortex.Volume):
+            vol = X
+            X = vol.data
         else:
-            if subject.startswith('S0'):
-                subject = 'UT' + subject
-            xfmname = f"{subject}_auto"
-        vol = cortex.Volume(X, subject, xfmname=xfmname, cmap=cmap)
-    # , with_curvature=True, with_sulci=True)
-    vabs = np.nanmax(np.abs(X))
-    vol.vmin = -vabs
-    vol.vmax = vabs
+            if subject == 'fsaverage':
+                xfmname = 'atlas_2mm'
+            else:
+                if subject.startswith('S0'):
+                    subject = 'UT' + subject
+                xfmname = f"{subject}_auto"
+            vol = cortex.Volume(X, subject, xfmname=xfmname, cmap=cmap)
+        # , with_curvature=True, with_sulci=True)
+        vabs = np.nanmax(np.abs(X))
+        if not cmap == 'Reds':
+            vol.vmin = -vabs
+            vol.vmax = vabs
+        elif cmap == 'Reds':
+            vol.vmin = np.nanmin(X)
+            vol.vmax = np.nanmax(X)
+
+        if cmap_perc_to_hide is not None:
+            vol.vmin = np.nanpercentile(X, cmap_perc_to_hide)
+            vol.vmax = np.nanpercentile(X, 100 - cmap_perc_to_hide)
     # fig = plt.figure()
     # , vmin=-vabs, vmax=vabs)
     cortex.quickshow(vol, with_colorbar=with_colorbar, **kwargs)
